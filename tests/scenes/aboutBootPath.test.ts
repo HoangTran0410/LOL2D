@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { scanImports, stripComments } from '../support/importScan';
+import { scanImports, stripComments } from '@/seams/importScan';
 
 /**
  * The About screen — reachable from the menu, before any match exists — must
@@ -22,7 +22,7 @@ import { scanImports, stripComments } from '../support/importScan';
  * you are reading.
  *
  * `staticImports` below is now a thin, value-only filter over
- * `tests/support/importScan.ts`'s `scanImports` rather than its own inline
+ * `src/seams/importScan.ts`'s `scanImports` rather than its own inline
  * parser — fix round 3 found this file's own copy shared a hole with
  * `menuBootPath.test.ts` and `pregameBootPath.test.ts`: all three anchored
  * a statement to a line start, so two statements sharing one line silently

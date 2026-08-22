@@ -28,7 +28,7 @@ type RosterSpellId = PackSpellCatalogId | 'BasicAttack';
  * This pack's own basic-attack role taxonomy — bruiser, marksman, and the
  * rest. It used to be core's (`src/game/config/spellCatalog.ts`'s
  * `ATTACK`), duplicated into this file so the roster below could reference
- * it without a pack file reaching into core (`tests/content/packBoundary.test.ts`
+ * it without a pack file reaching into core (the `pack-core-boundary` seam
  * refuses that outside the three type-only specifiers it allows). That
  * duplication was a fix-round finding: core's copy had no consumer left in
  * `src/` (only `tests/game/combat/AttackProfiles.test.ts` read it), so the
@@ -529,7 +529,7 @@ const championEntries = (): ChampionEntry[] => {
  * Every spell's display fields, as plain data — this pack's own generated
  * catalogue, reshaped into the registry's `SpellDisplayData`. Core's own
  * `BasicAttack` entry is *not* folded in here: a pack file may not import
- * `@/generated/spellCatalog` (`tests/content/packBoundary.test.ts`), so
+ * `@/generated/spellCatalog` (the `pack-core-boundary` seam), so
  * `src/content/install.ts` folds it on afterward, onto the `data` this
  * module exports — see that file's own header for why the merge belongs to
  * core rather than to this pack.

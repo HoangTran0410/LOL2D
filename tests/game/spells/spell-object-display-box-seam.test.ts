@@ -54,7 +54,7 @@ import { describe, expect, it } from 'vitest';
 // batch 5 task 6 fix round 1: `src/seams/spellObjectDisplayBox.ts` is the
 // same rule, exported, and `packs/riot`'s own `check-seams` script now runs
 // it against the pack's own tree (with the pack's own `GRANDFATHERED` set,
-// moved to `packs/riot/seam-debt.mjs`) — a pack violation reddens the
+// moved to `packs/riot/spells/seam-debt.mjs`) — a pack violation reddens the
 // pack's build, not this one.
 const SPELL_DIRECTORIES = ['spellObjects'];
 const GAME_OBJECT_DIR = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));

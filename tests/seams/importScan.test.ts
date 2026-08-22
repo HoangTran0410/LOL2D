@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { scanImports, stripComments } from './importScan';
+import { scanImports, stripComments } from '@/seams/importScan';
 
 /**
  * `scanImports`'s own proof, independent of any one caller's policy —
- * `tests/support/importScan.ts`'s own header explains why this exists as
+ * `src/seams/importScan.ts`'s own header explains why this exists as
  * its own file rather than living inside whichever scan happened to need it
  * first. Every case below is a form at least one of this module's six
  * current callers (`corePacksBoundary`, `packBoundary`, `contentApiChunk`,

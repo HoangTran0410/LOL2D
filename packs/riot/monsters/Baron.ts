@@ -31,7 +31,7 @@ import type { MonsterAbility, Vec2 } from '@moba2d/core/content/types';
  * Every class below is built inside a factory that takes `api: ContentApi`,
  * the same shape `packs/reference/spells/Vera_Q.ts` established for a spell —
  * `MissileSpellObject`/`SpellObject`/`AreaSpellObject` and the three buffs are
- * reachable only through `api`, per `packBoundary.test.ts`. The three concrete
+ * reachable only through `api`, per the `pack-core-boundary` seam. The three concrete
  * classes (`BaronPoisonSpit`/`BaronTailSlam`/`BaronPoisonPool`) are exported as
  * their own named factories, not just folded into `makeBaronAbilities`, for
  * the same reason `makeVeraQObject` is exported beside `makeVeraQ`:

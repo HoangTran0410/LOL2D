@@ -7,7 +7,7 @@ import type { Vec2 } from '@moba2d/core/content/types';
  * Two things changed to cross the pack boundary, neither a behaviour change:
  *
  * - **`BeamGeometry` is redeclared here instead of imported from
- *   `@/game/gameObject/spellObjects/BeamSpellObject`.** `packBoundary.test.ts`
+ *   `@/game/gameObject/spellObjects/BeamSpellObject`.** The `pack-core-boundary` seam
  *   only allows a pack file to reach core through `@moba2d/core/content/ContentApi`,
  *   `@moba2d/core/content/ContentPack` and `@moba2d/core/content/types`, type-only — `BeamSpellObject`
  *   is none of those. The shape is trivial (`{ start, end, width }` over the

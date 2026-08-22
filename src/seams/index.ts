@@ -79,28 +79,41 @@
  * catches the day that changes. This is that something else, run through
  * `verify` rather than left implicit).
  *
- * `attackableUnits/` is deliberately **not** in that list, even though it
- * is core's own tree too: it is unit-side plumbing, not spell-authored
- * code, and three of the thirteen rules have known, legitimate exceptions
- * there that a pack's spell tree never needs — `AttackableUnit.restoreMana`
- * and `Champion`'s HUD read are the sanctioned non-`Spell.spendMana()` mana
- * paths `mana-spend-seam.test.ts` has always carved out by hand;
- * `visibleToPlayerTeam` is `FogOfWar`'s own draw flag, read there by design
- * (see `AttackableUnit.visibleToPlayerTeam`'s own doc comment), not a
- * spell deciding targeting; and `game.worldMouse` is legitimately read
- * there for the *player's own* touch input, the one place in the engine
- * that is allowed to. `checkSeams(root, options)` applies all thirteen
- * seams uniformly to whatever `root` it is given — there is no per-seam
- * directory scoping — so folding `attackableUnits/` into this blanket scan
- * would misreport all three as violations. `buff-deactivate-seam.test.ts`
- * is the one rule that does legitimately reach `attackableUnits/`, and it
- * stays a hand-written core test for exactly that reason: it is the only
- * one of the thirteen this directory needs.
+ * `attackableUnits/` is in that list too since fix round 4, and how it got
+ * there is the point. It was excluded wholesale — it is unit-side plumbing,
+ * not spell-authored code, and three rules have legitimate exceptions there
+ * that a pack's spell tree never needs: `AttackableUnit.restoreMana` and
+ * `Champion`'s health-bar read are the sanctioned non-`Spell.spendMana()`
+ * mana paths ("granting is not billing"), `visibleToPlayerTeam` is
+ * `FogOfWar`'s own draw flag *declared* there, and `drawDir`'s two
+ * `game.worldMouse` reads are the player's own cursor, the one place in the
+ * engine allowed to read it. But those five exceptions live in **two of the
+ * directory's seven files**, and a directory-level exclusion is a permanent
+ * hole for the other five: `AIChampion`, `Minion`, `Monster`, `Pet` and
+ * `DummyChampion` are clean today and were not being checked by anything.
+ * So the five exceptions are now five individually visible entries in
+ * `src/game/gameObject/attackableUnits/seam-debt.mjs` — two pinned mana
+ * lines, one pinned fog-flag file, two pinned cursor lines — each of which
+ * reports itself stale the day it stops being true, and the whole directory
+ * is under all thirteen rules like every other tree. That is what the
+ * per-line `pinned` machinery bought.
  *
  * ## An exemption that matches nothing is also a violation
  *
- * `skip`, `grandfathered`, `grandfatheredClasses`, `noPressOverride` and
- * `pinned` are every licence this module hands out to break a rule.
+ * Seven fields are every licence this module hands out to break a rule:
+ * the shared `skip`, plus `grandfathered` (`castspec-frozen`),
+ * `grandfatheredClasses` (`spell-object-display-box`), `grandfatheredTests`
+ * (`spell-runtime-drive`), `grandfatheredFogReads` (`target-vision`),
+ * `noPressOverride` (`unit-target-team`), `pinned`
+ * (`world-mouse-in-spell-code`) and `pinnedManaLines` (`mana-spend`).
+ * `maxMs` (`cooldowns`) is a threshold, not a licence. No two of those
+ * names may collide, because `checkSeams(root, options)` hands **one**
+ * options object to every seam: fix round 3 found two seams both calling
+ * their set `grandfathered`, which made each report the other's entries
+ * stale, and fix round 4 found a third (`spell-runtime-drive`) still
+ * sharing the name. `tests/seams/seamOptionFields.test.ts` is what makes
+ * the next collision impossible rather than merely fixed.
+ *
  * Fix round 3 (task 6): a licence nobody ever revokes is how a seam
  * quietly stops meaning anything — the sharpest case is a `pinned`
  * `file:line` entry outliving the exact line it names, since the file
@@ -111,11 +124,28 @@
  * 'stale-exemption'` on the same `SeamViolation` shape, distinct from an
  * ordinary `kind: 'violation'` (the default), because "you broke a rule"
  * and "you are exempting something that no longer offends" are opposite
- * problems with opposite fixes. `skip` is checked once, centrally
- * (`staleSkipEntries` in `shared.ts`), since it is shared identically by
- * every seam rather than seam-specific. Both kinds fail `checkSeams`'s
- * caller the same way (a non-empty list), by design: an unrevoked licence
- * is exactly as much a reason to stop and look as a fresh violation is.
+ * problems with opposite fixes. Both kinds fail `checkSeams`'s caller the
+ * same way (a non-empty list), by design: an unrevoked licence is exactly
+ * as much a reason to stop and look as a fresh violation is.
+ *
+ * **`skip` is the one exception, and it is an existence check** — checked
+ * once, centrally (`staleSkipEntries` in `shared.ts`), since every seam
+ * honours it identically. This paragraph used to claim consumption
+ * checking for all five sets and was wrong about `skip` (fix round 4): a
+ * `skip` entry names a file that is not spell-shaped code at all — a
+ * barrel, a scaffolding template — so "did it suppress a violation" is not
+ * what it means, and demanding one would report the correct, quiet answer
+ * as stale. What can go stale about it is the file being renamed or
+ * deleted, and that is what is reported.
+ *
+ * Every entry, in every set, is matched the same way: **the path relative
+ * to the scanned root, or a bare basename matching at any depth**
+ * (`exemptionFor` in `shared.ts`; `grandfatheredClasses` is the exception
+ * that proves it, being keyed by class name and having no path at all).
+ * Fix round 4: `skip` was basename-keyed and the seam-specific sets were
+ * path-keyed, nothing said so, and a file in a subdirectory made a live,
+ * load-bearing exemption report as stale while the violation it exempted
+ * went red.
  */
 import type { Seam, SeamCheckOptions, SeamViolation } from './types';
 import { staleSkipEntries, walkTsFiles } from './shared';
@@ -132,12 +162,13 @@ import { checkStatResourceModifier } from './statResourceModifier';
 import { checkSpellObjectDisplayBox } from './spellObjectDisplayBox';
 import { checkSpellRuntimeDrive } from './spellRuntimeDrive';
 import { checkWorldMouseInSpellCode } from './worldMouseInSpellCode';
+import { checkPackCoreBoundary } from './packCoreBoundary';
 
 export type { Seam, SeamCheck, SeamCheckOptions, SeamViolation } from './types';
 export { staleSkipEntries } from './shared';
-export { checkManaSpend } from './manaSpend';
+export { checkManaSpend, type ManaSpendOptions } from './manaSpend';
 export { checkDashOnUpdate } from './dashOnUpdate';
-export { checkTargetVision } from './targetVision';
+export { checkTargetVision, type TargetVisionOptions } from './targetVision';
 export { checkUnitTargetTeam, type UnitTargetTeamOptions } from './unitTargetTeam';
 export { checkCastSpecFrozen, type CastSpecFrozenOptions } from './castSpecFrozen';
 export { checkCooldowns, type CooldownsOptions } from './cooldowns';
@@ -154,6 +185,8 @@ export {
   checkWorldMouseInSpellCode,
   type WorldMouseInSpellCodeOptions,
 } from './worldMouseInSpellCode';
+export { checkPackCoreBoundary } from './packCoreBoundary';
+export { scanImports, type ImportKind, type ImportReference } from './importScan';
 
 /** Every seam this module exports, named for reporting. */
 export const seams: Seam[] = [
@@ -223,6 +256,22 @@ export const seams: Seam[] = [
     check: checkWorldMouseInSpellCode,
   },
 ];
+
+/**
+ * The fourteenth rule, deliberately **not** in `seams` above: it is scoped
+ * to a *package* rather than to whatever tree the caller points at, and it
+ * does not apply to core's own trees at all (`@/...` is how core's source
+ * refers to itself). `scripts/check-seams.mjs` runs it against the package
+ * that owns the scanned tree, whenever that package is not core — see
+ * `packCoreBoundary.ts`'s own header for why the rule had to move to this
+ * side at all, and `owningPackage` in the CLI for how the question "whose
+ * tree is this" is answered without a flag a pack could set for itself.
+ */
+export const packCoreBoundarySeam: Seam = {
+  id: 'pack-core-boundary',
+  summary: 'a pack reaches core through its public content subpaths and nowhere else',
+  check: checkPackCoreBoundary,
+};
 
 export interface TaggedSeamViolation extends SeamViolation {
   seamId: string;

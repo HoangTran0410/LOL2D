@@ -1,5 +1,5 @@
-import type { SeamCheck, SeamViolation } from './types';
-import { readSource, stripComments, walkTsFiles } from './shared';
+import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
  * A spell that picks an enemy for you must first be able to see them.
@@ -25,7 +25,25 @@ const ALLIES_ONLY = /PredefinedFilters\.teamId\(/;
 /** `FogOfWar`'s own draw flag — a *draw* question, not a targeting one. */
 const FOG_DRAW_FLAG = /\bwillDraw\b|\bvisibleToPlayerTeam\b/;
 
-export const checkTargetVision: SeamCheck = (root, options) => {
+export interface TargetVisionOptions extends SeamCheckOptions {
+  /**
+   * Files that name the fog draw flag for a reason that is not targeting —
+   * by path relative to the scanned root or by bare basename
+   * (`exemptionFor`, `shared.ts`). Debt, not permission, and empty for
+   * every content tree: a spell has no business reading it at all.
+   *
+   * Content-pack-extraction batch 5 task 6 fix round 4: core's own
+   * `attackableUnits/` tree is the population — `AttackableUnit` *declares*
+   * `visibleToPlayerTeam`, the flag `FogOfWar.calculateSight` writes and the
+   * draw cull reads. Pinning that one file is what lets the directory be
+   * scanned instead of excluded from the whole set of rules.
+   */
+  grandfatheredFogReads?: Set<string>;
+}
+
+export const checkTargetVision: SeamCheck = (root, options?: TargetVisionOptions) => {
+  const grandfatheredFogReads = options?.grandfatheredFogReads ?? new Set<string>();
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
   for (const file of walkTsFiles(root, options)) {
     const source = stripComments(readSource(root, file));
@@ -43,8 +61,24 @@ export const checkTargetVision: SeamCheck = (root, options) => {
     }
 
     if (FOG_DRAW_FLAG.test(source)) {
-      violations.push({ file, message: 'reads the fog draw flag to decide targeting' });
+      const exemption = exemptionFor(grandfatheredFogReads, file);
+      if (exemption !== undefined) {
+        consumed.add(exemption);
+      } else {
+        violations.push({ file, message: 'reads the fog draw flag to decide targeting' });
+      }
     }
   }
+
+  for (const entry of grandfatheredFogReads) {
+    if (!consumed.has(entry)) {
+      violations.push({
+        file: entry,
+        message: 'grandfatheredFogReads exemption matched no scanned file naming the fog draw flag',
+        kind: 'stale-exemption',
+      });
+    }
+  }
+
   return violations;
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { scanImports } from '../support/importScan';
+import { scanImports } from '@/seams/importScan';
 
 const ROOT = join(__dirname, '../../');
 
@@ -25,7 +25,7 @@ const resolveSpecifier = (from: string, specifier: string): string | null => {
  * Fix round 3 replaced this walk's own inline regex — the exact original,
  * single-quote-only `import`/`export ... from` matcher two earlier rounds
  * had already found and fixed two holes in over in
- * `corePacksBoundary.test.ts` — with `tests/support/importScan.ts`'s
+ * `corePacksBoundary.test.ts` — with `src/seams/importScan.ts`'s
  * `scanImports`. Deliberately still narrower than that module's full
  * surface: this walk only ever followed static `from`-clause *value*
  * imports (never `import type`, never a side-effect import, never a

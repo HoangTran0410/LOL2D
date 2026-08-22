@@ -11,7 +11,7 @@ import type { MapDefinition } from '@moba2d/core/content/ContentPack';
  * geometry sibling) out of `src/content/maps/` and into the pack: Summoner's
  * Rift is Riot's own map, not a mechanism core has to carry. `import type`
  * only, matching the pack boundary every other file under `packs/` holds to
- * (`tests/content/packBoundary.test.ts`) — this module has no *value* import
+ * (the `pack-core-boundary` seam) — this module has no *value* import
  * beyond the dynamic one, same as before the move.
  *
  * `tests/content/contentApiChunk.test.ts` walks `src/content/catalog.ts`'s

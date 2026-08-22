@@ -28,7 +28,7 @@
  * batch 5 task 6: this exact rule is now `src/seams/manaSpend.ts`, exported
  * so the pack can run it on *itself* (`packs/riot/package.json`'s own
  * `check-seams` script, with the pack's own debt declared in
- * `packs/riot/seam-debt.mjs`) — proven with a planted violation whose
+ * `packs/riot/spells/seam-debt.mjs`) — proven with a planted violation whose
  * outcome was root `npm run verify` staying green while the pack's own
  * build went red. Before this move, this file scanning `packs/riot/spells`
  * directly meant the opposite: a pack-only violation still reddened core's

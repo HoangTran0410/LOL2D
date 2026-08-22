@@ -1,5 +1,5 @@
 import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
-import { readSource, stripComments, walkTsFiles } from './shared';
+import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
  * A `UNIT` spell says whose body it is allowed to pick. `TargetResolver`
@@ -24,7 +24,10 @@ export interface UnitTargetTeamOptions extends SeamCheckOptions {
    * Files known to resolve correctly on the path the game actually uses
    * (`Game.createSpellContext` runs `TargetResolver` before `press` is ever
    * called) and so do not need their own `press()` override. Debt, not
-   * permission — empty by default.
+   * permission — empty by default. An entry names a file by its path
+   * relative to the scanned root or by its bare basename, the one keying
+   * rule every exemption set in this module shares (`exemptionFor` in
+   * `shared.ts`, fix round 4).
    */
   noPressOverride?: Set<string>;
 }
@@ -50,8 +53,9 @@ export const checkUnitTargetTeam: SeamCheck = (root, options?: UnitTargetTeamOpt
     // (!noPressOverride.has(file) && ...)` short-circuit — the exemption's
     // own staleness depends on knowing whether it would have mattered.
     if (!/\bpress\s*\(/.test(source)) {
-      if (noPressOverride.has(file)) {
-        consumed.add(file);
+      const exemption = exemptionFor(noPressOverride, file);
+      if (exemption !== undefined) {
+        consumed.add(exemption);
       } else {
         violations.push({
           file,
@@ -61,12 +65,13 @@ export const checkUnitTargetTeam: SeamCheck = (root, options?: UnitTargetTeamOpt
     }
   }
 
-  for (const file of noPressOverride) {
-    if (!consumed.has(file)) {
+  for (const entry of noPressOverride) {
+    if (!consumed.has(entry)) {
       violations.push({
-        file,
-        message:
-          'noPressOverride exemption matches nothing — this file now has its own press(), is no longer a UNIT spell, or does not exist',
+        file: entry,
+        // Only what the scan observed — see `castSpecFrozen.ts`'s own note
+        // on why a stale report does not list causes it never checked.
+        message: 'noPressOverride exemption matched no scanned UNIT spell that lacks a press()',
         kind: 'stale-exemption',
       });
     }

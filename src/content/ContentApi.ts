@@ -110,8 +110,8 @@ import { uuidv4, hasFlag, rectToVertices } from '@/utils/index';
  * `ai/SpellRole` — were not carried at all. This was `coreSpellsApiSurface.test.ts`'s
  * job before batch 4 task 3 (it kept it from silently narrowing again by
  * scanning every `@/` import in `spells/` and `coreSpells/`); now that
- * `packs/riot/spells/` cannot name a `@/` core module at all
- * (`packBoundary.test.ts`), that scan's real population is `coreSpells/`
+ * `packs/riot/spells/` cannot name a `@/` core module at all (the
+ * `pack-core-boundary` seam), that scan's real population is `coreSpells/`
  * alone — see its own header for the renamed, narrower guarantee.
  */
 export interface ContentApi {
@@ -129,7 +129,7 @@ export interface ContentApi {
   /**
    * Marks a `function`-expression spell loader as a loader rather than a
    * class. `lazy()` itself lives on `@/content/ContentPack`, but that module
-   * is banned as a value import for a pack (`packBoundary.test.ts`) — an
+   * is banned as a value import for a pack (the `pack-core-boundary` seam) — an
    * arrow-function loader never needs it (it structurally can never be a
    * class), so the gap stayed invisible until an author reached for an
    * ordinary `function () { return import('./X'); }` instead. It rides at
@@ -183,7 +183,7 @@ export interface ContentApi {
    * looking one up by key — `asset()` above is `AssetManager.get`, a
    * different static method with a different shape, so it cannot stand in
    * for this one. `AssetManager` itself stays off the pack allow-list
-   * (`packBoundary.test.ts`); this is the same crossing `asset()` already
+   * (the `pack-core-boundary` seam); this is the same crossing `asset()` already
    * makes, for the other method a spell's `draw()` needs.
    *
    * Typed for what both real call sites actually do with it — feed it

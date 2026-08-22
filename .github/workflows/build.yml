@@ -30,13 +30,27 @@ jobs:
       # `npm run verify:all` runs core's own `verify` (which ends in `vite
       # build`, so dist/ is already on disk as the *verified* build) plus
       # every workspace's own checks — `packs/riot`'s and `packs/reference`'s
-      # asset/catalogue/typecheck/seam gates. Plain `verify` alone is
-      # core-only on purpose (content-pack-extraction batch 5 task 6): it has
-      # to keep passing once `packs/riot/` leaves this tree, which `verify:all`
-      # by construction cannot. Nothing ships that did not pass typecheck and
-      # the whole suite first — that is the point of deploying from here
-      # rather than connecting the repo to Cloudflare's own git builds, which
-      # would publish a red main.
+      # asset/catalogue/typecheck/seam gates. CI runs `verify:all` and never
+      # plain `verify`, and that is not a temporary arrangement: `verify` is
+      # scoped to core *by intent* (content-pack-extraction batch 5 task 6),
+      # and a pack's own gates are the pack's own to run.
+      #
+      # What this comment used to say — that `verify` "has to keep passing
+      # once packs/riot/ leaves this tree" — is a goal, not a property, and
+      # fix round 4 corrected it rather than leaving CI documented by an
+      # aspiration. Today `verify` still compiles and tests the pack:
+      # `src/content/install.ts` statically imports `packs/riot/pack`,
+      # `packs/reference/pack` and `packs/riot/generated/assetManifest`, so
+      # `typecheck` and `build` both follow it in, and 109 test files under
+      # `tests/` import from `packs/`. Measured rather than assumed — with
+      # `packs/` moved aside, `vue-tsc` stops in `src/content/install.ts`:
+      # `error TS2307: Cannot find module '../../packs/riot/pack'`. Making
+      # that import the dynamic one `install.ts`'s own header describes as
+      # "Stage 2" is what closes it, and that is a later task's job.
+      #
+      # Nothing ships that did not pass typecheck and the whole suite first —
+      # that is the point of deploying from here rather than connecting the
+      # repo to Cloudflare's own git builds, which would publish a red main.
       - name: Deploy to Cloudflare Pages
         if: >-
           github.event_name == 'push'

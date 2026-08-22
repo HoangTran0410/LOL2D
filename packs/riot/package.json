@@ -13,6 +13,9 @@
     "check-seams:monsters": "moba2d-check-seams ./monsters"
   },
   "devDependencies": {
-    "@moba2d/core": "*"
+    "@moba2d/core": "*",
+    "@types/p5": "^1.7.6",
+    "typescript": "^5.4.0",
+    "vite": "^5.2.0"
   }
 }

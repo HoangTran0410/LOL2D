@@ -15,8 +15,9 @@
 // file's own location* regardless of where this one lives (see its own
 // header for why that makes it portable rather than a second `../../` in
 // disguise). This pack's own code may still never write `@/...` itself —
-// that stays `packBoundary.test.ts`'s rule, an import-scanning check, not
-// a typecheck one — but this pack's compiler needs the alias resolvable
+// that is the `pack-core-boundary` seam's rule, an import scan this pack's
+// own `check-seams` runs over this whole package, not a typecheck one — but
+// this pack's compiler needs the alias resolvable
 // to see real types *through* `@moba2d/core`'s exported entry points,
 // which are core's own unbundled source and import via `@/*` internally
 // like the rest of that codebase.

@@ -28,7 +28,8 @@ const scriptPath = resolve(repoRoot, 'scripts/check-seams.mjs');
  * The first two regressions below used to point at `packs/riot/spells` for a
  * target guaranteed to have *some* violation — true when this file was
  * written, false since content-pack-extraction batch 5 task 6 gave the pack
- * its own `seam-debt.mjs` (`packs/riot/seam-debt.mjs`) and wired
+ * its own `seam-debt.mjs`, inside the tree it describes
+ * (`packs/riot/spells/seam-debt.mjs`), and wired
  * `packs/riot`'s own `check-seams` script to run clean by default. A
  * regression test asserting on a real pack's *debt count* is exactly the
  * kind of fixture this repo's own notes warn about — it silently stops

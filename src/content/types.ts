@@ -10,7 +10,7 @@
  *
  * So: `import type { CastContext } from '@/content/types'` is correct and
  * always will be; `import { Slow } from '@/game/gameObject/buffs/Slow'` is
- * not, and `tests/content/packBoundary.test.ts` fails the build over it.
+ * not, and the `pack-core-boundary` seam fails the pack's own build over it.
  */
 export type {
   ActivationPattern,

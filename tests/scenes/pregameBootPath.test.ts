@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { scanImports, stripComments } from '../support/importScan';
+import { scanImports, stripComments } from '@/seams/importScan';
 
 /**
  * The pregame screen renders the roster without loading a spell.
@@ -35,7 +35,7 @@ import { scanImports, stripComments } from '../support/importScan';
  * and icon without touching its class.
  *
  * `staticImports` below is now a thin, value-only filter over
- * `tests/support/importScan.ts`'s `scanImports` rather than its own inline
+ * `src/seams/importScan.ts`'s `scanImports` rather than its own inline
  * parser — fix round 3 found this file's own copy shared a hole with
  * `menuBootPath.test.ts` and `aboutBootPath.test.ts`: all three anchored a
  * statement to a line start, so two statements sharing one line silently

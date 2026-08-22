@@ -7,7 +7,7 @@
  * this file used to import from `@/game/gameObject/...` now comes off `api`
  * instead, and an icon comes from `api.asset(key)` rather than
  * `AssetManager.get`/`.placeholder` (a pack may not import `AssetManager` at
- * all — `tests/content/packBoundary.test.ts` enforces it).
+ * all — the `pack-core-boundary` seam enforces it).
  *
  * **Every factory here is memoized, and a real spell's must be too.** A bare
  * `class X extends api.Spell {}` returned straight from a function is a new

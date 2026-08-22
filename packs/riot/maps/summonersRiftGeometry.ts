@@ -38,7 +38,7 @@ import type {
  * `Lane.MID`/`Lane.BOT` are plain `'top'`/`'mid'`/`'bot'` strings — this
  * module writes them as literals instead, the same way
  * `packs/reference/provingGroundsGeometry.ts` writes `'mid'` for its own
- * lane. `tests/content/packBoundary.test.ts` bans a pack file from reaching
+ * lane. The `pack-core-boundary` seam bans a pack file from reaching
  * core outside the injected `ContentApi`, and `@/game/lanes` is a real
  * engine mechanism, not one of the three type-only exceptions that rule
  * allows.

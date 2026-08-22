@@ -1,5 +1,5 @@
 import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
-import { readSource, stripComments, walkTsFiles } from './shared';
+import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
  * `castSpec` is read once, on the first cast, and never again — `Spell.runtime`
@@ -11,7 +11,13 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * (a four-round recast ultimate computing its recast cooldown from `shotsRemaining`).
  */
 export interface CastSpecFrozenOptions extends SeamCheckOptions {
-  /** Spells known to still read live state — debt, not permission. */
+  /**
+   * Spells known to still read live state — debt, not permission. An entry
+   * names a file: either its path relative to the scanned root, or its bare
+   * basename, which matches at any depth (`exemptionFor` in `shared.ts` —
+   * one keying rule for every exemption set in this module since fix round
+   * 4, after a nested file made a live entry report as stale).
+   */
   grandfathered?: Set<string>;
 }
 
@@ -72,19 +78,25 @@ export const checkCastSpecFrozen: SeamCheck = (root, options?: CastSpecFrozenOpt
     const reads = liveStateReads(body);
     if (reads.length === 0) continue;
 
-    if (grandfathered.has(file)) {
-      consumed.add(file);
+    const exemption = exemptionFor(grandfathered, file);
+    if (exemption !== undefined) {
+      consumed.add(exemption);
     } else {
       violations.push({ file, message: reads.join(', ') });
     }
   }
 
-  for (const file of grandfathered) {
-    if (!consumed.has(file)) {
+  for (const entry of grandfathered) {
+    if (!consumed.has(entry)) {
       violations.push({
-        file,
-        message:
-          'grandfathered exemption matches nothing — this file no longer reads live state in castSpec, has no castSpec getter, or does not exist',
+        file: entry,
+        // Says only what the scan actually observed. The previous wording
+        // named three causes ("no longer reads live state, has no castSpec
+        // getter, or does not exist") and fix round 4's reproduction hit a
+        // case where all three were false — the file existed, had a getter
+        // and read live state, and the entry was mis-keyed. A message that
+        // lists causes it has not checked sends the reader hunting.
+        message: 'grandfathered exemption matched no scanned file whose castSpec reads live state',
         kind: 'stale-exemption',
       });
     }

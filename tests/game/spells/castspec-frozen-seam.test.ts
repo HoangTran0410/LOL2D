@@ -40,7 +40,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 // task 6 fix round 1: `src/seams/castSpecFrozen.ts` is the same rule,
 // exported, and `packs/riot`'s own `check-seams` script now runs it against
 // the pack's own tree (with the pack's own `GRANDFATHERED` set, moved to
-// `packs/riot/seam-debt.mjs`) — a pack violation reddens the pack's build,
+// `packs/riot/spells/seam-debt.mjs`) — a pack violation reddens the pack's build,
 // not this one. `coreSpells/` stays: it is core's own population.
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 

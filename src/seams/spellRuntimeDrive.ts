@@ -1,5 +1,5 @@
 import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
-import { readSource, stripComments, walkTsFiles } from './shared';
+import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
  * A spell test drives the spell, not one of its hooks. `onSpellCast` and its
@@ -16,8 +16,23 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * examples (a four-round recast ultimate and its own basic ability).
  */
 export interface SpellRuntimeDriveOptions extends SeamCheckOptions {
-  /** Test files known to still reach past the runtime. Debt, not permission. */
-  grandfathered?: Set<string>;
+  /**
+   * Test files known to still reach past the runtime. Debt, not permission.
+   * By path relative to the scanned root or by bare basename
+   * (`exemptionFor`, `shared.ts`).
+   *
+   * Renamed from `grandfathered` in fix round 4 of content-pack-extraction
+   * batch 5 task 6: `castSpecFrozen` already owned that field name, and
+   * `checkSeams(root, options)` hands *one* options object to every seam —
+   * so `packs/riot/spells/seam-debt.mjs`'s ten grandfathered cast specs
+   * were being handed to this seam as test-file exemptions too. Inert only
+   * because this seam ignores anything that is not a `*.test.ts`, which is
+   * luck rather than design, and it is the same shape as the collision fix
+   * round 3 found between the two other `grandfathered` fields. The
+   * disjointness of these field names is now a test
+   * (`tests/seams/seamOptionFields.test.ts`), not a convention.
+   */
+  grandfatheredTests?: Set<string>;
 }
 
 const RUNTIME_HOOKS = [
@@ -36,15 +51,37 @@ const RUNTIME_HOOKS = [
 const CALL_PATTERN = new RegExp(`(?<!super)\\.\\s*(?:${RUNTIME_HOOKS.join('|')})\\s*\\(`, 'g');
 
 export const checkSpellRuntimeDrive: SeamCheck = (root, options?: SpellRuntimeDriveOptions) => {
-  const grandfathered = options?.grandfathered ?? new Set<string>();
+  const grandfatheredTests = options?.grandfatheredTests ?? new Set<string>();
+  // Which declared entries actually suppressed a real would-be violation
+  // this run — the rest are stale. Fix round 4: this seam's own exemption
+  // set was the one `src/seams/index.ts` never listed among "every licence
+  // this module hands out", and so the one nothing ever checked.
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
 
   for (const file of walkTsFiles(root, options)) {
     if (!file.endsWith('.test.ts')) continue;
-    if (grandfathered.has(file)) continue;
     const source = stripComments(readSource(root, file));
     const matches = source.match(CALL_PATTERN);
-    if (matches) violations.push({ file, message: [...new Set(matches)].join(', ') });
+    if (!matches) continue;
+    const exemption = exemptionFor(grandfatheredTests, file);
+    if (exemption !== undefined) {
+      consumed.add(exemption);
+    } else {
+      violations.push({ file, message: [...new Set(matches)].join(', ') });
+    }
   }
+
+  for (const entry of grandfatheredTests) {
+    if (!consumed.has(entry)) {
+      violations.push({
+        file: entry,
+        message:
+          'grandfatheredTests exemption matched no scanned test that reaches past the runtime',
+        kind: 'stale-exemption',
+      });
+    }
+  }
+
   return violations;
 };

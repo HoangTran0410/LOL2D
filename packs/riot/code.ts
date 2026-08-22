@@ -13,7 +13,7 @@ import makeBaronAbilities from './monsters/Baron';
  * not this pack — is what folds core's own `BasicAttack` *and* `Recall`
  * spells on top of what this factory returns: a pack file may not import
  * `@/generated/spellModules` or `@/game/gameObject/coreSpells/Recall`
- * (`tests/content/packBoundary.test.ts` allows only
+ * (the `pack-core-boundary` seam allows only
  * `@moba2d/core/content/ContentApi`/`ContentPack`/`types`, type-only), and "a bare
  * spell id always resolves against this pack" is a promise `qualifySpellId`
  * makes about the *whole* installed `riot` entry, `BasicAttack` and `Recall`

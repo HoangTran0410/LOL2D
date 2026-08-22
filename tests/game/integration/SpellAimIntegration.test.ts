@@ -612,8 +612,9 @@ describe('spell aim integration', () => {
   // `coreSpells/`, `spellObjects/` and `buffs/` read `worldMouse` nowhere),
   // so the check had nothing core-specific left to prove and was a straight
   // duplicate of `src/seams/worldMouseInSpellCode.ts`, exercised for real by
-  // `packs/riot`'s own `check-seams` script (`packs/riot/seam-debt.mjs`'s
-  // `pinned: Set(['Blitzcrank_E.ts:83'])` is that same known offender,
-  // exempted per-line rather than per-file now). Removed rather than left to
-  // duplicate the pack's own gate.
+  // `packs/riot`'s own `check-seams` script (that tree's own
+  // `seam-debt.mjs` pins the same known offender by file, line *and* the
+  // line's own code — per-line rather than per-file, and since fix round 4
+  // per-line-content rather than per-line-number). Removed rather than left
+  // to duplicate the pack's own gate.
 });

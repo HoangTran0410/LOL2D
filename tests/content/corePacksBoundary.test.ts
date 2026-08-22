@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { scanImports, stripComments } from '../support/importScan';
+import { scanImports, stripComments } from '@/seams/importScan';
 
 /**
  * Core must not *value*-import out of `packs/` — anywhere, no exceptions.
@@ -58,7 +58,7 @@ import { scanImports, stripComments } from '../support/importScan';
  * it closes the class of mistake rather than one instance of it.
  *
  * The parser — "what does this file import, and is it a type or a value" —
- * lives in `tests/support/importScan.ts`, not here. Fix round 1 and round 2
+ * lives in `src/seams/importScan.ts`, not here. Fix round 1 and round 2
  * each found and fixed a hole in a copy of it that used to live inline in
  * this file alone; round 3 found the same parser copied into five other
  * scans (`packBoundary.test.ts` among them, carrying the exact original,
@@ -99,7 +99,7 @@ interface Reference {
 
 /**
  * Every module specifier a file names in a way that resolves at bundle time
- * — `tests/support/importScan.ts`'s `scanImports` answers "what does this
+ * — `src/seams/importScan.ts`'s `scanImports` answers "what does this
  * file import, and is it a type or a value" (static, side-effect and
  * dynamic alike; see that module's own header for why the parser moved
  * there in fix round 3, after two rounds of finding and re-finding the same

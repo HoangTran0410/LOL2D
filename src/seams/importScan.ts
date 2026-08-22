@@ -1,24 +1,32 @@
 /**
- * `tests/support/` — shared machinery for this repo's source-scan tests.
+ * `scanImports(source)` — what does this file import, and is each reference a
+ * type or a value? One parser, shared by every scan in this repository that
+ * needs to read an import graph.
  *
- * No such home existed before this file: `stripComments` alone is defined
- * independently in 21 different test files, and every import-scanning test
- * (`corePacksBoundary.test.ts`, `packBoundary.test.ts`,
- * `contentApiChunk.test.ts`, `menuBootPath.test.ts`, `pregameBootPath.test.ts`,
- * `aboutBootPath.test.ts`) carried its own copy of a parser answering the
- * same question. `src/seams/` is the closest existing precedent for
- * "extract inline scan logic into an importable module" — but it is a
- * different kind of thing on purpose: those are content-authoring rules,
- * `(root: string) => SeamViolation[]`, published as `@moba2d/core/seams` so a
- * *pack*, in a future separate repository, can run them against its own
- * tree. This module answers a question about *this engine's own* source —
- * what does a file import, and is each one a type or a value — that no pack
- * ever needs to ask, so it has no business shipping in `src/` or behind that
- * public surface. It lives here, under `tests/`, imported by plain relative
- * path the way `tests/game/fixtures.ts` and friends already are for their
- * own subtree, one level up so both `tests/content/` and `tests/scenes/`
- * (this module's six current callers span both) can reach it without
- * reaching *into* a sibling directory that is not the shared one.
+ * `stripComments` alone is defined independently in 21 different test files,
+ * and every import-scanning test (`corePacksBoundary.test.ts`,
+ * `packBoundary.test.ts`, `contentApiChunk.test.ts`, `menuBootPath.test.ts`,
+ * `pregameBootPath.test.ts`, `aboutBootPath.test.ts`) carried its own copy of
+ * a parser answering the same question.
+ *
+ * ## Why it lives in `src/seams/` and not under `tests/`
+ *
+ * It used to live at `tests/support/importScan.ts`, and that file's own
+ * header argued the placement: the seams beside it are content-authoring
+ * rules a *pack* runs against its own tree, whereas "what does this file
+ * import" was a question about this engine's own source that no pack ever
+ * needs to ask.
+ *
+ * That premise stopped being true in fix round 4 of content-pack-extraction
+ * batch 5 task 6. `packCoreBoundary.ts` — the rule that a pack reaches core
+ * only through core's public subpaths — is exactly a content-authoring rule
+ * expressed as an import scan, and it is the single most important one in
+ * the set: a pack that deep-imports `@/game/gameObject/buffs/Slow` compiles,
+ * typechecks and runs perfectly today and cannot be extracted tomorrow. It
+ * has to run from the pack's own `check-seams`, which means it ships in
+ * `@moba2d/core`, which means this parser does too. The alternative was a
+ * seventh copy of a regex that has already had two holes found in it (below)
+ * — the exact thing this module exists to prevent.
  *
  * ## Why one parser, not six
  *
@@ -355,7 +363,7 @@ const STATIC_PATTERN =
   /\b(?:import|export)\b\s+(type\s+)?((?:(?!\b(?:import|export)\b)[\s\S])*?)\bfrom\s+['"]([^'"]+)['"]/g;
 
 /**
- * A bare side-effect import — `import '../../packs/riot/spells/Yasuo_Q';` —
+ * A bare side-effect import — `import '../../packs/<pack>/spells/SomeSpell';` —
  * has no `from` clause and nothing between the keyword and its specifier, so
  * unlike `STATIC_PATTERN` it needs no keyword-boundary restriction at all to
  * stay inside one statement: `\s+['"]` immediately after `import` cannot

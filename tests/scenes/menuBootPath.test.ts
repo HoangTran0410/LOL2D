@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { scanImports, stripComments } from '../support/importScan';
+import { scanImports, stripComments } from '@/seams/importScan';
 
 /**
  * Nothing on the path to the menu may statically import the game.
@@ -23,7 +23,7 @@ import { scanImports, stripComments } from '../support/importScan';
  * already relies on exactly that for its `MenuScene` type.
  *
  * `staticImports` below is now a thin, value-only filter over
- * `tests/support/importScan.ts`'s `scanImports` rather than its own inline
+ * `src/seams/importScan.ts`'s `scanImports` rather than its own inline
  * parser — fix round 3 found this file's own copy shared a hole with
  * `pregameBootPath.test.ts` and `aboutBootPath.test.ts`: all three anchored
  * a statement to a line start, so two statements sharing one line silently

@@ -28,9 +28,18 @@
 // `api.MissileSpellObject`'s own methods silently degrade to errors
 // two and three hops downstream of the real cause, an unresolved
 // `@/managers/AssetManager` import inside `ContentApi.ts` itself).
-// `packBoundary.test.ts` is the actual rule that a pack's *own* code may
-// never write `@/...` — this mapping existing does not relax that; it
-// only lets a pack's compiler see through core's own internals.
+// The actual rule that a pack's *own* code may never write `@/...` is the
+// `pack-core-boundary` seam (`src/seams/packCoreBoundary.ts`), run by each
+// pack's own `check-seams` over its own package — this mapping existing does
+// not relax that; it only lets a pack's compiler see through core's own
+// internals. Fix round 4 of content-pack-extraction batch 5 task 6 is what
+// moved that rule to the pack's side, and this comment is why it had to:
+// publishing the alias makes every core internal nameable from a pack, so
+// the guard against naming one has to run where the naming happens. It used
+// to be `tests/content/packBoundary.test.ts` — a test in core's own suite,
+// i.e. a pack breaking this rule reddened the *engine's* build and none of
+// its own, and a check with no population at all once the pack is a
+// repository of its own.
 {
   "compilerOptions": {
     "target": "ESNext",

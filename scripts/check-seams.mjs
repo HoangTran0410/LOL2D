@@ -44,6 +44,21 @@
  * Exits 1 and prints one line per violation if any seam finds one; exits 0
  * and prints a summary otherwise.
  *
+ * ## Thirteen rules over the named tree, and one over the package
+ *
+ * `checkSeams(root)` runs the thirteen rules that all mean the same thing
+ * about the same directory. The fourteenth — `pack-core-boundary`, "a pack
+ * reaches core only through its public content subpaths" — is scoped to a
+ * *package* instead: a pack's `pack.ts`, its generated barrels, its maps and
+ * vfx modules can reach into core exactly as a spell can, and none of them
+ * sit under `./spells`. So this script resolves the `package.json` that owns
+ * the scanned tree (`owningPackage`) and runs that rule over the whole
+ * package — unless the owner is core itself, since `@/...` is how core's own
+ * source refers to itself. Fix round 4 of content-pack-extraction batch 5
+ * task 6; before it, that rule lived only in `tests/content/
+ * packBoundary.test.ts`, which meant a pack breaking the rule the entire
+ * extraction rests on reddened *core's* build and nothing of the pack's.
+ *
  * ## A pack's own debt is the pack's to state, not the engine's
  *
  * `checkSeams(root, options)` takes one `options` object, shared across all
@@ -79,7 +94,7 @@
  */
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { existsSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { createServer } from 'vite';
 
 const scriptPath = fileURLToPath(import.meta.url);
@@ -100,10 +115,64 @@ async function loadPackSeamDebt(absoluteTarget) {
   return module.seamDebt;
 }
 
+/**
+ * The package that owns `fromDir` — the nearest `package.json` at or above
+ * it, and its declared name. `packs/riot/spells` answers
+ * `packs/riot` / `@moba2d/content-riot`; `src/game/gameObject/coreSpells`
+ * answers this repository's root / `@moba2d/core`.
+ *
+ * This is how `pack-core-boundary` (the fourteenth seam,
+ * `src/seams/packCoreBoundary.ts`) decides whether it applies at all:
+ * `@/...` is how core's own source refers to itself, so the rule "reach core
+ * only through its public subpaths" is a rule about *someone else's* tree.
+ * Deliberately not a CLI flag and not a field in the pack's own
+ * `seam-debt.mjs` — a rule a pack can switch off for itself is not a gate —
+ * and deliberately not a hard-coded path, which stops meaning anything the
+ * day a pack is a repository of its own. Fail-closed: no `package.json`
+ * anywhere above the target means "not core", so the rule runs.
+ */
+function owningPackage(fromDir) {
+  let dir = fromDir;
+  for (;;) {
+    const manifest = resolve(dir, 'package.json');
+    if (existsSync(manifest)) {
+      try {
+        return { root: dir, name: JSON.parse(readFileSync(manifest, 'utf8')).name };
+      } catch {
+        return { root: dir, name: undefined };
+      }
+    }
+    const parent = dirname(dir);
+    if (parent === dir) return { root: fromDir, name: undefined };
+    dir = parent;
+  }
+}
+
+/** Core's own name for itself, read from core's own manifest rather than typed twice. */
+function corePackageName() {
+  try {
+    return JSON.parse(readFileSync(resolve(repoRoot, 'package.json'), 'utf8')).name;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function runCheckSeams(targetRoot) {
   const server = await createServer({
     root: repoRoot,
-    configFile: resolve(repoRoot, 'vite.config.ts'),
+    // `configFile: false`, not core's own `vite.config.ts` (fix round 4).
+    // Loading that config drags in core's *devDependencies* — it imports
+    // `@vitejs/plugin-vue` and `vite-plugin-pwa` — which a pack installing
+    // `@moba2d/core` as a dependency never receives. Measured from a real
+    // sibling checkout outside this repository, with core installed from an
+    // `npm pack` tarball: `moba2d-check-seams ./spells` died with
+    // `Cannot find package '@vitejs/plugin-vue'` before it read a line of
+    // the pack's code. Nothing under `src/seams/` needs any of it — the
+    // whole directory imports `node:fs`, `node:path` and its own siblings
+    // and nothing else, so the only thing Vite is doing here is compiling
+    // TypeScript. The pack's own gate has to run from the pack's own
+    // repository, or it is not the pack's gate.
+    configFile: false,
     logLevel: 'error',
     server: { middlewareMode: true, hmr: false },
     appType: 'custom',
@@ -135,7 +204,34 @@ export async function runCheckSeams(targetRoot) {
     // above so a `skip`-exempted file — debt or a barrel — is not counted as
     // "scanned" either; the two numbers describe the same walk.
     const scannedCount = scannedSeamFiles(absoluteTarget, options).length;
-    return { violations, scannedCount };
+
+    // The fourteenth rule, scoped to the package rather than to this one
+    // tree: a pack's entry point, generated barrels, maps and vfx modules
+    // can reach into core exactly as a spell can, and none of them sit
+    // under `./spells`. Skipped when the scanned tree belongs to core
+    // itself. Given no `options`: the debt a pack declares is about its
+    // spells (`skip: index.ts` is the barrel it does not want scanned as a
+    // spell), and a barrel is the *most* likely place for a core re-export
+    // to hide, so this rule sees every file either way.
+    const owner = owningPackage(absoluteTarget);
+    const boundary = owner.name === corePackageName() ? null : owner;
+    if (boundary) {
+      const { packCoreBoundarySeam } = await server.ssrLoadModule('/src/seams/index.ts');
+      const boundaryRoot = relative(process.cwd(), boundary.root) || '.';
+      for (const violation of packCoreBoundarySeam.check(boundary.root)) {
+        violations.push({ ...violation, seamId: packCoreBoundarySeam.id, root: boundaryRoot });
+      }
+      return {
+        violations,
+        scannedCount,
+        boundary: {
+          package: boundary.name ?? boundaryRoot,
+          scannedCount: scannedSeamFiles(boundary.root).length,
+        },
+      };
+    }
+
+    return { violations, scannedCount, boundary: null };
   } finally {
     await server.close();
   }
@@ -163,9 +259,14 @@ if (invokedDirectly()) {
   }
 
   runCheckSeams(targetRoot)
-    .then(({ violations, scannedCount }) => {
+    .then(({ violations, scannedCount, boundary }) => {
       if (violations.length === 0) {
         console.log(`check-seams: scanned ${scannedCount} file(s), clean (${targetRoot})`);
+        if (boundary) {
+          console.log(
+            `check-seams: pack-core-boundary scanned ${boundary.scannedCount} file(s) of ${boundary.package}, clean`
+          );
+        }
         return;
       }
       // Fix round 3: a stale exemption ("you are exempting something that
@@ -188,6 +289,11 @@ if (invokedDirectly()) {
       console.error(
         `check-seams: ${parts.join(', ')} across ${scannedCount} file(s) scanned in ${targetRoot}`
       );
+      if (boundary) {
+        console.error(
+          `check-seams: pack-core-boundary scanned ${boundary.scannedCount} file(s) of ${boundary.package}`
+        );
+      }
       process.exitCode = 1;
     })
     .catch(error => {

@@ -9,6 +9,24 @@ import type {
 import type { PackRegistry } from './PackRegistry';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import AssetManager from '@/managers/AssetManager';
+// These three static imports are what makes core's own `verify` a build of
+// the pack as well as of the engine, and saying so here is the correction
+// fix round 4 of content-pack-extraction batch 5 task 6 owed the reader.
+// `tsconfig.json`'s `include: ["src/**/*"]` follows imports, so `typecheck`
+// compiles `packs/riot` and `packs/reference`; `vite build` bundles them.
+// Move `packs/` aside and `verify`'s first step stops on these three lines
+// — `error TS2307: Cannot find module '../../packs/riot/pack'` — which is
+// measured, not predicted.
+//
+// So "plain `verify` is core-only" describes what the *script list* was
+// scoped to (batch 5 task 6 split the pack's asset, catalogue, typecheck and
+// seam gates out into `verify:all`), not what the build actually reaches. A
+// pack-free `verify` needs this file to become the Stage 2 loader its own
+// header below describes — a fetch and an `import(blobUrl)`, no specifier
+// naming `packs/` at all — plus the 109 test files under `tests/` that
+// import from `packs/` moving to the pack's own suite. Both are later
+// tasks; neither is true today, and `.github/workflows/build.yml` says the
+// same thing beside the CI step that would otherwise be read as proof.
 import riotCode, { data as riotData, BUNDLED_PACK_ID } from '../../packs/riot/pack';
 import referenceCode, { data as referenceData } from '../../packs/reference/pack';
 import { assetManifest as riotAssetManifest } from '../../packs/riot/generated/assetManifest';
@@ -67,7 +85,7 @@ export { BUNDLED_PACK_ID };
  * which every kit's slot 0 names bare — and, since batch 5 task 1, `Recall`:
  * `packs/riot/data.ts`'s `championEntries()` still names every champion's
  * way home as the bare string `'Recall'`. `packs/riot/code.ts`/`data.ts`
- * cannot fold either in themselves: `tests/content/packBoundary.test.ts`
+ * cannot fold either in themselves: the `pack-core-boundary` seam
  * refuses a pack file any reach into `@/generated/spellCatalog`/
  * `@/generated/spellModules`/`@/game/gameObject/coreSpells/Recall`. So this
  * file does it instead, the one place already allowed to name both the pack
@@ -90,7 +108,7 @@ export { BUNDLED_PACK_ID };
 // doubles is the correct behaviour, not a swallowed error. Idempotent
 // (`Map.set`), so re-running it on a module re-evaluation is harmless. Moved
 // here from `bundledPack.ts`: a pack file may not import `AssetManager`
-// directly (`packBoundary.test.ts`), so this registration was never the
+// directly (the `pack-core-boundary` seam), so this registration was never the
 // pack's own to keep.
 AssetManager.registerPackAssets?.(BUNDLED_PACK_ID, riotAssetManifest);
 

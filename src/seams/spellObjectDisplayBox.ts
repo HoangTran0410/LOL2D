@@ -85,8 +85,13 @@ export const checkSpellObjectDisplayBox: SeamCheck = (
     if (!consumed.has(className)) {
       violations.push({
         file: className,
+        // Only what the scan observed — see `castSpecFrozen.ts`'s own note
+        // on why a stale report does not list causes it never checked.
+        // This set alone is keyed by *class name*, not by file, so
+        // `exemptionFor`'s path-or-basename rule does not apply to it:
+        // a class name has no path to be relative to.
         message:
-          'grandfatheredClasses exemption matches nothing — this class now states its own extent, no longer extends SpellObject directly, or does not exist',
+          'grandfatheredClasses exemption matched no scanned class inheriting a zero-area display box',
         kind: 'stale-exemption',
       });
     }

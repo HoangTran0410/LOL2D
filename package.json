@@ -65,7 +65,7 @@
     "e2e:attacks": "node tests/e2e/drive-basic-attacks.mjs",
     "vendor:copy": "node scripts/copy-vendor.mjs",
     "chunks:check": "node scripts/check-chunks.mjs",
-    "check-seams": "moba2d-check-seams ./src/game/gameObject/coreSpells && moba2d-check-seams ./src/game/gameObject/spellObjects && moba2d-check-seams ./src/game/gameObject/buffs",
+    "check-seams": "moba2d-check-seams ./src/game/gameObject/coreSpells && moba2d-check-seams ./src/game/gameObject/spellObjects && moba2d-check-seams ./src/game/gameObject/buffs && moba2d-check-seams ./src/game/gameObject/attackableUnits",
     "version:show": "node scripts/version.mjs",
     "e2e:pwa": "npm run build && node tests/e2e/verify-pwa-offline.mjs",
     "e2e:champions": "node tests/e2e/smoke-new-champions.mjs",
