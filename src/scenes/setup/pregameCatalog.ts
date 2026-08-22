@@ -109,12 +109,16 @@ export const getPregameCatalog = (): PregameCatalog => {
     const spellCatalog = listSpellCatalog();
     const catalogById = new Map(spellCatalog.map(entry => [entry.id, entry]));
     const summoners = listSummonerSpells();
-    // `Set<string>`, not the inferred `Set<SpellCatalogId>`: `summonerIds.has`
-    // below is checked against `KitShelfEntry.entry.id`, which is `string`
-    // now that a pack's own qualified id can live there too (see
-    // `SpellCatalogEntry.id`'s doc comment) — the membership test itself
-    // stays exact, this only widens what it is allowed to be asked about.
-    const summonerIds: Set<string> = new Set(summoners.map(option => option.id));
+    // Plain `Set<string>` inference — `summonerIds.has` below is checked
+    // against `KitShelfEntry.entry.id`, which is `string` (a pack's own
+    // qualified id can live there too, see `SpellCatalogEntry.id`'s doc
+    // comment). Until batch 5 task 2 this needed an explicit `Set<string>`
+    // annotation to avoid inferring the narrower `Set<SpellCatalogId>` —
+    // `SpellCatalogId` was the bundled pack's own 237-literal union then, and
+    // `.has()` would have refused a foreign pack's id. `SpellCatalogId` is
+    // `string` itself now, so the two infer identically and the annotation
+    // no longer changes anything.
+    const summonerIds = new Set(summoners.map(option => option.id));
 
     /**
      * Which of the two non-champion shelves this is, if either. Written out

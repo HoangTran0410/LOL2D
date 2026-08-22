@@ -1,27 +1,35 @@
 import AssetManager from '@/managers/AssetManager';
-// Relative, not `@/generated/spellCatalog`: batch 4 task 3 moved the 237
-// bundled spell ids into `packs/riot/generated/spellCatalog.ts` — core's own
-// generated union is now just `'BasicAttack'`. `tests/content/rosterSource.test.ts`
-// only bans the `@/generated/...` alias form, so this relative import does
-// not need adding to its (now empty) allow-list.
-import type { SpellCatalogId as PackSpellCatalogId } from '../../../packs/riot/generated/spellCatalog';
 import type { MatchRules } from './PregameConfig';
 import { contentCatalog } from '@/content/catalog';
 import type { SpellDisplayData } from '@/content/ContentPack';
 import { packAsset } from './packAsset';
 
 /**
- * The one file allowed to name the riot pack's generated catalogue
- * directly for its id type — see `tests/content/rosterSource.test.ts`.
- * Re-exported here so a caller that needs only the id type, not a spell's
- * display data, still goes through this module rather than reaching past
- * it.
+ * A spell's id, as this catalogue hands it back: the bundled pack's own bare
+ * form (`'<Champion>_Q'`) or core's own `BASIC_ATTACK_ID`.
  *
- * A union with core's own `'BasicAttack'`, not just the pack's 237: slot 0
- * of every kit is `BASIC_ATTACK_ID`, which is core's id, not the riot
- * pack's own.
+ * Deliberately not a literal union. Until batch 5 task 2 this was
+ * `PackSpellCatalogId | 'BasicAttack'` — a type-only import of the riot
+ * pack's own generated 237-literal union (`packs/riot/generated/spellCatalog.ts`),
+ * unioned with core's own id — which made a content-free engine's public id
+ * type a list of one publisher's champions, and would have had no members at
+ * all once the pack could be built apart from core. What the union bought
+ * was editor autocomplete across five call sites, all of which turned out to
+ * key off a runtime membership check anyway; none needed the union for
+ * exhaustiveness (`tests/game/config/spellCatalogId.types.test.ts` and this
+ * batch's task report walk all 22). Membership is a runtime question now,
+ * answered by `isSpellCatalogId`/`contentCatalog()`, not by this type.
+ *
+ * `src/generated/spellCatalog.ts`'s own `SpellCatalogId` (`keyof typeof
+ * spellCatalog`, core's *generated* catalogue, one entry: `BasicAttack`) is
+ * a different, narrower type with the same name — the same layering
+ * `AssetKey` already has (core's own generated union vs. each pack's own,
+ * crossed only through `packAsset`'s cast). That one stays a literal union
+ * on purpose: it is a compile-time guard against core's own generator
+ * drifting from its own barrel, never exported past this module, and it
+ * does not reach into any pack.
  */
-export type SpellCatalogId = PackSpellCatalogId | 'BasicAttack';
+export type SpellCatalogId = string;
 
 /**
  * The spell catalogue as **data**: names, icons, numbers and which abilities
@@ -135,7 +143,7 @@ const qualifyBundledId = (id: string): string =>
  */
 export const bareCatalogId = (qualifiedId: string): SpellCatalogId | null =>
   qualifiedId.startsWith(BUNDLED_PACK_PREFIX)
-    ? (qualifiedId.slice(BUNDLED_PACK_PREFIX.length) as SpellCatalogId)
+    ? qualifiedId.slice(BUNDLED_PACK_PREFIX.length)
     : null;
 
 /**
@@ -160,9 +168,13 @@ export const bareCatalogId = (qualifiedId: string): SpellCatalogId | null =>
  * a string that re-qualifies as `riot:Vera_Q` (the *bundled* pack's id,
  * `qualifySpellId`'s bare-id rule) rather than `reference:Vera_Q`, so the
  * slot silently failed every one of those lookups and `preset.ts` rerolled
- * it to a random bundled spell. `SpellCatalogEntry.id` is `string`, not
- * core's generated `SpellCatalogId` union, precisely so a pack's own
- * qualified id can live here without a cast back into that union.
+ * it to a random bundled spell. `SpellCatalogEntry.id` stays `string` rather
+ * than `SpellCatalogId` for the reason it always did — a qualified id from
+ * some other pack was never a member of the old 237-literal union — even
+ * though batch 5 task 2 widened `SpellCatalogId` itself to `string`, which
+ * makes the two types interchangeable now. Naming the field `string` still
+ * reads truer: a `SpellCatalogEntry.id` can genuinely be a foreign pack's
+ * id, and `SpellCatalogId` no longer excludes anything to make that point.
  */
 export const packSpellCatalogEntry = (qualifiedId: string): SpellCatalogEntry | null => {
   const entry = contentCatalog().spellDisplay(qualifiedId);
@@ -174,7 +186,17 @@ export const packSpellCatalogEntry = (qualifiedId: string): SpellCatalogEntry | 
   };
 };
 
-/** Whether a stored slot choice still names a spell this build has. */
+/**
+ * Whether a stored slot choice still names a spell this build has.
+ *
+ * The `id is SpellCatalogId` return type no longer narrows to anything
+ * `string` doesn't already say — `SpellCatalogId` is `string` now, not the
+ * 237-literal union it used to be — but the check itself is unchanged and
+ * still the only thing standing between a stale `localStorage` slot and a
+ * lookup that throws: `PregameConfigSource.describeAbility` gates a
+ * player's persisted config through exactly this before ever calling
+ * `spellDisplayOf`.
+ */
 export const isSpellCatalogId = (id: string): id is SpellCatalogId =>
   contentCatalog().hasDisplayFor(qualifyBundledId(id));
 
@@ -231,9 +253,10 @@ const displayFromEntry = (entry: SpellDisplayData, matchRules: MatchRules): Spel
  * qualified id (`'reference:Vera_Q'`, e.g. from `SelectableChampionSpell.id`
  * or a picker entry's `id`) — only a *bare* id from a pack other than the
  * bundled one has nothing to resolve to here; see `packSpellCatalogEntry` for
- * that case. `id` is `string`, not `SpellCatalogId`, for the same reason:
- * every caller here now hands back whatever the registry actually keys by,
- * bundled or not.
+ * that case. `id` is `string` rather than `SpellCatalogId` for readability,
+ * not enforcement — the two are the same type since batch 5 task 2 — because
+ * every caller here hands back whatever the registry actually keys by,
+ * bundled or not, and `string` says that plainly.
  */
 export const spellDisplayOf = (
   id: string,
@@ -287,11 +310,15 @@ export interface SelectableChampionSpell {
   /**
    * The bundled pack's own bare id (`'<Champion>_Q'`) for a bundled champion, or
    * another pack's registry-qualified id (`'reference:Vera_Q'`) for one of
-   * its champions — never that pack's *bare* local id. `string`, not
-   * `SpellCatalogId`: that generated union is the bundled pack's own bare ids
-   * only, and a pack's qualified id is not a member of it. This is the id a
-   * persisted slot ends up storing (`LoadoutEditorModal.pickSpell`), so it
-   * has to be whatever `isSpellId`/`spellDisplayOf` can resolve back.
+   * its champions — never that pack's *bare* local id. `string` rather than
+   * `SpellCatalogId`: before batch 5 task 2, `SpellCatalogId` was the
+   * bundled pack's own generated 237-literal union and a foreign pack's
+   * qualified id was never a member of it, which is what forced this field
+   * to `string` in the first place. `SpellCatalogId` is `string` itself now,
+   * so the two types no longer disagree — this stays `string` because that
+   * is what it always meant: this is the id a persisted slot ends up storing
+   * (`LoadoutEditorModal.pickSpell`), so it has to be whatever
+   * `isSpellId`/`spellDisplayOf` can resolve back, bundled or not.
    */
   id: string;
   display: SpellDisplay;
@@ -444,9 +471,10 @@ const shelfNameById = (): Map<string, string> => {
 
 export interface SpellCatalogEntry {
   /**
-   * `string`, not `SpellCatalogId` — see `SelectableChampionSpell.id`'s doc
-   * comment. `listSpellCatalog` still only ever populates this with a bundled
-   * bare id, but `packSpellCatalogEntry` (read by `pregameCatalog.ts`'s shelf
+   * `string` rather than `SpellCatalogId` — see `SelectableChampionSpell.id`'s
+   * doc comment for why that used to matter and no longer changes anything.
+   * `listSpellCatalog` still only ever populates this with a bundled bare
+   * id, but `packSpellCatalogEntry` (read by `pregameCatalog.ts`'s shelf
    * builder for a pack champion) hands back a qualified one, and the two have
    * to share one type for the picker to treat them alike.
    */

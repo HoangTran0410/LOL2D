@@ -27,19 +27,22 @@
     "src/game/gameObject/structures/Turret.ts",
     "src/game/gameObject/structures/Fountain.ts",
     "src/game/gameObject/buffs/**/*.ts",
-    "packs/**/*.ts",
     "src/game/managers/ObjectManager.ts",
     "src/game/managers/UnitCollisionSystem.ts",
     "tests/game/UnitCollisionSystem.test.ts",
     // The seven individually-listed strict spells (Lux_R, Janna_R, Janna_Q,
     // Anivia_R, Varus_Q, Pantheon_Q, Malphite_Q) moved into `packs/riot/spells/`
-    // in batch 4 task 3 — `packs/**/*.ts` above already covers their new path.
+    // in batch 4 task 3. `packs/**/*.ts` used to cover their new path here;
+    // batch 5 task 2 moved that glob to the pack's own `tsconfig.pack-riot.json`
+    // (`typecheck:riot`, wired into `verify` beside `typecheck:core`) so
+    // core's strict pass no longer depends on any pack being present at all.
     "src/game/vfx/**/*.ts",
     "src/generated/**/*.ts",
     "src/managers/AssetManager.ts",
     "tests/game/spells/representative-spells.test.ts",
     "tests/game/types/BaseObjectTypes.test.ts",
     "tests/game/types/BuffUnitTypes.test.ts",
-    "tests/game/types/ChampionTypes.test.ts"
+    "tests/game/types/ChampionTypes.test.ts",
+    "tests/game/config/spellCatalogId.types.test.ts"
   ]
 }

@@ -32,7 +32,7 @@ import { scanImports, stripComments } from '../support/importScan';
  * resolved against it, by folding core's class onto the pack's spells —
  * the same core-last fold that file already does for `BasicAttack`.
  *
- * Two places in core still have a genuine reason to reach into `packs/`:
+ * One place in core still has a genuine reason to reach into `packs/`:
  *
  * - `src/content/install.ts` — **permanent, by design.** This is Stage 1's
  *   pack loader; the whole point of the `ContentPackFactory` shape (see that
@@ -45,11 +45,14 @@ import { scanImports, stripComments } from '../support/importScan';
  *   file rather than picked apart line by line: every reach it makes into
  *   `packs/riot/` (both halves of the pack, its generated manifest) is the
  *   same kind of loading, not a bridge with an end date any more.
- * - `src/game/config/spellCatalog.ts` — **one named line, type-only.**
- *   `SpellCatalogId` types every catalogue id against the pack's own
- *   generated `SpellCatalogId` union (erased at runtime) — a compile-time
- *   check the rest of the engine's ids stay real, not a value this file
- *   carries at runtime.
+ *
+ * `src/game/config/spellCatalog.ts` used to be a second, narrower exception
+ * — one named line, type-only, importing the pack's generated `SpellCatalogId`
+ * union to type core's own public id. Batch 5 task 2 removed it: core's
+ * `SpellCatalogId` is `string`, declared in that file with no import from
+ * `packs/` at all, so `ALLOWED_TYPE_ONLY` below is empty. Left as a `Record`
+ * rather than deleted outright — the shape a third exception would take if
+ * one is ever genuinely needed again, same as `EXEMPT_FILES` above it.
  *
  * A source scan, in the shape of `packBoundary.test.ts`: a millisecond, and
  * it closes the class of mistake rather than one instance of it.
@@ -72,10 +75,11 @@ const EXEMPT_FILES = new Set(['content/install.ts']);
 /**
  * `relativePath -> the exact specifiers that file may name, and only as
  * `import type` — a *value* import of `packs/` is never allowed, anywhere.`
+ *
+ * Empty since batch 5 task 2 — see this file's own header for the one entry
+ * that used to live here (`game/config/spellCatalog.ts`'s `SpellCatalogId`).
  */
-const ALLOWED_TYPE_ONLY: Record<string, string[]> = {
-  'game/config/spellCatalog.ts': ['../../../packs/riot/generated/spellCatalog'],
-};
+const ALLOWED_TYPE_ONLY: Record<string, string[]> = {};
 
 function tsAndVueFilesUnder(dir: string): string[] {
   const out: string[] = [];

@@ -23,7 +23,6 @@ import {
   BASIC_ATTACK_ID,
   summonerSpellIds,
   listSelectableChampions,
-  type SpellCatalogId,
   type SpellDisplay,
 } from './config/spellCatalog';
 import {
@@ -121,13 +120,18 @@ const classForId = (id: string): SpellClass => spellClassOfId(id) ?? BasicAttack
  * The loop is deliberate — this project's Array `filter` polyfill cannot narrow
  * types, so a predicate would still leave `image` nullable.
  *
- * `image` and `spells` are plain `string`/`string[]` rather than
- * `AssetKey`/`SpellCatalogId[]`: a `QualifiedChampion` may come from any
- * installed pack, and a pack's own asset key or registry-qualified spell id
- * (`reference:Vera_Q`) is not a member of core's generated unions. Nothing
- * here casts back to the narrow type — see `packAsset` in
- * `config/spellCatalog.ts`, the matching resolve-side helper Task 7 already
- * introduced for the same crossing.
+ * `image` is plain `string` rather than `AssetKey`: a `QualifiedChampion` may
+ * come from any installed pack, and a pack's own asset key is not a member of
+ * core's generated `AssetKey` union. Nothing here casts back to the narrow
+ * type — see `packAsset` in `config/spellCatalog.ts`, the matching
+ * resolve-side helper Task 7 already introduced for the same crossing.
+ * `spells` is `string[]` too, but for a weaker reason since batch 5 task 2:
+ * `SpellCatalogId` is `string` now, not a literal union, so `SpellCatalogId[]`
+ * would type-check identically here — `string[]` stays because it is what
+ * `spells` actually is, a mix of the bundled pack's bare ids and other
+ * packs' qualified ones, and naming a catalogue-specific type for a field
+ * that is not exclusively the catalogue's own would be misleading regardless
+ * of what that type happens to allow.
  */
 interface PlayableChampionKit {
   name: string;
@@ -364,7 +368,9 @@ const randomSpellId = (): string => random(allSpellIds());
 /** A stored summoner choice, or the shelf's own first entry if it no longer names one. */
 const summonerIdOr = (choice: string): string => {
   const ids = summonerSpellIds();
-  return ids.includes(choice as SpellCatalogId) ? choice : (ids[0] ?? choice);
+  // No cast needed against `ids: SpellCatalogId[]` — `SpellCatalogId` is
+  // `string` since batch 5 task 2, so `choice` is already a member.
+  return ids.includes(choice) ? choice : (ids[0] ?? choice);
 };
 
 /** A slot's stored choice with 'random' — and any id this build dropped — rolled out. */
