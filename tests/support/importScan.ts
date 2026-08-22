@@ -86,9 +86,169 @@ export interface ImportReference {
  * exported separately only so a caller that wants stripped source for some
  * *other* reason (a second regex of its own, unrelated to imports) does not
  * have to strip twice or duplicate this one line a 22nd time.
+ *
+ * A single left-to-right pass that always knows which of six things the
+ * cursor is inside — plain code, a line comment, a block comment, a
+ * single-quoted string, a double-quoted string, or a template literal — not
+ * two independent regexes run back to back. That used to be
+ * `source.replace(/\/\*[\s\S]*?\*‍/g, '').replace(/\/\/[^\n]*‍/g, '')`, and
+ * it was wrong in both directions at once: stripping block comments first
+ * means a `//` line whose *text* happens to contain the two characters `/`
+ * `*` next to each other — `// assetsInclude: ['**‍/*.json']`, a real line in
+ * this repository's own `packs/riot/maps/summonersRiftGeometry.ts` — opens a
+ * *phantom* block comment there, which then runs to the next real `*‍/`
+ * anywhere later in the file, silently deleting every line, including a real
+ * `import type {...} from '@moba2d/core/content/ContentPack'`, in between.
+ * Swapping the order does not fix it, it mirrors it: a block comment
+ * containing `//` (a URL in a JSDoc line, `* see https://example.com/x`)
+ * would then end early at that `//`, leaving a dangling `/*` for the *next*
+ * pass to pair with whatever real `*‍/` comes next. Neither ordering can be
+ * right, because both treat "comment start" as a property of two adjacent
+ * characters, when it is really a property of *where those characters sit*
+ * — never inside a string or template literal, and a `//` or `/*` inside
+ * one of those is just data. A regex has no notion of "inside a string";
+ * this function tracks it explicitly instead.
+ *
+ * Escapes (`\'`, `\"`, `` \` ``) keep a string or template literal open past
+ * a quote character that would otherwise close it. A template literal's
+ * `${...}` substitution is code again — it can hold its own strings,
+ * comments, and even a nested template literal — so `braceDepth` on the
+ * stack tracks exactly which `}` closes the substitution and returns to the
+ * literal's text, one frame per nesting level (`` `${`${x}`}` `` is legal
+ * JavaScript and round-trips through this correctly). A comment's own
+ * characters are dropped; everything else, including every character inside
+ * a string or template literal, passes through unchanged — this module's
+ * callers only ever look for `import`/`export` keywords and specifiers
+ * outside of strings, so string *contents* are never this function's
+ * business. **Stated limit, inherited from the version this replaces and
+ * unchanged by it:** a `/` that starts a regex literal (not a string, not a
+ * comment) is not modelled — `/[/*]/` would still be misread as opening a
+ * comment. No file this module currently scans contains that shape
+ * (checked, not assumed, the same way `STATIC_PATTERN`'s own stated limit
+ * above documents a checked-not-assumed boundary); a caller that starts
+ * scanning a tree where it might would need to widen this.
  */
-export const stripComments = (source: string): string =>
-  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+export function stripComments(source: string): string {
+  type State = 'code' | 'line' | 'block' | 'single' | 'double' | 'template';
+  // One frame per open template-literal `${...}` substitution the cursor is
+  // currently nested inside, so its matching `}` — not some inner object
+  // literal's — is the one that returns to that literal's own text.
+  const braceDepth: number[] = [];
+  let state: State = 'code';
+  let out = '';
+  let i = 0;
+  const n = source.length;
+
+  while (i < n) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    if (state === 'line') {
+      if (ch === '\n') {
+        out += ch;
+        state = 'code';
+      }
+      i++;
+      continue;
+    }
+
+    if (state === 'block') {
+      if (ch === '*' && next === '/') {
+        i += 2;
+        state = 'code';
+        continue;
+      }
+      if (ch === '\n') out += ch; // preserves line numbers in the result
+      i++;
+      continue;
+    }
+
+    if (state === 'single' || state === 'double') {
+      if (ch === '\\' && next !== undefined) {
+        out += ch + next;
+        i += 2;
+        continue;
+      }
+      out += ch;
+      if ((state === 'single' && ch === "'") || (state === 'double' && ch === '"')) state = 'code';
+      i++;
+      continue;
+    }
+
+    if (state === 'template') {
+      if (ch === '\\' && next !== undefined) {
+        out += ch + next;
+        i += 2;
+        continue;
+      }
+      if (ch === '$' && next === '{') {
+        out += ch + next;
+        braceDepth.push(1);
+        state = 'code';
+        i += 2;
+        continue;
+      }
+      out += ch;
+      if (ch === '`') state = 'code';
+      i++;
+      continue;
+    }
+
+    // state === 'code'
+    if (ch === '/' && next === '/') {
+      state = 'line';
+      i += 2;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      state = 'block';
+      i += 2;
+      continue;
+    }
+    if (ch === "'") {
+      out += ch;
+      state = 'single';
+      i++;
+      continue;
+    }
+    if (ch === '"') {
+      out += ch;
+      state = 'double';
+      i++;
+      continue;
+    }
+    if (ch === '`') {
+      // A backtick always opens a new template literal's own text region —
+      // whether the cursor is in top-level code or nested inside an outer
+      // template's `${...}` substitution, `braceDepth` is untouched either
+      // way, so the matching close still finds the right enclosing frame.
+      out += ch;
+      state = 'template';
+      i++;
+      continue;
+    }
+    if (braceDepth.length > 0) {
+      // Only braces reachable from inside a template substitution are worth
+      // counting — a `{`/`}` pair in ordinary top-level code never changes
+      // what state this function is in, so it is left alone.
+      if (ch === '{') braceDepth[braceDepth.length - 1]++;
+      else if (ch === '}') {
+        braceDepth[braceDepth.length - 1]--;
+        if (braceDepth[braceDepth.length - 1] === 0) {
+          braceDepth.pop();
+          out += ch;
+          state = 'template';
+          i++;
+          continue;
+        }
+      }
+    }
+    out += ch;
+    i++;
+  }
+
+  return out;
+}
 
 /**
  * A static `import ... from '...'` / `export ... from '...'` clause,

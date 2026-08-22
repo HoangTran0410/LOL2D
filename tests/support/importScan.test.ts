@@ -180,4 +180,101 @@ describe('stripComments', () => {
     expect(stripped).toContain('const a = 1;');
     expect(stripped).toContain('const b = 2;');
   });
+
+  // Fix round 1 of content-pack-extraction batch 5 task 4: the previous
+  // implementation was two independent global regexes
+  // (`source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')`),
+  // and every case below is a shape that breaks *some* ordering of that pair
+  // — either the real one (block comments stripped first) or its mirror
+  // (line comments stripped first), which "just swap the order" is not a
+  // fix for. The single-pass, state-tracking replacement handles all of
+  // them because none of `//`, `/*`, `*/` are special to it while the
+  // cursor is inside a string or template literal, or already inside a
+  // comment of the other kind.
+
+  it('a line comment containing "/*" does not open a phantom block comment that swallows the code after it', () => {
+    // The exact shape found in packs/riot/maps/summonersRiftGeometry.ts:
+    // `**/*.json` inside a `//` comment contains the two characters `/` `*`
+    // adjacent, which a block-comments-first pass misreads as an opener —
+    // and, since nothing between here and the trailing docblock below
+    // contains a real `*/` of its own, the phantom span runs clean through
+    // the import in between, exactly as it did in the real file. (An
+    // earlier draft of this test put a docblock *before* the import instead
+    // of after it, which gave the phantom opener a `*/` to close against
+    // early and let the import survive by accident — worth keeping in mind
+    // when writing a case like this: the import must sit before the first
+    // real `*/`, not after it, or the case does not reproduce anything.)
+    const source = [
+      "// assetsInclude: ['**/*.json']",
+      "import { X } from './real';",
+      '',
+      '/**',
+      ' * a real docblock further down the file',
+      ' */',
+    ].join('\n');
+    expect(stripComments(source)).toContain("import { X } from './real';");
+    expect(scanImports(source)).toEqual([{ specifier: './real', kind: 'value' }]);
+  });
+
+  it('the real hidden-import case: the same shape, with the real specifier from summonersRiftGeometry.ts', () => {
+    const source = [
+      "// `assetsInclude: ['**/*.json']` so `AssetManager` can hand out every JSON",
+      "// file as a fetchable URL at runtime, and that claims the extension ahead of",
+      "import type { MapGeometry } from '@moba2d/core/content/ContentPack';",
+      '',
+      '/**',
+      ' * standing in for the real docblock 19 lines later in the real file',
+      ' */',
+    ].join('\n');
+    expect(scanImports(source)).toEqual([
+      { specifier: '@moba2d/core/content/ContentPack', kind: 'type' },
+    ]);
+  });
+
+  it('a single-quoted string containing "//" is not read as a line comment', () => {
+    const source = "const url = 'http://example.com'; import { X } from './real';";
+    const stripped = stripComments(source);
+    expect(stripped).toContain("const url = 'http://example.com';");
+    expect(stripped).toContain("import { X } from './real';");
+  });
+
+  it('a double-quoted string containing "/*" is not read as a block comment opener', () => {
+    const source = 'const glob = "**/*.json"; import { X } from \'./real\';';
+    const stripped = stripComments(source);
+    expect(stripped).toContain('const glob = "**/*.json";');
+    expect(stripped).toContain("import { X } from './real';");
+  });
+
+  it('a template literal containing "//" or "/*" is passed through untouched, not read as either comment form', () => {
+    const source = [
+      'const url = `http://example.com/${path}`;',
+      'const glob = `**/*.json`;',
+      "import { X } from './real';",
+    ].join('\n');
+    const stripped = stripComments(source);
+    expect(stripped).toContain('const url = `http://example.com/${path}`;');
+    expect(stripped).toContain('const glob = `**/*.json`;');
+    expect(stripped).toContain("import { X } from './real';");
+  });
+
+  it('a block comment containing "//" on the same line as its own closer is not cut short by a naive line-comments-first pass', () => {
+    // Not broken by the real (block-first) bug — a non-greedy block-comment
+    // match already finds this comment's real closer correctly. Broken by
+    // the *mirror* fix ("just strip line comments first"): a `//`-first
+    // pass would remove from the `//` inside the URL to end of line,
+    // deleting the block comment's own `*/` closer along with it, and leave
+    // a dangling opener for the next pass to wrongly pair with whatever
+    // real `*/` comes later.
+    const source = ['/* see http://example.com */', "import { X } from './real';"].join('\n');
+    expect(scanImports(source)).toEqual([{ specifier: './real', kind: 'value' }]);
+  });
+
+  it('nested template-literal substitutions are tracked by depth, not by the first "}"', () => {
+    // `` `${`${x}`}` `` — an inner template literal's own substitution
+    // closes with a `}` that must not be mistaken for the outer one's.
+    const source = 'const t = `${`${x}`}`;\nimport { X } from \'./real\';';
+    const stripped = stripComments(source);
+    expect(stripped).toContain('const t = `${`${x}`}`;');
+    expect(stripped).toContain("import { X } from './real';");
+  });
 });

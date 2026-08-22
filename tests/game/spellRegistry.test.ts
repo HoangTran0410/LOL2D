@@ -28,6 +28,19 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 import * as CoreSpells from '../../src/game/gameObject/coreSpells/index';
 import * as AllSpellFactories from '../../packs/riot/spells/index';
+// The reference pack has no barrel index (only four spells, imported by
+// `packs/reference/pack.ts` individually) — imported the same way here, for
+// the same reason `AllSpellFactories` above is imported directly rather than
+// asked of the real `PackRegistry`: this file's own expected values must be
+// independent of the registry code under test, and a *second* installed
+// pack's champion is exactly as reachable by `planMatchKits`'s random
+// selection as the bundled pack's, so this test's own oracle has to know
+// about it too (fix round 1 of content-pack-extraction batch 5 task 4 — see
+// `AllSpellsByQualifiedId` below).
+import makeVeraQ from '../../packs/reference/spells/Vera_Q';
+import makeVeraW from '../../packs/reference/spells/Vera_W';
+import makeVeraE from '../../packs/reference/spells/Vera_E';
+import makeVeraR from '../../packs/reference/spells/Vera_R';
 import { buildContentApi } from '../../src/content/ContentApi';
 import { DEFAULT_CHAMPION_ATTACK } from '../../src/game/gameObject/attackableUnits/Champion';
 import { spellModules as coreSpellModules } from '../../src/generated/spellModules';
@@ -88,6 +101,44 @@ const spellCatalog: Record<string, unknown> = { ...riotSpellCatalog, ...coreSpel
 const barrelKeys = Object.keys(AllSpellsById).filter(
   key => typeof AllSpellsById[key] === 'function'
 );
+
+// The reference pack's four spells, resolved against the same `__api` —
+// `AllSpells` above only ever covers the bundled (riot) pack, which is
+// correct for the module-map/catalogue coverage checks it feeds (those are
+// specifically about the riot pack's own generated files), but wrong as the
+// *only* source of truth for "what class does this id build" once a second
+// pack's champion can be dealt into a real match.
+const ReferenceSpells: Record<string, unknown> = {
+  Vera_Q: makeVeraQ(__api),
+  Vera_W: makeVeraW(__api),
+  Vera_E: makeVeraE(__api),
+  Vera_R: makeVeraR(__api),
+};
+
+/**
+ * Every class this build can produce, keyed by the *qualified* id
+ * `qualifySpellId`/`PackRegistry` actually use — `riot:<id>` for the bundled
+ * pack (which is also where core's own `BasicAttack`/`Recall` live, folded
+ * onto it by `install.ts`) and `reference:<id>` for the reference pack.
+ *
+ * Fix round 1 of content-pack-extraction batch 5 task 4: `"is buildable
+ * once"` below used to strip only a `riot:` prefix and look the bare id up
+ * in `AllSpellsById` (riot + core only), so a match plan that happened to
+ * deal the reference pack's own champion (Vera — `planMatchKits` picks
+ * randomly and unseeded, so this was a genuine, roughly 1-in-8 flake, not a
+ * hypothetical) computed the wrong expected value: `undefined`, since
+ * `AllSpellsById` has no `reference:`-anything and the strip left a
+ * `reference:Vera_Q` key untouched. That was a bug in this test's own
+ * independent oracle, not in the registry it exercises — deleting Vera from
+ * the random pool would have hidden the gap instead of closing it, so the
+ * fix is this table covering both installed packs instead.
+ */
+const AllSpellsByQualifiedId: Record<string, unknown> = {
+  ...Object.fromEntries(Object.entries(AllSpellsById).map(([id, cls]) => [`riot:${id}`, cls])),
+  ...Object.fromEntries(
+    Object.entries(ReferenceSpells).map(([id, cls]) => [`reference:${id}`, cls])
+  ),
+};
 
 beforeEach(() => resetSpellRegistryForTests());
 afterEach(() => vi.restoreAllMocks());
@@ -245,18 +296,25 @@ describe('a match plan', () => {
     const plan = planMatchKits(DEFAULT_PREGAME_CONFIG);
     await loadSpells(plannedSpellIds(plan));
 
-    // A named champion's own ids arrive registry-qualified now (`riot:Yasuo_Q`);
-    // `AllSpellsById` is keyed by the barrel's bare export names, so the
-    // expected-value lookup strips the bundled pack's own prefix back off —
-    // independently of `qualifySpellId`/`classForId`, the functions under test.
-    const bareRiotId = (id: string): string => id.replace(/^riot:/, '');
+    // An id that already carries a colon (a named champion's own, e.g.
+    // `riot:Yasuo_Q`, or a cross-pack one, e.g. `reference:Vera_Q`) is used
+    // as-is; a bare id means the bundled pack, same rule `qualifySpellId`
+    // states — but written out again here, independently, rather than
+    // imported from `../../src/game/spellRegistry`: this test's expected
+    // value must not depend on the function the registry itself uses to
+    // compute it, or a bug in that function would cancel out against
+    // itself instead of failing here.
+    const qualify = (id: string): string => (id.includes(':') ? id : `riot:${id}`);
 
     for (const kit of [plan.player, ...plan.bots]) {
       const preset = presetFromPlan(kit);
       expect(preset.spells).toHaveLength(SLOT_COUNT);
       // Every slot is the exact class its id names — no fallbacks fired.
+      // `AllSpellsByQualifiedId` covers every installed pack (riot and
+      // reference), not just the bundled one, since `planMatchKits` picks a
+      // champion at random across all of them and this oracle must too.
       kit.spellIds.forEach((id, slot) => {
-        expect(preset.spells![slot]).toBe(AllSpellsById[bareRiotId(id)]);
+        expect(preset.spells![slot]).toBe(AllSpellsByQualifiedId[qualify(id)]);
       });
     }
   });
