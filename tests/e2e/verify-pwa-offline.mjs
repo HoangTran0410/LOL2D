@@ -20,6 +20,39 @@
  */
 import { preview } from 'vite';
 import { chromium } from 'playwright';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const distDir = join(process.cwd(), 'dist');
+
+/**
+ * How many distinct URLs `dist/sw.js`'s own precache manifest declares —
+ * the honest floor for "precache is populated", derived from this build's
+ * actual output rather than pinned to one configuration's file count.
+ *
+ * `CacheStorage` is keyed by URL, so a duplicate collapses to one entry at
+ * runtime. The generated manifest has one, deterministically: workbox's
+ * `generateSW` plugin lists `manifest.webmanifest` and all seven
+ * `favicon/*` icons twice — once from the asset glob, once from the PWA
+ * icon list it reads separately for the manifest it generates — in both a
+ * pack-present and a pack-free build, since neither pack touches the
+ * favicon set. Counting raw entries instead of unique URLs would overcount
+ * by exactly that duplication no matter how many files a build ships, so
+ * `cached` would never equal it and the check would need a fudge factor to
+ * pass at all. Deduping here is what makes an *exact* match honest instead
+ * of a guess.
+ *
+ * This is a real external check, not a self-fulfilling one: `cached` comes
+ * from the running service worker's actual `CacheStorage` at runtime, while
+ * this reads the manifest `sw.js` itself declares. A service worker that
+ * fails to cache everything it promised — a quota error, a dropped fetch, a
+ * install that partially completes — moves one without moving the other.
+ */
+const declaredPrecacheCount = () => {
+  const source = readFileSync(join(distDir, 'sw.js'), 'utf8');
+  const urls = [...source.matchAll(/\{url:"([^"]+)"/g)].map(match => match[1]);
+  return new Set(urls).size;
+};
 
 const server = await preview({ preview: { port: 0, strictPort: false } });
 const url = server.resolvedUrls.local[0];
@@ -72,7 +105,12 @@ try {
     }
     return count;
   });
-  check('precache is populated', cached > 200, `${cached} entries`);
+  const expectedPrecache = declaredPrecacheCount();
+  check(
+    'precache is populated',
+    cached === expectedPrecache,
+    `${cached} of ${expectedPrecache} declared entries cached`
+  );
 
   // A reload is what puts the worker in control of the page; without it the
   // first load is still coming straight off the network.

@@ -661,3 +661,54 @@ checks, confirmed both with riot present and with riot absent this session. Whet
 "complete enough" to ship core as a standalone product, or whether core needs its own
 summoner-spell pair before that claim holds, is a product decision for the user to make. It
 is not a defect this batch found and left unfixed.
+
+### Two pre-existing e2e failures — not this batch's, and not swept under it
+
+Task 9's full sweep found two scripts failing on re-run (each run twice, identically both
+times — the standard for treating a failure as real rather than the documented flakes). Both
+were checked against `git diff --stat 04d4946..HEAD` (this batch's whole range) and against
+`git log 04d4946..HEAD` for the driver script and the source it exercises. Neither the script
+nor the underlying game code appears anywhere in that range. **They are not this batch's bug
+and were left alone**, exactly as instructed, so the next session inherits a fact instead of a
+rumour:
+
+- **`tests/e2e/drive-touch-controls.mjs`** fails two checks:
+  - `a short UNIT drag releases the nearest auto-lock and selects along the aim ray` — a short
+    eastward drag after a tap-target auto-lock keeps the *nearest* target instead of releasing
+    to the *intended* one along the drag's aim ray.
+  - `dragging back onto the button spends nothing` — dragging a spell gesture back onto its
+    own button (the cancel gesture) spawns one object where zero is expected.
+  - Exercises `src/game/input/TouchControls.ts`. Not touched by this batch.
+- **`tests/e2e/drive-lux-beam-visibility.mjs`** fails one check:
+  - `the caster was unrendered for the whole cast (visibleToPlayerTeam false, Champion.draw at
+    zero)` — an off-camera, out-of-vision caster's `visibleToPlayerTeam` flag reads `true` for
+    the whole cast when it should read `false`; `Champion.draw` correctly never runs
+    (`casterDraws=0` both times), so only the flag itself is wrong, not the render skip it's
+    supposed to describe.
+  - Exercises `src/game/gameObject/map/FogOfWar.ts`. Not touched by this batch.
+
+### Fix round 1 — `verify-pwa-offline.mjs`'s precache floor stopped being a literal
+
+The one item the coordinator asked for after this handover note first shipped:
+`tests/e2e/verify-pwa-offline.mjs`'s `check('precache is populated', cached > 200, ...)` was
+exactly the class of bug this batch's own Global Constraints forbid — *"No population floor
+may be an absolute literal... A floor that reads `> 200` in a repo whose whole programme is
+moving files is a landmine."* Task 7 swept that class out of the Vitest scans; it never reached
+this e2e script, so `200` survived and failed every pack-free run at 57-65 entries.
+
+Fixed by deriving the expectation from the build's own output: `declaredPrecacheCount()` reads
+`dist/sw.js`'s own precache manifest and counts **distinct** URLs. The dedup is not
+cosmetic — the manifest deterministically lists `manifest.webmanifest` and all seven
+`favicon/*` icons twice (the asset glob and the PWA icon list both find them), in both build
+shapes, and `CacheStorage` collapses a duplicate URL to one entry at runtime. The check is now
+`cached === expectedPrecache`, an exact match, non-vacuous in both directions because
+`expectedPrecache` is read from the static manifest while `cached` is measured from the live
+service worker's actual `CacheStorage` — a genuine precache failure moves one without moving
+the other. Proven both ways, both shapes:
+
+| Build | Before falsification | After deleting real cache entries |
+|---|---|---|
+| pack-present | `467 of 467 declared entries cached` — PASS | deleted 12 → `455 of 467` — FAIL |
+| pack-free | `57 of 57 declared entries cached` — PASS | deleted 5 → `52 of 57` — FAIL |
+
+`npm run verify` stayed green at 279 files / 3807 tests after the change.
