@@ -178,7 +178,7 @@ export interface ContentApi {
    */
   asset(key: string): AssetHandle;
   /**
-   * `AssetManager.renderable`, for the two draw methods (Leblanc_W, Yasuo_Q)
+   * `AssetManager.renderable`, for the two draw methods (a stage-shifting decoy and a tornado ability)
    * that resolve a handle to something `image()` can paint rather than just
    * looking one up by key — `asset()` above is `AssetManager.get`, a
    * different static method with a different shape, so it cannot stand in
@@ -212,13 +212,14 @@ const COMBAT = Object.freeze({
   PredefinedFilters,
 });
 /**
- * `LuxBeamEffect` and Darius's `drawAxeArc`/`drawDariusAxe` used to live here,
+ * A beam ability's draw helper and an axe-throw ability's `drawAxeArc`/`drawAxe` used to live here,
  * and their presence was Batch 2's own whole-branch review flagging a bug:
  * they are champion-named drawing helpers, which is exactly what
  * `ContentApi` is not supposed to carry — a seam meant to keep core's surface
  * pack-neutral was requiring the opposite. Task 2 of the content-pack
- * extraction moved both into `packs/riot/vfx/`; `Darius_Q/W/E.ts` and
- * `Lux_R.ts` reached them by a relative path in the interim and moved into
+ * extraction moved both into `packs/riot/vfx/`; the axe-throw kit's three
+ * spells and
+ * the beam ultimate's spell reached them by a relative path in the interim and moved into
  * `packs/riot/spells/` themselves in batch 4 task 3, where that relative
  * reach is now an ordinary sibling-pack import. See
  * `tests/content/coreSpellsApiSurface.test.ts`'s "carries no champion-named

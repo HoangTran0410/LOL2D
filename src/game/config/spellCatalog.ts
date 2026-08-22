@@ -227,7 +227,7 @@ const displayFromEntry = (entry: SpellDisplayData, matchRules: MatchRules): Spel
 /**
  * One spell's display fields, with match rules applied. `qualifyBundledId`
  * passes an already-qualified id straight through, so this equally answers
- * for a bare bundled-pack id (`'Yasuo_Q'`) and for another pack's own
+ * for a bare bundled-pack id (`'<Champion>_Q'`) and for another pack's own
  * qualified id (`'reference:Vera_Q'`, e.g. from `SelectableChampionSpell.id`
  * or a picker entry's `id`) — only a *bare* id from a pack other than the
  * bundled one has nothing to resolve to here; see `packSpellCatalogEntry` for
@@ -285,7 +285,7 @@ export const spellIconKey = (id: string): string | null =>
 
 export interface SelectableChampionSpell {
   /**
-   * The bundled pack's own bare id (`'Yasuo_Q'`) for a bundled champion, or
+   * The bundled pack's own bare id (`'<Champion>_Q'`) for a bundled champion, or
    * another pack's registry-qualified id (`'reference:Vera_Q'`) for one of
    * its champions — never that pack's *bare* local id. `string`, not
    * `SpellCatalogId`: that generated union is the bundled pack's own bare ids
@@ -329,8 +329,9 @@ export { packAsset };
  * exactly that rule, validated once at pack install rather than re-checked
  * here (Task 3 moved it into pack validation; re-applying it here would mean
  * two definitions of pickable again). The roster also carries
- * single-ability stubs (Olaf, Graves, Thresh, ...) used to fill the random
- * pool — picking one of those directly would leave three of its four ability
+ * single-ability stubs — a champion kept in the pool with only one of Q/W/E/R
+ * implemented, used to fill the random pool — picking one of those directly
+ * would leave three of its four ability
  * slots empty, so they're left out of *this* picker and stay reachable
  * through "Ngẫu nhiên", and through `listSpellCatalog` slot by slot.
  */
@@ -369,36 +370,48 @@ export interface SummonerSpellOption {
 }
 
 /**
- * The "Phép Bổ Trợ" shelf. Written out explicitly rather than derived from the
- * shelf's position in the roster, so the D/F slots keep offering the same
- * five things if the shelf ever moves.
+ * The bundled pack's own D/F shelf — whichever roster row it marks
+ * `summonerShelf` (see `ChampionEntry.summonerShelf`'s own doc comment),
+ * read back through the registry the same way `listSelectableChampions`
+ * above reads the champion roster. Used to be a five-id literal sitting
+ * directly in this file — this pack's own content, unguarded, in the one
+ * module whose whole point is to read a pack's data rather than hold a copy
+ * of it (see this file's own header comment on `CHAMPION_KITS` moving out
+ * for the identical reason). `bareCatalogId` narrows the result to the
+ * bundled pack's own ids on purpose: the D/F picker only ever offers this
+ * pack's summoner spells today, same as before.
  */
-export const SUMMONER_SPELL_IDS: SpellCatalogId[] = [
-  'Flash',
-  'Ghost',
-  'Heal',
-  'Ignite',
-  'StealthWard',
-];
+export const summonerSpellIds = (): SpellCatalogId[] => {
+  const shelf = contentCatalog()
+    .champions()
+    .find(champion => champion.summonerShelf);
+  if (!shelf) return [];
+  const ids: SpellCatalogId[] = [];
+  for (const qualifiedId of shelf.spells) {
+    const id = bareCatalogId(qualifiedId);
+    if (id) ids.push(id);
+  }
+  return ids;
+};
 
 export const listSummonerSpells = (): SummonerSpellOption[] =>
-  SUMMONER_SPELL_IDS.map(id => ({ id, display: spellDisplayOf(id) }));
+  summonerSpellIds().map(id => ({ id, display: spellDisplayOf(id) }));
 
 /**
- * Which kit slot a spell's *name* claims: `Yasuo_Q` → 1 (Q), `Zed_R` → 4 (R).
- * Slot order is A(0), Q(1), W(2), E(3), R(4), D(5), F(6) — `SLOT_COUNT` and
- * `SpellHotKeys`.
+ * Which kit slot a spell's *name* claims: an id ending `_Q` claims slot 1,
+ * one ending `_R` claims slot 4. Slot order is A(0), Q(1), W(2), E(3), R(4),
+ * D(5), F(6) — `SLOT_COUNT` and `SpellHotKeys`.
  *
  * This exists so "apply this champion's whole kit" can put each ability where
  * it belongs even when the champion only has some of them: the roster
- * carries single-ability shelves (Graves is `Graves_W` alone, Fizz is
- * `Fizz_E`) and dropping those into Q just because they are first in their
+ * carries single-ability shelves (a shelf whose one implemented spell is its
+ * W, say) and dropping those into Q just because they are first in their
  * shelf would be wrong. Full four-ability shelves are always listed in
  * Q/W/E/R order, so for those this agrees with position — it only ever
  * *disagrees* for the partial shelves, which is the case it is here for.
  *
- * `null` for anything without one of those four suffixes — `BasicAttack`,
- * `Flash`, `StealthWard` — which is also how the basic-attack and summoner
+ * `null` for anything without one of those four suffixes — `BasicAttack`, a
+ * summoner spell — which is also how the basic-attack and summoner
  * shelves end up with no "apply the kit" action at all.
  */
 const ABILITY_SLOT_BY_SUFFIX: Record<string, number> = { Q: 1, W: 2, E: 3, R: 4 };

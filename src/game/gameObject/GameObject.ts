@@ -87,8 +87,8 @@ export default class GameObject {
    * Two plain numbers, not a vector: every object carries a pair and the draw
    * pass reads them every frame, so a `createVector` here would be an allocation
    * per object per tick for a value nothing outside rendering ever sees. Named
-   * `renderOrigin*` rather than `previous*` because `Camille_E`/`Nautilus_Q`
-   * already declare `private previousX/Y` and the collision would be a TS2415
+   * `renderOrigin*` rather than `previous*` because two of this pack's own
+   * spell classes already declare `private previousX/Y` and the collision would be a TS2415
    * `typecheck:core` catches and nothing else.
    */
   renderOriginX: number;

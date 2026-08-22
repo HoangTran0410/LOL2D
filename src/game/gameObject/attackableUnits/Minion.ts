@@ -103,8 +103,8 @@ export const AGGRO_SCAN_INTERVAL_MS = 200;
  * should not mean editing a test.
  *
  * A champion is 55 units across and moves 180 units/sec; this is picked to
- * read as a slow, deliberate shot next to that, not a spell-speed one (Varus'
- * arrow and Turret's bolt both move at 780-1200 units/sec).
+ * read as a slow, deliberate shot next to that, not a spell-speed one (a
+ * long-range arrow ability and Turret's bolt both move at 780-1200 units/sec).
  */
 export const RANGED_BOLT_SPEED = 360 / 60;
 /** How far a minion lights fog for its team — a cheap circle, no wall raycast. */
@@ -166,7 +166,7 @@ export default class Minion extends AttackableUnit {
    */
   static displayZIndex = 3.2;
 
-  /** Read by spell damage multipliers (Pantheon Q) to soften hits on a wave. */
+  /** Read by spell damage multipliers (a wave-clear ability) to soften hits on a wave. */
   readonly unitType = 'minion';
 
   name: string;
@@ -378,7 +378,7 @@ export default class Minion extends AttackableUnit {
       this.stopMovement();
       // `canAttack` because a minion swings on its own timer instead of through
       // `BasicAttackController`, which is where champions get this gate. Without
-      // it a wave lifted by a Yasuo tornado or a Janna Q kept swinging on the
+      // it a wave lifted by a knock-up or held by a slowing zone kept swinging on the
       // beat all the way up — the buff and its status flags applied correctly,
       // so the crowd control simply read as doing nothing. The cooldown is only
       // spent on a swing that actually happens, so the wave resumes the frame it

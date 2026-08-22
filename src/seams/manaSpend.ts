@@ -10,7 +10,7 @@ import { codeOnly, readSource, walkTsFiles } from './shared';
  * catches that: the write is perfectly well typed.
  *
  * See `tests/game/spells/mana-spend-seam.test.ts` for the worked example
- * (Anivia R) and for the parts of this rule that stay core-only: unit-side
+ * (an upkeep-channel ultimate) and for the parts of this rule that stay core-only: unit-side
  * mana plumbing (fountains, regen, refills) is deliberately out of scope, and
  * is checked by that test against core's own fixed directories rather than
  * an arbitrary content tree.

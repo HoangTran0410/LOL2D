@@ -5,7 +5,7 @@ import Buff from '@/game/gameObject/Buff';
 
 /**
  * The unit cannot be picked as a target or hit by anything, but keeps acting.
- * Used by the brief invulnerable windows on leaps (Fizz E, Zed R).
+ * Used by the brief invulnerable windows on leaps.
  *
  * `PredefinedFilters.canTakeDamageFromTeam` already tests `targetable`, so every
  * spell that queries for enemies skips the unit for free.

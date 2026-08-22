@@ -67,6 +67,8 @@ const ROSTER: {
   image: string | null;
   spells: RosterSpellId[];
   attack?: ChampionAttack;
+  /** See `ChampionEntry.summonerShelf`'s own doc comment. Set on exactly one row, below. */
+  summonerShelf?: boolean;
 }[] = [
   // First, and a shelf of its own rather than a line on the summoner spell
   // shelf: it belongs to no champion and it is not a summoner spell, it is the
@@ -83,6 +85,7 @@ const ROSTER: {
     name: 'Phép Bổ Trợ',
     image: null,
     spells: ['Flash', 'Ghost', 'Heal', 'Ignite', 'StealthWard'],
+    summonerShelf: true,
   },
   {
     name: 'Yasuo',
@@ -516,6 +519,7 @@ const championEntries = (): ChampionEntry[] => {
       attack: kit.attack,
       spells: [...kit.spells],
       recall: 'Recall',
+      summonerShelf: kit.summonerShelf,
     });
   }
   return out;

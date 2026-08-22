@@ -206,8 +206,9 @@ export default class MatchDirector {
    * classes and an avatar, and `'random'` — the default for the player and
    * every bot — has already collapsed into one particular champion. So
    * `Champion` → `ChampionLoadout` is not recoverable by inspection; a bot on
-   * `'random'` that spawned as Yasuo would read back as "the Yasuo loadout",
-   * which is a different match setting from the one the player chose.
+   * `'random'` that spawned as a particular champion would read back as "the
+   * loadout for that champion", which is a different match setting from the
+   * one the player chose.
    *
    * A `WeakMap` rather than a field on `Champion` because this is the *panel's*
    * bookkeeping, not the unit's: nothing in the simulation reads it, and a bot
@@ -521,9 +522,10 @@ export default class MatchDirector {
    * unpaused tick — two different things, and `bots()` explains why it counts
    * both. Nothing it does is visible on the canvas until then (see the file
    * comment). `presetFactory` closes over the same loadout so the bot's
-   * identity survives its own deaths — a bot the player configured as Zed
-   * comes back as Zed, while one left on 'random' keeps re-rolling exactly as
-   * before, because `getChampionPresetFromLoadout` re-resolves 'random' on
+   * identity survives its own deaths — a bot the player configured as a
+   * particular champion comes back as that champion, while one left on
+   * 'random' keeps re-rolling exactly as before, because
+   * `getChampionPresetFromLoadout` re-resolves 'random' on
    * every call.
    */
   addBot(loadout: ChampionLoadout): AIChampion | null {
@@ -633,8 +635,8 @@ export default class MatchDirector {
    * leaves them alone because its other two callers must not touch them (a
    * champion under construction, and a respawn that has already refilled), so
    * "the unit keeps standing where it is but starts the try-out at full" is
-   * this method's own contract: a Yasuo on 12 HP that becomes a Zed on 12 HP
-   * is not what "try this champion now" means.
+   * this method's own contract: a champion on 12 HP that becomes a different
+   * champion on 12 HP is not what "try this champion now" means.
    *
    * For a bot this also rewrites `presetFactory` and re-arms the respawn roll,
    * so the identity the player just chose survives the bot's next death
@@ -1085,7 +1087,7 @@ export default class MatchDirector {
 
 /**
  * Effectively permanent, matching the other never-expiring buffs in this
- * codebase (`Veigar_Q_Power`, `ChoGath_R_Growth`). The toggle turns
+ * codebase (a stacking spell's own permanent-power buff, a size-growth ultimate's own permanent buff). The toggle turns
  * invulnerability off with `deactivateBuff()`, so this is a backstop rather
  * than the mechanism.
  */

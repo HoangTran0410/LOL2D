@@ -11,7 +11,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * when the incoming context carries no target.
  *
  * See `tests/game/spells/unit-target-team-seam.test.ts` for the shipped
- * examples (Diana E, Sett R, Syndra R, Vi R).
+ * examples (four unit-targeted spells across four different champions).
  */
 export interface UnitTargetTeamOptions extends SeamCheckOptions {
   /**

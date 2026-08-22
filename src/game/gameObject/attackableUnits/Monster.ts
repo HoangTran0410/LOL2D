@@ -8,8 +8,8 @@ import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Champion from './Champion';
 
 /**
- * Something a camp can do besides swing — Baron's poison spit, its tail slam,
- * the pool it leaves behind. Declared on the preset rather than written into
+ * Something a camp can do besides swing — a ranged spit, a melee slam,
+ * a pool it leaves behind. Declared on the preset rather than written into
  * `Monster`, so the second camp that wants a kit (a dragon, a buff camp) states
  * it the same way instead of adding another branch here.
  *
@@ -87,8 +87,8 @@ export const MONSTER_GIVE_UP_DELAY_MS = 2000;
 /**
  * What a camp is when nobody said. Deliberately anonymous and at the origin.
  *
- * This was Baron — its name, its art and its Summoner's Rift coordinates —
- * which made an engine file depend on one map's content and put any
+ * This was a specific jungle boss — its name, its art and its map's own
+ * coordinates — which made an engine file depend on one map's content and put any
  * preset-less monster in the middle of that map's river. Every real camp comes
  * from map data; this exists so the constructor has something total to fall
  * back on, and a caller that reaches it has a bug worth seeing.
@@ -161,7 +161,7 @@ export default class Monster extends AttackableUnit {
     this.stats.healthRegen.baseValue = 0;
     this.stats.visionRadius.baseValue = 0;
 
-    // A camp with no speed of its own (Baron) is scenery: it pushes units off
+    // A camp with no speed of its own (a stationary boss) is scenery: it pushes units off
     // itself and never budges. One with legs takes its half like everyone else.
     this.isImmovable = preset.speed === 0;
 
@@ -196,8 +196,8 @@ export default class Monster extends AttackableUnit {
     //
     // A camp with no speed of its own has no way back from a displacement, so
     // it never accepts one — exactly the contract a turret's foundation has,
-    // and the same two lines. Baron used to be draggable by a hook, a wall or a
-    // Lee Sin kick and then stranded for the rest of the match: past its 100px
+    // and the same two lines. A stationary boss used to be draggable by a hook, a wall or a
+    // dash-kick and then stranded for the rest of the match: past its 100px
     // camp radius `updateAttack` bounces it into BACK_TO_CAMP, a phase it can
     // never walk out of, and a camp in BACK_TO_CAMP never runs `updateIdle`
     // again — so it stopped aggroing, stopped swinging, and stopped drawing the
@@ -226,8 +226,8 @@ export default class Monster extends AttackableUnit {
     this._scanCooldown = 250;
 
     // The leash check used to live only in `updateAttack`, so it could not see
-    // a camp that was moved with nothing chasing it: an Anivia wall or a hook
-    // that pushed a wolf out of its pit while it was idle left it standing
+    // a camp that was moved with nothing chasing it: a spell-made wall or a hook
+    // that pushed a camp out of its pit while it was idle left it standing
     // wherever it was dumped for the rest of the match. Measured against the
     // camp radius, not the arrival tolerance — camps in a shared pit hold each
     // other tens of pixels off their own points forever, and walking home over
@@ -254,8 +254,8 @@ export default class Monster extends AttackableUnit {
    * than the pit on purpose so it actually pursues rather than stopping at the
    * edge of its own ground.
    *
-   * The base is `camp.r`/`aggroRange`, whichever is wider (the pit for a wolf,
-   * the reach for Baron), plus `MONSTER_CHASE_MARGIN`. A target — or the camp
+   * The base is `camp.r`/`aggroRange`, whichever is wider (the pit for a small camp,
+   * the reach for a stationary boss), plus `MONSTER_CHASE_MARGIN`. A target — or the camp
    * itself, once it has walked out chasing — outside this for longer than
    * `MONSTER_GIVE_UP_DELAY_MS` is let go.
    */
@@ -283,7 +283,7 @@ export default class Monster extends AttackableUnit {
     // it — the target runs off, or the camp itself has walked too far out — a
     // delay runs before it turns for home. A player who kites just past the line
     // for a moment, or ducks out and back, is still pursued rather than dropped
-    // the instant they step over it. Baron (no legs) never moves, so only its
+    // the instant they step over it. A stationary boss (no legs) never moves, so only its
     // target leaving can start the clock.
     const leash = this.chaseLeashRange();
     const escaped =
@@ -336,7 +336,7 @@ export default class Monster extends AttackableUnit {
    * The first ability that is off cooldown and close enough, or nothing.
    *
    * `canCast` rather than `canAttack`: this is the gate a champion's abilities
-   * sit behind, so a stun or a knock-up landed on Baron cuts its combo the same
+   * sit behind, so a stun or a knock-up landed on a camp cuts its combo the same
    * way it cuts yours. One per frame, and the caller returns straight after —
    * a camp that both quaked and bit in the same 16ms would be unreadable.
    */
@@ -444,7 +444,7 @@ export default class Monster extends AttackableUnit {
    * jungle monster chasing a minion down a lane is not a thing this game has.
    * So a taunt from anything else is simply not something a camp can obey —
    * which today is no restriction at all, since the only taunt in the game is
-   * Rammus E.
+   * one champion's own.
    */
   forceAttackTarget(attacker: AttackableUnit): void {
     if (this.isDead || attacker.isDead || !(attacker instanceof Champion)) return;

@@ -10,8 +10,8 @@ import { Rectangle } from '@/libs/quadtree';
  * question and it was missing entirely: every auto-locking spell in the game
  * picked its victim out of a bare `queryObjects` circle, which knows about
  * teams, death and targetability and nothing at all about the fog the player is
- * looking at. Warwick R standing in the jungle behind a wall, on a screen
- * showing nothing but black, still found the blue camp, still passed
+ * looking at. A leap ability standing in the jungle behind a wall, on a screen
+ * showing nothing but black, still found a jungle camp, still passed
  * `checkCastCondition`, and still leaped through the wall to bite it. So did
  * the two dozen other spells that pick a target for you.
  *
@@ -34,7 +34,7 @@ import { Rectangle } from '@/libs/quadtree';
  * arrives holding a candidate its own query already bounded — a spell's range,
  * a minion's aggro radius. A sight-radius cap on top would silently retune all
  * of them against 500, a number picked for the camera, and would have shrunk
- * Warwick R from its authored 550. The one place a radius *does* count is a
+ * one leap ability from its authored 550. The one place a radius *does* count is a
  * borrowed eye: a ward sees the circle it lights and no further.
  *
  * Applied to `AIChampion`'s target scan at every tier, through
@@ -255,7 +255,7 @@ function borrowedEyeSees(game: VisionHost | undefined, eye: Seeable, target: See
   if (!from || !to) return false;
 
   // Measured to the target's edge, the same widening `Reach.ts` applies: a
-  // Cho'Gath who has eaten his way to twice the size is seen from further away.
+  // champion who has grown to twice its size is seen from further away.
   const reach = grantedSightRadius(eye) + (target.stats?.size?.value ?? 0) / 2;
   if (!withinRadius(from, to, reach)) return false;
 

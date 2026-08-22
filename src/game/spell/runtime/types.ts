@@ -89,11 +89,11 @@ export interface ActiveSpec {
   recastDelayMs?: number;
   /**
    * How many times the key may be pressed again before the activation ends.
-   * Defaults to 1, which is every recast spell here bar one: Ziggs W detonates,
-   * Riven R slashes, Renekton E dashes a second time and that is the end of it.
+   * Defaults to 1, which is every recast spell here bar one: a detonation
+   * fires, a slash lands, a second dash goes off and that is the end of it.
    *
-   * Jhin R is the shape that needs more — one press raises the curtain and the
-   * next four are his four rounds — and without this the runtime completed the
+   * One ultimate is the shape that needs more — one press raises the curtain and the
+   * next four are its four rounds — and without this the runtime completed the
    * activation on the first recast, so the stage closed after a single shot.
    * `recastDelayMs` is then the gap between *consecutive* recasts rather than a
    * one-off wait after the activation begins.

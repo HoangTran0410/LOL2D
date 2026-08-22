@@ -14,10 +14,10 @@ import NavGrid, { navNow, type NavPoint } from './NavGrid';
  *
  * The heuristic is then **weighted**, which trades optimality for expansions.
  * Measured over 178 reachable orders scattered across this map, and the walk
- * from the blue fountain to Baron's camp as the hard case:
+ * from the blue fountain to the jungle boss's camp as the hard case:
  *
  *   weight   median   p99      worst    route length
- *   1.0      —        —        —        (baron: 6,532 expansions)
+ *   1.0      —        —        —        (boss camp: 6,532 expansions)
  *   1.2        771    7,647    15,568   baseline
  *   1.5        395    5,166    13,591   +0.7%
  *   2.0        303    3,622     5,649   +2.1%   <- shipped

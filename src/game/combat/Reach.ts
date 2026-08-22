@@ -6,12 +6,13 @@ import { withinRadius } from '@/utils/math.utils';
  *
  * Ability ranges are measured from the caster's centre, but bodies take up
  * space and push each other apart: `UnitCollisionSystem` holds two units at
- * least `bodyRadius(a) + bodyRadius(b)` apart. Grow a champion — Cho'Gath R
- * reaches MAX_UNIT_SIZE — and the nearest an enemy's centre can ever get grows
- * with him, while the range stayed where it was written. Ranges shorter than
- * that separation stop working entirely rather than partially: Lee Sin's
- * ultimate looks for enemies inside 80 units and, at full size, cannot be
- * satisfied by a body that is physically forbidden from coming closer than 110.
+ * least `bodyRadius(a) + bodyRadius(b)` apart. Grow a champion — a stacking
+ * self-buff can reach MAX_UNIT_SIZE — and the nearest an enemy's centre can
+ * ever get grows with it, while the range stayed where it was written. Ranges
+ * shorter than that separation stop working entirely rather than partially: a
+ * melee-range ultimate looks for enemies inside 80 units and, at full size,
+ * cannot be satisfied by a body that is physically forbidden from coming
+ * closer than 110.
  *
  * The rule is to give back only what a grown body took away:
  *

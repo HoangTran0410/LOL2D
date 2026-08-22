@@ -9,7 +9,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * step towards the destination. Use `onDashUpdate`, which the base calls.
  *
  * See `tests/game/spells/dash-onupdate-seam.test.ts` for the shipped
- * examples (Camille E, Ekko E, Jarvan Q) and the behavioural half that proves
+ * examples (three separate dash spells across three champions) and the behavioural half that proves
  * `onDashUpdate` still moves the champion.
  */
 const ON_UPDATE_ASSIGNMENT = /\b\w+\.onUpdate\s*=/g;

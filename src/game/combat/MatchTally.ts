@@ -38,7 +38,7 @@ export default class MatchTally {
  * What killing this unit is worth on someone else's scoreboard.
  *
  * `'none'` is not an oversight: a `Pet` extends `Champion`, so without it every
- * Shaco clone and every Zed shadow would read as a champion kill, and a turret
- * would read as a minion. Neither is a thing you get credit for here.
+ * summoned pet's kill would read as a champion kill, and a turret would read
+ * as a minion. Neither is a thing you get credit for here.
  */
 export type KillCredit = 'champion' | 'minion' | 'none';

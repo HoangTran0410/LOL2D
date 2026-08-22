@@ -9,7 +9,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * target *acquisition*, never damage application.
  *
  * See `tests/game/spells/target-vision-seam.test.ts` for the worked example
- * (Warwick R finding a camp through a wall).
+ * (a leap ability finding a camp through a wall).
  */
 const PICKS_ONE_UNIT = /nearestDistance|closestDistance|nearestDist\b|minD\b/;
 

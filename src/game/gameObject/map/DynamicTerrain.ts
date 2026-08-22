@@ -7,7 +7,7 @@ import type GameObject from '@/game/gameObject/GameObject';
 /**
  * Terrain a spell put there.
  *
- * Anivia W and Jarvan R do not decorate the map — they *are* map, for as long
+ * A spell-made ice wall and a spell-made rock wall do not decorate the map — they *are* map, for as long
  * as they last: both shove every unit out of themselves each frame, the same
  * job `TerrainMap.pushOutOfWalls` does for the polygons in
  * `summoner_map.json`. What they were not was *askable*. `TerrainMap` knows
@@ -15,9 +15,10 @@ import type GameObject from '@/game/gameObject/GameObject';
  * ones that hook onto them, stop at them, bounce off them — saw a map with
  * holes in it exactly where another player had just built something.
  *
- * That is the shape of the reported bug: Camille's grapple flew straight
- * through an ice wall, and it flew through Cataclysm too. Neither is a Camille
- * bug; both are the same missing question, and Janna R's knockback clamp had it
+ * That is the shape of the reported bug: a grapple-hook ability flew straight
+ * through an ice wall, and it flew through a spell-made rock wall too. Neither is a
+ * bug in the grapple ability; both are the same missing question, and a
+ * knockback ultimate's clamp had it
  * as well.
  *
  * So a slab declares `blocksMovement` and `wallVertices()`, and
@@ -36,7 +37,7 @@ export interface DynamicWall {
   position: { x: number; y: number };
 
   /**
-   * Whether it is terrain *right now*. A Cataclysm slab is underground until
+   * Whether it is terrain *right now*. A delayed-eruption slab is underground until
    * `eruptDelay` and stops blocking the instant a recast collapses it; a hook
    * that caught either would be catching on something not on screen.
    */

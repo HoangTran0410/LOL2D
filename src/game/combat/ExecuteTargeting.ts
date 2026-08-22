@@ -7,8 +7,8 @@ import { vecDist } from '@/utils/math.utils';
  * Last-hitting, for a game that cannot click a unit.
  *
  * Several abilities are only worth casting on something that dies to them —
- * Nasus Q and Cho'Gath R bank a permanent stack off the kill, Garen R exists to
- * finish people. In League you last hit by clicking the one you mean. Here
+ * a stack-banking spell only pays out on a kill, an execute ability exists to
+ * finish people. In the reference game you last hit by clicking the one you mean. Here
  * there is no unit-targeted click: those spells auto-lock, and every one of
  * them locked onto whatever was *nearest*, which is exactly the enemy you did
  * not want when a different one was two hits from dead.
@@ -41,8 +41,8 @@ export interface ExecuteSpell {
 
   /**
    * Damage `target` would take if the spell went off this instant. An estimate
-   * is fine and sometimes unavoidable — Garen R computes the real number 450ms
-   * later, after the blade lands — but it must be the same formula, or the mark
+   * is fine and sometimes unavoidable — a delayed execute computes the real
+   * number 450ms later, after the blow lands — but it must be the same formula, or the mark
    * on screen promises a kill the cast does not deliver.
    */
   executeDamageAgainst(target: AttackableUnit): number;
@@ -91,8 +91,8 @@ type ExecuteCaster = { owner?: Seeable & { position?: { x: number; y: number } }
 /**
  * Everyone the spell could hit *and* the caster can actually see.
  *
- * The candidate queries are per-spell and every one of them was blind: Garen R
- * would sentence a champion through a wall, and the mark promising the kill was
+ * The candidate queries are per-spell and every one of them was blind: a
+ * delayed execute would sentence a champion through a wall, and the mark promising the kill was
  * painted on a body the player could not see. Filtering here rather than in each
  * `executeCandidates` means the targeting and the mark cannot disagree, which is
  * this module's whole reason for existing.
@@ -132,14 +132,15 @@ export function lethalTargets(spell: ExecuteSpell & ExecuteCaster): AttackableUn
  *
  * Among the ones that die, the *lowest* effective health wins rather than the
  * nearest. Two reasons, and the first is the one that bites: a lethal pick is
- * only a promise until the damage lands, and Garen R takes 450ms to land it —
- * during which a heal or a shield can save anyone. The candidate with the least
- * health left is the one that survives the fewest of those. The second is that
- * it is the same rule Garen R already used, so nothing about that ability
- * changed shape.
+ * only a promise until the damage lands, and a delayed execute takes 450ms
+ * to land it — during which a heal or a shield can save anyone. The candidate
+ * with the least health left is the one that survives the fewest of those. The
+ * second is that it is the same rule that delayed execute already used, so
+ * nothing about that ability changed shape.
  *
  * Distance only breaks a tie. With nobody killable the spell's own fallback
- * decides, which is what keeps Nasus Q usable as a plain damage button.
+ * decides, which is what keeps a plain stack-banking spell usable as an
+ * ordinary damage button.
  */
 export function pickExecuteTarget(spell: ExecuteSpell & ExecuteCaster): AttackableUnit | null {
   const origin = spell.owner?.position;

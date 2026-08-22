@@ -12,8 +12,8 @@ import type Spell from '@/game/gameObject/Spell';
  *
  * Deliberately *not* a `castSpec.vfx` and not drawn from `Champion.draw`. Both
  * are skipped the moment the caster is culled, and this has to keep painting on
- * a target at the far edge of the range ring — the same failure that made Lux's
- * beam invisible. `Game.draw` calls it beside `drawNavDebug`, inside the camera
+ * a target at the far edge of the range ring — the same failure that made a
+ * beam ability's own visual invisible. `Game.draw` calls it beside `drawNavDebug`, inside the camera
  * transform, so it answers only to the camera.
  *
  * Only the player's own spells are ever consulted. A ring over an enemy that
@@ -35,7 +35,8 @@ export interface ExecuteMark {
    * `Spell.isCastableNow` — off cooldown, paid for, caster free to act.
    *
    * Deliberately *not* a condition for being marked at all. It was, and the
-   * result was measured rather than argued about: spamming Veigar Q left the
+   * result was measured rather than argued about: spamming a fast-cooldown
+   * damage spell left the
    * ring on for 7 frames out of 481, every blank frame down to
    * `state === COOLDOWN`. A mark that blinks off the instant you use the
    * ability is at its least useful exactly when you are using it — the whole
@@ -48,8 +49,8 @@ export interface ExecuteMark {
 /**
  * Every enemy the caster could finish this instant, each listed once.
  *
- * A unit can be lethal to two different spells at once (a stacked Nasus Q and a
- * Cho'Gath R both reach it); it still gets one mark, because the mark means
+ * A unit can be lethal to two different spells at once (a stacked damage-over-time
+ * effect and a direct hit both reach it); it still gets one mark, because the mark means
  * "dies to something you have", not "dies twice".
  */
 export function executeMarks(caster: SpellCarrier | null | undefined): ExecuteMark[] {

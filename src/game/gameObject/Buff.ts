@@ -115,7 +115,8 @@ export default class Buff {
    *
    * `swung` is what arrived before anything ate it; `landed` is what actually
    * reached health. It cannot change either, and that is the point: a buff that
-   * *reacts* to being hit (Rammus W's spikes, Annie E's shield burn) has no
+   * *reacts* to being hit (a thorns-style spike counter, a shield's own burn
+   * effect) has no
    * business being a link in the mitigation chain, where the answer depends on
    * whether some other buff was added before or after it. Two shields on one
    * unit put a reflect behind them and it silently stopped firing.

@@ -77,7 +77,7 @@ export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
  * Health per tick mark on a champion's bar. The frame is a fixed width, so the
  * number of ticks is what communicates pool size: more ticks means more health.
  * The step widens once a pool would draw more than MAX_TICKS, otherwise a
- * grown-out Cho'Gath bar turns into a solid block of lines.
+ * grown-out health pool's bar turns into a solid block of lines.
  */
 /**
  * Crowd-control buffs named under the health bar, in the order they print.
@@ -195,8 +195,8 @@ export default class Champion extends AttackableUnit {
    * being rebuilt into an identical-looking new one. The practice panel's
    * loadout editor commits a whole loadout even when the player changed a
    * single slot, so rebuilding unconditionally charged every edit the state
-   * that lives on a spell instance and nowhere else: Nasus Q's stacks went to
-   * zero when the player swapped W. Running cooldowns and active phases went
+   * that lives on a spell instance and nowhere else: a stacking spell's stacks went to
+   * zero when the player swapped a different slot. Running cooldowns and active phases went
    * the same way.
    */
   applyPreset(preset: ChampionPresetData): void {
@@ -450,7 +450,7 @@ export default class Champion extends AttackableUnit {
     let x = topleft.x + 10 * k;
     if (alpha < 255) tint(255, alpha);
     // One icon per kind of buff with a stack count, not one per instance:
-    // Veigar Q can hold hundreds of StatAmp stacks, which used to draw hundreds
+    // one stacking spell can hold hundreds of StatAmp stacks, which used to draw hundreds
     // of icons straight off the side of the screen.
     // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
     // drew every buff twice, and inside this block's tint().)

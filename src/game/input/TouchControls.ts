@@ -403,7 +403,7 @@ export class TouchControls {
       this.gestures.set(point.id, gesture);
       // Aim before pressing, not after. A charged spell is pressed *inside*
       // beginSlot, and it builds its cast context there — if the aim has not
-      // landed yet, Varus Q starts charging at whatever the mouse last touched.
+      // landed yet, a charge spell starts charging at whatever the mouse last touched.
       gesture.aim = this.aimFor(gesture);
       this.host.setSlotAim(button.slot, gesture.aim ? gesture.aim.cursorWorld : null);
       this.host.beginSlot(button.slot);

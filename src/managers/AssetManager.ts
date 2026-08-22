@@ -212,7 +212,7 @@ export default class AssetManager {
    * Several keys routinely point at one file: Vite emits a single
    * content-hashed asset for byte-identical sources, and 17 groups of icons
    * here are literally the same picture — `jinx_q`, `jinx_q2`, `jinx_q3` and
-   * `jinx_q4` are one PNG, as are Leblanc's four R stages. Keyed only by asset
+   * `jinx_q4` are one PNG, as are another champion's four ultimate stages. Keyed only by asset
    * key, each of those fetched the same bytes again: measured at 4 requests for
    * `jinx_q-CtVD-9_Y.png` in a production build, 762 requests for 372 distinct
    * files across the preload.

@@ -7,12 +7,12 @@ import { BUNDLED_PACK_ID } from '@/content/install';
  * ## The problem this solves
  *
  * Spell classes live behind `PackRegistry` now (`@/content/registry`), keyed
- * by qualified id — `riot:Yasuo_Q`, not `Yasuo_Q` — because a second
+ * by qualified id — `riot:<Champion>_Q`, not `<Champion>_Q` — because a second
  * installed pack may reasonably reuse a local name. This module does not own
  * a map of its own any more; it is the thin, bare-id-friendly adapter the
  * rest of the engine already calls. `qualifySpellId` is the seam: a stored
- * loadout in a player's browser holds `"Yasuo_Q"`, and that string keeps
- * meaning "the bundled pack's Yasuo_Q" for as long as this file resolves it
+ * loadout in a player's browser holds `"<Champion>_Q"`, and that string keeps
+ * meaning "the bundled pack's <Champion>_Q" for as long as this file resolves it
  * that way.
  *
  * ## Why the read side is synchronous
@@ -50,7 +50,7 @@ let everythingRequested = false;
 /**
  * A bare id means the bundled pack.
  *
- * Loadouts persisted before content became packs hold `"Yasuo_Q"`, and a
+ * Loadouts persisted before content became packs hold `"<Champion>_Q"`, and a
  * player's saved kit is not something to throw away over a prefix. A pack id
  * is `[A-Za-z0-9][A-Za-z0-9._-]*` and a colon appears in no local id, so the
  * test is unambiguous.

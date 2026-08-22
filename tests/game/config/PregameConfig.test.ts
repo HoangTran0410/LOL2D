@@ -6,6 +6,7 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_BOT_DIFFICULTY,
+  DEFAULT_CHAMPION_LOADOUT,
   DEFAULT_MAP_ID,
   DEFAULT_PREGAME_CONFIG,
   SLOT_COUNT,
@@ -752,6 +753,22 @@ describe('mapId', () => {
     vi.stubGlobal('localStorage', new MemoryStorage());
     savePregameConfig({ ...DEFAULT_PREGAME_CONFIG, mapId: 'reference:proving-grounds' });
     expect(loadPregameConfig().mapId).toBe('reference:proving-grounds');
+  });
+});
+
+/**
+ * `DEFAULT_CHAMPION_LOADOUT.summonerD`/`summonerF`'s own doc comment: two
+ * more restated literals, for the same reason `DEFAULT_MAP_ID` is one. This
+ * is the cross-check that stops them drifting from the bundled pack's own
+ * summoner-spell shelf silently — the same discipline the `mapId` describe
+ * block above applies to `DEFAULT_MAP_ID`.
+ */
+describe('DEFAULT_CHAMPION_LOADOUT summoner defaults', () => {
+  it('names two real entries on the bundled pack’s own summoner-spell shelf', async () => {
+    const { summonerSpellIds } = await import('../../../src/game/config/spellCatalog');
+    const ids = summonerSpellIds();
+    expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerD);
+    expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerF);
   });
 });
 

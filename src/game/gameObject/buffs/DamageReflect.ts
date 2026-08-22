@@ -11,7 +11,7 @@ import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUni
  * insertion order with each buff handing the next what is left, so *where* the
  * reflect sat decided what it reflected — behind a shield it only ever saw the
  * overflow. Making the caster add it first fixed one cast and not the next:
- * recast Annie E while the old shield is still up (90% CDR makes that routine)
+ * recast a shield-with-burn spell while the old shield is still up (90% CDR makes that routine)
  * and the *old* shield sits in front of the *new* burn, which then never fires.
  *
  * `Buff.onDamageTaken` runs after the whole mitigation chain and is handed both
@@ -20,7 +20,7 @@ import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUni
  * takes 40" is the sentence, and a shield eating the 50 does not make the swing
  * smaller.
  *
- * Every hit is paid for. Annie E carried a "once per enemy per cast" ledger
+ * Every hit is paid for. One shield-with-burn spell carried a "once per enemy per cast" ledger
  * for a while — the wiki's own wording — and it was dropped on purpose: a
  * reflect that fires once and then goes quiet reads as broken rather than as
  * limited, which is exactly how it was reported. What stops it doubling is not
@@ -43,11 +43,11 @@ let reflecting = false;
 export default class DamageReflect extends Buff {
   name = 'Phản Đòn';
 
-  /** Share of the incoming hit sent back, 0–1. Rammus W's whole effect. */
+  /** Share of the incoming hit sent back, 0–1. A thorns spell's whole effect. */
   percent = 0.8;
 
   /**
-   * A fixed return on top of the share. Annie E is the flat kind — a shield
+   * A fixed return on top of the share. A shield-with-burn spell is the flat kind — a shield
    * that burns whoever touches it for the same amount however hard they hit.
    * Additive rather than a mode switch, so a spell that wants both just sets
    * both and nothing here has to branch.

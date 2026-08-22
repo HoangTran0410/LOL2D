@@ -8,7 +8,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * between them, or a single-point sample a moving hook can overshoot or skip.
  *
  * See `tests/game/spells/terrain-field-seam.test.ts` for the five shipped
- * examples (Camille E, Nautilus Q, Xin Zhao R, Vayne E, Janna R).
+ * examples (a grapple hook, an anchoring hook, a shove, a knockback pin, a knockback ultimate).
  */
 const BANNED = ['wallOutlinesInArea', 'pointInWall'];
 

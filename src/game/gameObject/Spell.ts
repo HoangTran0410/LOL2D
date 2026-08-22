@@ -106,7 +106,7 @@ export default class Spell {
   }
 
   /**
-   * A counter this spell accumulates across casts, e.g. Nasus Q's strikes. The
+   * A counter this spell accumulates across casts, e.g. a stacking spell's strikes. The
    * HUD badges the icon with it, so a stacking spell shows its progress instead
    * of only flashing a number at the moment it lands. `undefined` means the
    * spell has nothing to count and gets no badge.
@@ -303,7 +303,7 @@ export default class Spell {
    * not a rare case: `AIChampion.aimPoint` falls back to `destination` when
    * there is no cursor, and a bot with `_autoMove` off leaves that parked on
    * its own feet, so it aims every spell into the ground under it. Measured on
-   * a live Lux R: a beam whose start and end were the same coordinate, which
+   * a live beam ability: a beam whose start and end were the same coordinate, which
    * paints nothing and hit-tests as a dot at the caster's feet.
    *
    * The fallback is the caster's own heading and then a fixed vector, which is
@@ -348,7 +348,7 @@ export default class Spell {
    * had not been migrated onto their own `castSpec`. DIRECTION is the one
    * mode that discards a drag's distance, so on touch every one of those
    * spells flew to its absolute maximum range no matter where the thumb let
-   * go — including placed effects like Zed W, which should have stopped
+   * go — including placed effects like a ground-mark ability, which should have stopped
    * wherever it was aimed. `castSpec` now throws instead of guessing, so a
    * legacy spell subclass must set this explicitly to what it actually does.
    * `tests/game/spells/TargetingModeDeclared.test.ts` fails the build for any
@@ -407,9 +407,11 @@ export default class Spell {
    *   the spell no longer used, curable only by picking a different spell —
    *   which builds a new instance.
    * - A spell's own, for the ones that set a cooldown mid-cast rather than
-   *   letting the runtime start it: a recast phase ending (Lee Sin Q2, Zed R's
-   *   swap, Anivia Q's detonation), a hit-shortened cooldown (Yasuo Q), a
-   *   partial refund (Janna E, Pantheon Q). Those write
+   *   letting the runtime start it: a recast phase ending (a second-cast kick,
+   *   a shadow-swap ability's own
+   *   swap, a delayed detonation), a hit-shortened cooldown (a spell that
+   *   refunds on a landed hit), a
+   *   partial refund (a channel's early cancel, a charge ability's cancel). Those write
    *   `this.currentCooldown = this.reducedCooldown(<tuning number>)`, which is
    *   the same call by hand.
    *
@@ -448,8 +450,9 @@ export default class Spell {
    * single flip rather than a per-spell edit.
    *
    * Takes an amount rather than reading `manaCost` because a spell's own cost
-   * is not the only mana it charges: an upkeep tick (Anivia R) or a half
-   * refund (Pantheon Q, Malphite E, Varus Q) has to run through the same rule,
+   * is not the only mana it charges: an upkeep tick (a channel that drains over
+   * time) or a half
+   * refund (three of this pack's charge-cancel spells) has to run through the same rule,
    * and before this existed the upkeep quietly did not.
    */
   effectiveMana(amount: number): number {
@@ -461,7 +464,7 @@ export default class Spell {
    * `manaCost` stays the spell's own tuning number; every consumption/refund
    * path below reads through here instead.
    *
-   * Three spells (Pantheon Q, Malphite E, Varus Q) deduct a second,
+   * Three spells in this pack deduct a second,
    * cancel-triggered half-refund of their own mana cost outside this base
    * class's commit/refund path; they read this getter directly rather than
    * `manaCost` for the same reason.
@@ -508,7 +511,7 @@ export default class Spell {
   }
 
   /**
-   * Moves the caster instantly — Flash, Zed's shadow swap, anything that blinks.
+   * Moves the caster instantly — a blink, a shadow swap, anything that teleports.
    *
    * The single place a champion may relocate itself, so grounding is enforced
    * once here instead of in each spell. Self-propelled dashes get the same rule
@@ -691,7 +694,7 @@ export default class Spell {
    *
    * Called with no argument from `Game.draw`, and it used to draw nothing at all
    * in that case — so every spell that did not override this (about seventy of
-   * them, including eleven of the twelve in the Camille/Ekko/Jarvan kits) gave
+   * them, including eleven of the twelve abilities across three whole kits) gave
    * the player no way to know how far it reached short of casting it and
    * watching. Falling back to the declared reach makes the ring the default
    * rather than an opt-in.

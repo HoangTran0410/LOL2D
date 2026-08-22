@@ -20,16 +20,16 @@
  *   number per cell, and — this is the part that matters — can serve *every*
  *   body size from a single build if what it stores is not "walkable" but
  *   **clearance**: the distance from the cell to the nearest wall. A minion
- *   (17px), a champion (27.5px) and a fully stacked Cho'Gath (60px) then read
+ *   (17px), a champion (27.5px) and a fully stacked size-growing ultimate (60px) then read
  *   the same array with different thresholds. One structure, no per-unit build.
  *
  * ## Resolution
  *
  * 16px cells: 400 x 400 = 160,000 cells, 313KB as an Int16Array, ~4ms to build.
  * The resolution was picked by measurement, not taste — flood-filling the map
- * for each body size at 48/32/24/20/16px shows 48px severs Baron's camp from
+ * for each body size at 48/32/24/20/16px shows 48px severs the jungle boss's camp from
  * the lanes for a champion and severs the top lane for a large body, and 32px
- * still severs Baron for a large body; 24px was the original pick on those
+ * still severs that camp for a large body; 24px was the original pick on those
  * connectivity grounds alone.
  *
  * It undersold the real cost, though: a second measurement — moat area a
@@ -128,8 +128,8 @@ export const NAV_MAX_ACCEPTED_OVERLAP = 4;
  *    110             60,895    97.9%
  *    165 (MAX_UNIT_SIZE) 45,216  93.5%
  *
- * The map never actually severs — a fully stacked Cho'Gath can still reach
- * 93.5% of what he can stand on. What collapses is the *number of gaps he
+ * The map never actually severs — a fully stacked size-growing ultimate can still reach
+ * 93.5% of what it can stand on. What collapses is the *number of gaps it
  * fits through*: 43% of standable ground is gone, so routes that were a
  * straight line for a champion become long detours, which is what a player
  * sees and reports as broken pathfinding. It is not broken; the body genuinely

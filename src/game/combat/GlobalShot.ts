@@ -5,10 +5,9 @@ import Pet from '@/game/gameObject/attackableUnits/Pet';
 /**
  * The two rules that make a global ultimate a global ultimate.
  *
- * Ashe's Enchanted Crystal Arrow and Jinx's Super Mega Death Rocket are the
- * same shot with different art, and the wiki (`docs/abilities/ashe/r.json`,
- * `docs/abilities/jinx/r.json`) says the same three things about both: range
- * *Global*, speed rising with time in the air, and payload scaling with the
+ * Two of this pack's ultimates are the same shot with different art, and the
+ * wiki says the same three things about both: range *Global*, speed rising
+ * with time in the air, and payload scaling with the
  * distance it covered before it hit. Neither collides with anything but an
  * enemy champion — that is what lets them be fired down a lane full of minions
  * from the other side of the map.
@@ -30,8 +29,8 @@ export const enemyChampionsOnly = (teamId: string): readonly GameObjectFilter[] 
 
 /**
  * 0 at the muzzle, 1 at `fullPowerAt`. Both ultimates ramp something over the
- * flight — Jinx's damage from 10% to 100%, Ashe's stun from 1s to 3.5s — and
- * both mean "this is a shot you take from far away".
+ * flight — one's damage from 10% to 100%, the other's stun from 1s to 3.5s —
+ * and both mean "this is a shot you take from far away".
  */
 export const travelRamp = (distanceTravelled: number, fullPowerAt: number): number =>
   Math.max(0, Math.min(1, distanceTravelled / fullPowerAt));

@@ -47,7 +47,7 @@ export const BOLT_MAX_LIFE_MS = 3_000;
  *
  * EventType.ON_ATTACK is the other half and fires when the swing *starts*, with
  * the attacking unit as its whole payload — that shape predates this module
- * (Janna's ultimate cancels its channel on it) and is kept as it is.
+ * (a channel-breaking ultimate cancels on it) and is kept as it is.
  */
 export interface BasicAttackHit {
   attacker: AttackableUnit;

@@ -60,7 +60,8 @@ export class Stat {
    *
    * That is one typo away at all times. `Slow.percent` is a fraction — 0.5 is
    * fifty percent — and a single caller writing `35` for "35%" turns a champion
-   * into something that cannot walk towards the thing slowing it. Baron's
+   * into something that cannot walk towards the thing slowing it. A jungle
+   * boss's own
    * poison pool shipped with exactly that and read in game as the pool
    * physically shoving people out. Both values are numbers, so nothing in `tsc`
    * or in a type test can catch the next one; the floor is what makes it a
@@ -189,10 +190,10 @@ export const DEFAULT_UNIT_SIZE = 55;
 
 /**
  * Ceiling on how big a unit's body can get, whatever stacks it. A champion is
- * 55 across, Baron is 100 and a turret 92, so three times base already makes a
+ * 55 across, a jungle boss is 100 and a turret 92, so three times base already makes a
  * unit the largest thing on the field. Past that the model stops fitting
  * through lane chokepoints, its fixed-width health bar detaches from it, and
- * Cho'Gath R — 6 size a stack, 99 stacks, permanent — would reach 649.
+ * an uncapped stacking-size ultimate — 6 size a stack, 99 stacks, permanent — would reach 649.
  */
 export const MAX_UNIT_SIZE = 165;
 
@@ -202,8 +203,8 @@ export const MAX_UNIT_SIZE = 165;
  */
 /**
  * The ceiling. Raised from 2.5 once roles got their own profiles: a marksman
- * base of 1.65 plus Twitch R (+45%) is already 2.39, so at 2.5 a second
- * attack-speed source — Olaf W, an ally's buff — bought almost nothing, and
+ * base of 1.65 plus an attack-speed ultimate (+45%) is already 2.39, so at 2.5
+ * a second attack-speed source — a self-buff, an ally's buff — bought almost nothing, and
  * stacking them is meant to be a real decision rather than a wasted cast.
  */
 export const MAX_ATTACK_SPEED = 3.0;
@@ -348,7 +349,7 @@ export default class Stats {
         hasFlag(statusFlag, StatusFlags.Feared) ||
         // A taunt takes the decision away, not the weapon: `CAN_ATTACK` and
         // `CAN_MOVE` stay on deliberately, because `Taunt` spends both of them
-        // on Rammus every frame. It is the only control effect in this list
+        // on the taunted champion every frame. It is the only control effect in this list
         // that appears in exactly one of the three.
         hasFlag(statusFlag, StatusFlags.Taunted) ||
         hasFlag(statusFlag, StatusFlags.Stunned) ||
@@ -380,7 +381,7 @@ export default class Stats {
     // the base once per frame, and the modifier then re-applied itself on the
     // next read — so a buff granting +50 health granted +50 *again* every
     // frame, +3000 a second at 60fps, and simply re-pinned its owner to full
-    // health no matter what was hitting them. Singed R, Nasus R and Renekton R
+    // health no matter what was hitting them. Three separate ultimates
     // all shipped `health: { baseBonus: N }` on a StatAmp and all three were
     // effectively unkillable for the duration.
     //

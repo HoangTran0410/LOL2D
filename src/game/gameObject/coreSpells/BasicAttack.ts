@@ -23,7 +23,7 @@ import type { CastContext, CastSpec, Vec2 } from '@/game/spell/runtime/types';
  * It owns none of the fighting. Acquisition is `findAttackTargetNearPoint`, the
  * standing order and the chase and the swing timer are BasicAttackController,
  * the delivery is combat/BasicAttack.ts, and an on-hit passive hangs off
- * `EventType.ON_ATTACK_HIT` (see Teemo_E). All this class does is turn a key
+ * `EventType.ON_ATTACK_HIT` (see an on-hit passive ability). All this class does is turn a key
  * press into an order.
  *
  * Made to be subclassed. A champion with an attack of its own overrides
@@ -66,7 +66,7 @@ export default class BasicAttack extends Spell {
    *
    *   - the champion's own reach, so the fallback is "someone I can shoot",
    *     which is what makes this a kiting key and not a charge key. It is the
-   *     live stat, so Jinx's rocket launcher lengthens the fallback the same
+   *     live stat, so a champion's own range-boosting passive lengthens the fallback the same
    *     frame it lengthens the swing;
    *   - `visionRadius`, because `BasicAttackController.leashTo` gives the order
    *     up past exactly that. Acquiring beyond it would hand the controller a

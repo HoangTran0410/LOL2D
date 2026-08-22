@@ -180,11 +180,12 @@ export class TeamBlackboard {
 
       if (!(object instanceof Champion)) continue;
       // `instanceof Champion` is not "is a champion": `Pet extends Champion`
-      // (Tibbers, Shaco's box and clone, Jinx's chomper, Malzahar's voidling)
-      // and so does `Zed_W_Clone`, and every one of them carries its summoner's
-      // `teamId`. Counting them made `enemies.length - allies.length >= 2` fire
-      // on summons and send healthy bots home, dragged `rally` toward a
-      // stationary box, and let `pickFocus` hand the whole team a Zed shadow to
+      // (a summoned bear, a decoy clone and its box, a homing pet, a
+      // stationary voidling)
+      // and so does a self-copying clone, and every one of them carries its
+      // summoner's `teamId`. Counting them made `enemies.length - allies.length
+      // >= 2` fire on summons and send healthy bots home, dragged `rally` toward a
+      // stationary box, and let `pickFocus` hand the whole team a decoy clone to
       // converge on. `killCredit` is the discriminator the codebase already
       // treats as authoritative for exactly this question — `Pet` sets it to
       // `'none'` *because* `instanceof` cannot tell them apart (see CLAUDE.md).

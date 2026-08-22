@@ -106,9 +106,9 @@ export default class SpellObject extends GameObject {
    *
    * `ParticleSystem.autoRemoveIfEmpty` defaults to true and `update()` applies it
    * on the very first frame, which is right for a burst emitted at the moment of
-   * spawn and wrong for every effect that emits *later*: Jarvan's standard throws
-   * its dust when the pole lands ~180ms in, Camille's sweep on the strike at
-   * 200ms, Ekko's sphere when it arms two seconds later. All of those deleted
+   * spawn and wrong for every effect that emits *later*: a thrown pole's dust
+   * on landing ~180ms in, a sweep's strike at
+   * 200ms, a sphere's arming two seconds later. All of those deleted
    * their own system before reaching their emit point, so the impact they exist
    * for never appeared — silently, because nothing errors and the damage lands.
    *

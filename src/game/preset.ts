@@ -21,7 +21,7 @@ import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameCo
 import { SLOT_COUNT } from './config/PregameConfig';
 import {
   BASIC_ATTACK_ID,
-  SUMMONER_SPELL_IDS,
+  summonerSpellIds,
   listSelectableChampions,
   type SpellCatalogId,
   type SpellDisplay,
@@ -97,7 +97,8 @@ const random = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
  * `localStorage` slot naming a spell this build removed, and — for a mid-match
  * re-roll — an id whose chunk has not landed yet. Neither is worth a broken
  * match, so this degrades to the basic attack. It must never borrow a different
- * loaded spell: a Lux portrait holding Yasuo Q is playable but dishonest, and
+ * loaded spell: one champion's portrait holding another's ability is playable
+ * but dishonest, and
  * much harder to diagnose than an obvious safe fallback. Anything a match
  * *plans* for is loaded before it starts; see `planMatchKits`.
  */
@@ -298,7 +299,7 @@ export {
   listSelectableChampions,
   listSpellCatalog,
   listSummonerSpells,
-  SUMMONER_SPELL_IDS,
+  summonerSpellIds,
   type SelectableChampion,
   type SelectableChampionSpell,
   type SpellCatalogEntry,
@@ -324,7 +325,7 @@ export {
 // are loaded, and only then are classes read (`presetFromPlan`). One roll, and
 // a match that fetches the six kits it is about to play.
 //
-// Ids are the spell barrel's own export names — e.g. `'Yasuo_Q'` — never
+// Ids are the spell barrel's own export names — e.g. `'<Champion>_Q'` — never
 // `SpellClass.name`. Both are ostensibly the same string today, but only the
 // key is stable: a minifier renames a class's `Function.prototype.name` and
 // cannot rename a key that `spellModules.ts` writes as a literal.
@@ -351,9 +352,11 @@ export interface MatchPlan {
 
 const randomSpellId = (): string => random(allSpellIds());
 
-/** A stored summoner choice, or Flash if it no longer names one. */
-const summonerIdOr = (choice: string): string =>
-  SUMMONER_SPELL_IDS.includes(choice as SpellCatalogId) ? choice : 'Flash';
+/** A stored summoner choice, or the shelf's own first entry if it no longer names one. */
+const summonerIdOr = (choice: string): string => {
+  const ids = summonerSpellIds();
+  return ids.includes(choice as SpellCatalogId) ? choice : (ids[0] ?? choice);
+};
 
 /** A slot's stored choice with 'random' — and any id this build dropped — rolled out. */
 const planSlot = (choice: SlotChoice): string =>
@@ -365,10 +368,19 @@ const planSlot = (choice: SlotChoice): string =>
  *
  * D and F are arguments rather than part of that row because summoners are an
  * explicit choice on every loadout. Random decides the champion, not those two
- * slots — a player who set Ignite on a random champion must keep Ignite.
+ * slots — a player who set a particular summoner spell on a random champion
+ * must keep it. Omitted (or invalid), each falls back through `summonerIdOr`
+ * to the shelf's own first entry rather than a literal id of this pack's own.
  */
-const planRandomKit = (summonerD = 'Flash', summonerF = 'Heal'): KitPlan => {
+const planRandomKit = (summonerD?: string, summonerF?: string): KitPlan => {
   const kit = randomChampionKit();
+  // Left wholly unset (the AI's respawn re-roll — see `getChampionPresetRandom`),
+  // D and F default to the shelf's first two entries rather than its first
+  // entry twice, so a coherent random kit still offers two different
+  // summoner spells the way an explicit loadout always would.
+  const ids = summonerSpellIds();
+  const defaultD = ids[0] ?? '';
+  const defaultF = ids[1] ?? defaultD;
   return {
     name: kit.name,
     avatar: kit.image,
@@ -381,8 +393,8 @@ const planRandomKit = (summonerD = 'Flash', summonerF = 'Heal'): KitPlan => {
       // beside the spell one.
       BASIC_ATTACK_ID,
       ...kit.spells,
-      summonerIdOr(summonerD),
-      summonerIdOr(summonerF),
+      summonerD === undefined ? defaultD : summonerIdOr(summonerD),
+      summonerF === undefined ? defaultF : summonerIdOr(summonerF),
     ],
   };
 };
@@ -471,8 +483,8 @@ export const getChampionPresetFromLoadout = (
 /**
  * Safe live-match variant: decide the identity once, fetch exactly those spell
  * modules, then build from that same plan. Practice-panel swaps use this path
- * so confirming Lux before the background catalogue warm-up finishes cannot
- * produce a Lux portrait with fallback skills.
+ * so confirming a champion before the background catalogue warm-up finishes
+ * cannot produce that champion's portrait with fallback skills.
  */
 export const loadChampionPresetFromLoadout = async (
   loadout: ChampionLoadout
@@ -515,10 +527,10 @@ export const monsterFillingSlot = (slot: NeutralSlot): QualifiedMonster | null =
  * so they are merged in here from the pack's *code* half instead —
  * `contentRegistry().abilitiesFor(monster.id)`, keyed by the monster's own
  * qualified id, the same way a champion's spell classes are resolved by
- * qualified spell id. Baron (`packs/riot/monsters/Baron.ts`) is the only
+ * qualified spell id. This pack's one boss monster is the only
  * monster that supplies any today, and it is a camp of one, so in practice
  * this only ever returns something for `members[0]`; nothing here is
- * Baron-specific, though — a second pack's monster with its own kit needs no
+ * specific to that monster, though — a second pack's monster with its own kit needs no
  * change here to pick this up.
  */
 export const monsterBodyPreset = (

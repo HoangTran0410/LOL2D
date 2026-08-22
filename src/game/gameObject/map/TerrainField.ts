@@ -42,7 +42,7 @@ import { wallOutlinesInArea, type TerrainHost } from './DynamicTerrain';
  * different answers to "where is the wall" that `NAV_MAX_ACCEPTED_OVERLAP`
  * exists to reconcile.
  *
- * Spell-made walls — Anivia W, Jarvan R — cannot be in it. The field is baked
+ * Spell-made walls — an ice wall, a rock wall — cannot be in it. The field is baked
  * once at map load and those slabs appear mid-match, so they are asked
  * separately, through `wallOutlinesInArea`. Each is a single convex rectangle,
  * which is exactly the case a per-polygon test handles perfectly: one shape, no
@@ -260,7 +260,7 @@ export default class TerrainField {
    * quadtree query plus an SAT test per convex piece, which is what this
    * replaced.
    *
-   * Static only, deliberately: `Anivia_W` and `JarvanIV_R` each already shove
+   * Static only, deliberately: a spell-made ice wall and a spell-made rock wall each already shove
    * every unit out of their own slab every frame, and this is not the place to
    * take that over. The two would agree — both resolve to the same surface and
    * a second push finds nothing left to do — but they do not agree about *whom*
@@ -358,11 +358,11 @@ export default class TerrainField {
    * wall first stops it, or `null` if the whole sweep is clear.
    *
    * This is the one question every terrain-reading spell asks, however
-   * differently each used to phrase it. Camille's grapple and Nautilus's anchor
+   * differently each used to phrase it. A grapple-hook ability and an anchoring hook
    * marched their own fixed steps and took the first sample that tested inside
-   * — which is up to a step *past* the surface, so Camille latched onto a point
-   * inside the wall and then dashed to it. Xin Zhao's shove and Vayne's condemn
-   * marched at 20px and could stop that far short. Janna's monsoon intersected
+   * — which is up to a step *past* the surface, so a grapple-hook ability latched onto a point
+   * inside the wall and then dashed to it. A shoving spell and a knockback-pin ability
+   * marched at 20px and could stop that far short. A knockback ultimate intersected
    * polygon edges instead, which is exact where it applies but finds nothing at
    * all when the victim starts inside a wall, and blew them clean through it.
    *
@@ -399,7 +399,7 @@ export default class TerrainField {
     // sits with its body inside a wall, and a champion mid-dash is `IS_GHOSTED`
     // and skipped too. Measuring from zero instead refused every displacement on
     // such a unit — a shove pointing straight *away* from the wall included —
-    // and handed Vayne E a free pin plus wall bonus at travel 0.
+    // and handed the knockback-pin ability a free pin plus wall bonus at travel 0.
     const startGap = gapAt(0);
     const floor = Math.min(startGap, 0) - CONTACT_TOLERANCE;
 
@@ -416,7 +416,7 @@ export default class TerrainField {
     // fails, `low` never moves, and the "contact" returned is a point up to
     // MIN_STEP + CONTACT_TOLERANCE inside the wall. Measured at 2.95px worst
     // case over the shipped map: the same defect this whole file exists to fix,
-    // in miniature, landing Camille's anchor and Vayne's pin inside the rock.
+    // in miniature, landing the grapple-hook ability's anchor and the knockback-pin ability's pin inside the rock.
     let reached = 0;
     let travelled = 0;
     for (let step = 0; step < MAX_STEPS; step++) {
@@ -496,13 +496,13 @@ interface FieldHost {
  * wall of either kind first stops it, or `null` if the whole line is clear.
  *
  * Five abilities used to ask this five different ways and get five different
- * answers wrong. Camille's grapple and Nautilus's anchor tested their own
+ * answers wrong. A grapple-hook ability and an anchoring hook tested their own
  * position once a frame and took the first sample that came back inside — which
- * is up to a frame of travel *past* the surface, so Camille latched onto a
+ * is up to a frame of travel *past* the surface, so a grapple-hook ability latched onto a
  * point inside the wall and then dashed to it, and every seam in that wall was
- * a place the push-out could not get her out of again. Xin Zhao's shove and
- * Vayne's condemn marched fixed 20px steps and could stop that far short of a
- * wall, or step over one thinner than a stride. Janna's monsoon intersected
+ * a place the push-out could not get her out of again. A shoving spell and
+ * A knockback-pin ability marched fixed 20px steps and could stop that far short of a
+ * wall, or step over one thinner than a stride. A knockback ultimate intersected
  * polygon edges instead — exact where it applies, but it finds no crossing at
  * all when the victim starts inside a wall, and blew them clean through it.
  *

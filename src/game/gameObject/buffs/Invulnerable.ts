@@ -41,7 +41,7 @@ export default class Invulnerable extends Buff {
   /**
    * A steady double ring — no sparkle, no tint, nothing that could be mistaken
    * for `Stasis`'s rotating golden spokes. The radius is world units so it
-   * hugs a unit whose size changes (Cho'Gath), while the stroke goes through
+   * hugs a unit whose size changes (a stacking self-buff), while the stroke goes through
    * `constantSize` so it stays visible when the camera is zoomed out on a
    * phone (see `Camera.constantSize`).
    */

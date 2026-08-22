@@ -178,7 +178,7 @@ function buildSpells(player: any): SpellDisplay[] {
 }
 
 /**
- * One row per kind of buff, not per stack: Veigar Q alone can hold hundreds of
+ * One row per kind of buff, not per stack: one stacking spell alone can hold hundreds of
  * StatAmp instances, which used to render hundreds of icons. The longest
  * remaining instance drives the countdown.
  */

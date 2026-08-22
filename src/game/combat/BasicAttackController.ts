@@ -176,7 +176,7 @@ export default class BasicAttackController {
 
   /**
    * Fires one swing. ON_ATTACK is emitted here, at the start, with the attacker
-   * as its payload — that is the shape Janna's ultimate already listens for, and
+   * as its payload — that is the shape one channel-breaking ultimate already listens for, and
    * "the unit committed to a swing" is exactly when a channel should break.
    * ON_ATTACK_HIT comes later, from whichever object actually lands.
    */

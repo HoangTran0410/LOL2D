@@ -56,7 +56,7 @@ export default class MissileSpellObject extends SpellObject {
 
   update() {
     // A missile in flight never attaches, so this is a no-op for it; missiles
-    // that latch onto a body (Amumu's bandage, Thresh's chain) call attachTo
+    // that latch onto a body (a hooked bandage, a chained lantern) call attachTo
     // when they land and get dropped here the moment that body is gone.
     if (this.dropIfAttachmentLost()) return;
 

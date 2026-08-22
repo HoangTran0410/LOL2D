@@ -71,8 +71,8 @@ export class SpellInputController {
   /**
    * A thumb has landed on slot `slot`'s button.
    *
-   * A charge is pressed here, exactly as a key would press it: Varus Q and
-   * Pantheon Q have to *start charging* the moment the thumb lands, and their
+   * A charge is pressed here, exactly as a key would press it: a charge-and-
+   * release spell has to *start charging* the moment the thumb lands, and its
    * whole reason for existing is the time between that and the release.
    *
    * Everything else has its press withheld until `pointerUp`. On the keyboard

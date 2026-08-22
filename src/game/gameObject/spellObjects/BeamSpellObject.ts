@@ -25,7 +25,7 @@ interface BeamOptions {
 /**
  * The rectangle a beam occupies, padded by its half-width. Shared so anything
  * that has to be culled by the beam rather than by its caster — the damage
- * volume here, Lux R's visual — measures the same box.
+ * volume here, one beam ultimate's visual — measures the same box.
  */
 export const beamBoundingBox = (geometry: BeamGeometry, data: unknown): Rectangle => {
   const padding = geometry.width / 2;

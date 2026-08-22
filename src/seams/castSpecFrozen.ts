@@ -8,7 +8,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * the spell as it was on the opening press, for the rest of the match.
  *
  * See `tests/game/spells/castspec-frozen-seam.test.ts` for the worked example
- * (Jhin R computing its recast cooldown from `shotsRemaining`).
+ * (a four-round recast ultimate computing its recast cooldown from `shotsRemaining`).
  */
 export interface CastSpecFrozenOptions extends SeamCheckOptions {
   /** Spells known to still read live state — debt, not permission. */

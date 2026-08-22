@@ -47,9 +47,9 @@ export type {
  * no longer reach into core directly at all: `BasicAttackHit` is the
  * `ON_ATTACK_HIT` payload shape (15 files, all read-only);
  * `BasicAttackController` names the field a bot reads off
- * `this.owner.basicAttack` (Jinx_Q, purely as a cast target, never
- * constructed); `GameObjectRuntimeContext` is `Thresh_E`'s helper's `game`
- * parameter type; `KillCredit` is `Zed_W`'s clone declaring how a kill on it
+ * `this.owner.basicAttack` (one skillshot, purely as a cast target, never
+ * constructed); `GameObjectRuntimeContext` is a lantern-throw ability's helper's `game`
+ * parameter type; `KillCredit` is a clone spell's clone declaring how a kill on it
  * should be scored; `TargetingRequest` is the shape every `UNIT`-targeting
  * spell's `targetingRequest` field returns (20 files); the rest
  * (`ExecuteFallback`/`ExecuteSpell`, `DynamicWall`, `BeamGeometry`,

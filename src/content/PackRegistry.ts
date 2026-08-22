@@ -20,7 +20,7 @@ import type {
  * Installed packs, and the one view the rest of the engine reads.
  *
  * Ids are `<packId>:<localId>` because two packs may reasonably use the same
- * local name — an author writing `Fizz_E` should not have to know what anyone
+ * local name — an author writing a spell's own local id should not have to know what anyone
  * else called theirs. The author writes the local half and never sees the
  * prefix; the registry is the only thing that joins them.
  *
@@ -187,7 +187,7 @@ export class PackRegistry {
       }
     }
     // The same pairing check, one field over: a `monsterAbilities` entry
-    // naming a monster the data half never declared is the Baron shape of
+    // naming a monster the data half never declared is the same shape of
     // the bug this method exists to catch — an ability array nothing ever
     // resolves to, because `abilitiesFor` is only ever looked up by a real
     // monster's qualified id.
@@ -502,9 +502,9 @@ export class PackRegistry {
   /**
    * A monster's code half — real `MonsterAbility` callbacks, built from the
    * pack's own `ContentApi` — or `undefined` for a monster that declared
-   * none (every camp except Baron, today). `preset.ts`'s `monsterBodyPreset`
-   * is the one caller: this is what lets it merge Baron's kit onto the
-   * preset without core importing `packs/riot/monsters/Baron.ts` directly.
+   * none (every camp except this pack's one boss monster, today). `preset.ts`'s `monsterBodyPreset`
+   * is the one caller: this is what lets it merge that monster's kit onto the
+   * preset without core importing that pack file directly.
    */
   abilitiesFor(qualifiedMonsterId: string): MonsterAbility[] | undefined {
     return this.monsterAbilities.get(qualifiedMonsterId);

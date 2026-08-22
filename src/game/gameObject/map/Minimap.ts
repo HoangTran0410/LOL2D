@@ -117,7 +117,7 @@ const CAMERA_BOX_COLOR = [235, 240, 250, 190] as const;
  * Dot diameters in minimap pixels at the collapsed size, by kind.
  *
  * Deliberately not derived from `stats.size`: a dot is an icon, not a scale
- * model, and a 165-unit Cho'Gath must not become a blob covering four other
+ * model, and a 165-unit fully-stacked champion must not become a blob covering four other
  * units. The expanded map multiplies these by its rect ratio only so the same
  * icons stay the same *apparent* size — that ratio is a property of the rect,
  * never of the unit.

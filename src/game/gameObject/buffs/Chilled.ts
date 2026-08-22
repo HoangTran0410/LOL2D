@@ -3,8 +3,9 @@ import BuffAddType from '@/game/enums/BuffAddType';
 import Buff from '@/game/gameObject/Buff';
 
 /**
- * Shared across Anivia's kit: Flash Frost (Q) and a fully-formed Glacial Storm
- * (R) both mark a target Chilled, and Frostbite (E) reads it to double its
+ * Shared across one champion's whole kit: a slowing skillshot (Q) and a
+ * fully-formed area ultimate (R) both mark a target Chilled, and a damage
+ * ability (E) reads it to double its
  * damage. Not a crowd-control effect — no statusFlags — so it carries its
  * own frost mark rather than a CC icon like `buff_slow`.
  *

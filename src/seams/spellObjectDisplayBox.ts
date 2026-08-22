@@ -11,8 +11,8 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * Two ways to satisfy it: declare `getDisplayBoundingBox()`, or set a
  * non-zero `visionRadius`.
  *
- * See `tests/game/spells/spell-object-display-box-seam.test.ts` (Lux R's
- * beam, and the behavioural half — `aoe-display-bounds.test.ts` — that
+ * See `tests/game/spells/spell-object-display-box-seam.test.ts` (a beam
+ * ultimate's beam, and the behavioural half — `aoe-display-bounds.test.ts` — that
  * checks the box is actually big enough, which this scan cannot).
  */
 export interface SpellObjectDisplayBoxOptions extends SeamCheckOptions {

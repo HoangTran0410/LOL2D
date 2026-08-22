@@ -23,7 +23,7 @@ export interface PetOptions extends ChampionOptions {
   aggroRadius?: number;
   /**
    * Whether the pet walks back to its summoner when it has nothing to fight.
-   * False for a pet the player steers themselves (Shaco's clone, which is
+   * False for a pet the player steers themselves (a recastable decoy clone, which is
    * recast to send it somewhere) — it still leashes and still picks its own
    * fights, it just does not undo the order it was given.
    */
@@ -40,7 +40,7 @@ export interface PetOptions extends ChampionOptions {
  *
  * ## Why a `Champion` and not a `SpellObject`
  *
- * Everything the game already summons (Shaco's box, Teemo's shrooms, a Thresh
+ * Everything the game already summons (a trap box, a scattered ward-trap, a
  * lantern) is a `SpellObject`: an effect with a position and a timer, which
  * cannot be targeted, cannot be attacked, and does not appear to anything that
  * queries for units. That is right for a trap and wrong for a pet — half of
@@ -69,7 +69,7 @@ export interface PetOptions extends ChampionOptions {
 export default class Pet extends Champion {
   /**
    * Overrides `Champion`'s `'champion'`. A summon is not a takedown: without
-   * this, every Shaco clone and Zed shadow killed would land on someone's kill
+   * this, every decoy clone and shadow pet killed would land on someone's kill
    * count, because a `Pet` *is* a `Champion` as far as `instanceof` goes.
    */
   killCredit: KillCredit = 'none';
@@ -111,7 +111,7 @@ export default class Pet extends Champion {
    * one call rather than two.
    *
    * Deliberately not folded into the `Invisible` buff itself: a stealthed
-   * *champion* (Twitch) is a different question with its own balance, and this
+   * *champion* is a different question with its own balance, and this
    * change should not silently answer it.
    */
   setHidden(hidden: boolean): void {
@@ -167,7 +167,7 @@ export default class Pet extends Champion {
     // Timed out or outlived its summoner. Being killed is handled in `die`,
     // which the damage pipeline reaches before this ever runs — all three are
     // the end of the same life and all three owe the pet its parting effect
-    // (Shaco's clone explodes whichever way it goes).
+    // (a decoy clone explodes whichever way it goes).
     if (
       this.isDead ||
       this.age >= this.lifeTimeMs ||
@@ -230,7 +230,7 @@ export default class Pet extends Champion {
   /**
    * Only an *autonomous* pet leashes. The leash exists to stop a pet that
    * picks its own fights from chasing a fleeing enemy across the map; a pet
-   * the player steers (`followsOwner: false` — Tibbers, Shaco's clone) was
+   * the player steers (`followsOwner: false` — a summoned bear, a decoy clone) was
    * sent where it is on purpose, and refusing to fight once it got there is
    * the ability not working.
    */
@@ -318,8 +318,8 @@ export default class Pet extends Champion {
    * `Champion`'s full frame is 125px wide and paints a score box, a mana strip,
    * level ticks, buff icons and status text around the bar. A pet has none of
    * that to say: it inherits `score = 0` and never changes it, it casts nothing
-   * so its mana pool stays empty, and it is gone in seconds. On a Tibbers or a
-   * row of Shaco boxes that frame is almost entirely empty chrome, and several
+   * so its mana pool stays empty, and it is gone in seconds. On a summoned bear or a
+   * row of trap boxes that frame is almost entirely empty chrome, and several
    * at once cover the fight they exist to explain.
    *
    * The compact frame was built for mobile, where the reason was the camera. The

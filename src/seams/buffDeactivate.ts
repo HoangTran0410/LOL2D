@@ -9,7 +9,7 @@ import { readSource, walkTsFiles } from './shared';
  * arrays a spell walks are loosely typed, so `tsc` never sees the call.
  *
  * See `tests/game/spells/buff-deactivate-seam.test.ts` for the shipped
- * examples (Twitch E, Olaf R).
+ * examples (a stealth cloak and a self-heal-over-time ultimate).
  */
 const DEACTIVATE_CALL = /([A-Za-z_$][\w$]*)\s*\??\.deactivate\(\)/g;
 

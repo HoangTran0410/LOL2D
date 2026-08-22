@@ -326,10 +326,11 @@ export class SpellRuntime {
    * **A recast is aimed by its own press.** `press()` is handed a fresh context
    * every time, and this used to drop it and hand the delegate `this.context` —
    * the snapshot taken when the window *opened*. So every recast fired at
-   * wherever the cursor had been at activation: Syndra W threw the sphere back
-   * to about where she picked it up, because she has to stand next to one to
-   * grab it, and Riven R's wind slash flew along the direction R was opened
-   * with. Renekton E carried a local workaround for exactly this and was the
+   * wherever the cursor had been at activation: a pull-back recast threw its
+   * payload back toward wherever it had been picked up rather than where the
+   * second press aimed, and a directional recast flew along the direction the
+   * first press opened with. One spell carried a local workaround for exactly
+   * this and was the
    * only recast that aimed correctly. The snapshot is replaced rather than
    * passed alongside, the way `release()` already does it, so the `onComplete`
    * that follows the last recast describes the same press as the recast did.

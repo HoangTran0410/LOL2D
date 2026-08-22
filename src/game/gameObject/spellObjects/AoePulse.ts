@@ -11,8 +11,8 @@ import SpellObject from '@/game/gameObject/SpellObject';
  * ## `style` is not decoration
  *
  * The first version of this drew one thing — a ring — and every new area
- * ability got it. Six of them on one screen were indistinguishable: a Nasus
- * ultimate, an Amumu tantrum and an Alistar pulverize all read as "a circle
+ * ability got it. Six of them on one screen were indistinguishable: a
+ * stack-consuming ultimate, a knockup tantrum and a stun pulverize all read as "a circle
  * appeared", so a player could not tell from the flash what had just hit them
  * or how far it reached. The styles below are shapes, not palettes: a burst of
  * shards, whipping strips, erupting columns and a cracked crater are told
@@ -27,8 +27,8 @@ import SpellObject from '@/game/gameObject/SpellObject';
  *
  * ## One style per champion identity, not per shape category
  *
- * `shards` was at one point the impact for Amumu, Cassiopeia, Fizz, Graves and
- * Jinx at once, and `columns` for Alistar, Annie and Garen — which put the
+ * `shards` was at one point the impact for five different champions at once,
+ * and `columns` for three more — which put the
  * problem back exactly where the styles were invented to solve it. A dash
  * through water and a shotgun blast are not the same event and must not draw
  * the same picture. Adding a style is cheaper than sharing one: if a champion's
@@ -40,19 +40,19 @@ export type AoePulseStyle =
   | 'bandage'
   | 'columns'
   | 'crater'
-  /** Fizz: water thrown up and falling back. */
+  /** Water thrown up and falling back. */
   | 'splash'
-  /** Graves: a cone of pellets and muzzle smoke. */
+  /** A cone of pellets and muzzle smoke. */
   | 'buckshot'
-  /** Annie: tongues of flame licking outward. */
+  /** Tongues of flame licking outward. */
   | 'flame'
-  /** Jinx: fragmentation — hard chunks plus rolling smoke puffs. */
+  /** Fragmentation — hard chunks plus rolling smoke puffs. */
   | 'frag'
-  /** Cassiopeia: creeping venom pools and bubbles. */
+  /** Creeping venom pools and bubbles. */
   | 'venom'
-  /** Alistar: a hoof-strike dust wedge, heavy and low. */
+  /** A hoof-strike dust wedge, heavy and low. */
   | 'stomp'
-  /** Garen: descending blades of light. */
+  /** Descending blades of light. */
   | 'blades';
 
 export default class AoePulse extends SpellObject {
@@ -105,7 +105,7 @@ export default class AoePulse extends SpellObject {
     pop();
   }
 
-  /** Fizz: droplets thrown up on a parabola and falling back into a puddle. */
+  /** Droplets thrown up on a parabola and falling back into a puddle. */
   _drawSplash(t: number, fade: number, r: number, g: number, b: number) {
     noStroke();
     for (let i = 0; i < this.spokes; i++) {
@@ -125,7 +125,7 @@ export default class AoePulse extends SpellObject {
     circle(0, 0, this.radius * 2 * (0.2 + 0.8 * t));
   }
 
-  /** Graves: a tight cone of pellets, not a symmetric burst. */
+  /** A tight cone of pellets, not a symmetric burst. */
   _drawBuckshot(t: number, fade: number, r: number, g: number, b: number) {
     noStroke();
     const spread = 0.75; // radians, half-angle of the cone
@@ -148,7 +148,7 @@ export default class AoePulse extends SpellObject {
     }
   }
 
-  /** Annie: tongues of flame, licking and tapering rather than flying straight. */
+  /** Tongues of flame, licking and tapering rather than flying straight. */
   _drawFlame(t: number, fade: number, r: number, g: number, b: number) {
     noStroke();
     for (let i = 0; i < this.spokes; i++) {
@@ -168,7 +168,7 @@ export default class AoePulse extends SpellObject {
     }
   }
 
-  /** Jinx: hard fragments plus the rolling smoke of an actual explosive. */
+  /** Hard fragments plus the rolling smoke of an actual explosive. */
   _drawFrag(t: number, fade: number, r: number, g: number, b: number) {
     // smoke first, so the chunks read on top of it
     noStroke();
@@ -192,7 +192,7 @@ export default class AoePulse extends SpellObject {
     }
   }
 
-  /** Cassiopeia: venom creeping outward in lobes, bubbling as it goes. */
+  /** Venom creeping outward in lobes, bubbling as it goes. */
   _drawVenom(t: number, fade: number, r: number, g: number, b: number) {
     // an uneven pool rather than a circle: poison spreads, it does not pulse
     noStroke();
@@ -218,7 +218,7 @@ export default class AoePulse extends SpellObject {
     }
   }
 
-  /** Alistar: a low, heavy dust wedge thrown out under a hoof strike. */
+  /** A low, heavy dust wedge thrown out under a hoof strike. */
   _drawStomp(t: number, fade: number, r: number, g: number, b: number) {
     // squashed rings: the force goes along the ground, not up
     noFill();
@@ -249,7 +249,7 @@ export default class AoePulse extends SpellObject {
     }
   }
 
-  /** Garen: blades of light driven down into the ground, point first. */
+  /** Blades of light driven down into the ground, point first. */
   _drawBlades(t: number, fade: number, r: number, g: number, b: number) {
     const fall = Math.min(1, t * 2.4);
     for (let i = 0; i < this.spokes; i++) {

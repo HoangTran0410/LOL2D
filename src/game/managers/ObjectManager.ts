@@ -198,7 +198,7 @@ export const PredefinedFilters = {
       !object.isDead &&
       object.teamId !== teamId,
   /**
-   * Drops units hidden by an active stealth (Twitch Q).
+   * Drops units hidden by an active stealth spell.
    *
    * Applied to every scan that acquires a target on its own — the wave, the
    * camps, the turrets and the bots. Before this, `ActionState.STEALTHED` was
@@ -227,8 +227,8 @@ export const PredefinedFilters = {
    * standing in one was picked up by every minion and camp scan that came
    * within aggro range. Terrain was the other half and was missing entirely:
    * nothing that acquired a target had ever asked whether it could *see* it, so
-   * Warwick R found the blue camp through a jungle wall on a screen showing
-   * nothing but fog. `canSee` answers walls, bushes, sight range and friendly
+   * a wall-piercing leap found a jungle camp through a jungle wall on a screen
+   * showing nothing but fog. `canSee` answers walls, bushes, sight range and friendly
    * wards in one place, matching what `FogOfWar` paints.
    *
    * Only `AttackableUnit`s are gated: a query that also returns spell objects

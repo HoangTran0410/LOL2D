@@ -156,6 +156,17 @@ export interface ChampionEntry {
   playable: boolean;
   /** Basic-attack profile. Omitted means core's `DEFAULT_CHAMPION_ATTACK`. */
   attack?: ChampionAttack;
+  /**
+   * True for the one roster row whose `spells` are this pack's own D/F
+   * options — the summoner-spell shelf, not a champion. `playable: false`
+   * cannot mark it on its own: every partial champion stub (a one-ability
+   * shelf kept only to widen the random pool) is `playable: false` too, and
+   * matching this shelf by its display name would break the same way
+   * `playable` itself used to (see that field's own doc comment) the moment
+   * a translation changed the label. Declared, like `playable`, so core can
+   * find the D/F shelf without naming a single spell of its own.
+   */
+  summonerShelf?: boolean;
 }
 
 /**
@@ -199,7 +210,7 @@ export interface ChampionAttack {
  * `offset` places a body relative to its slot's centre — `NeutralSlot`
  * carries only where the *camp* sits, never an individual body, so a
  * multi-body camp needs its own internal layout. `{0, 0}` is the common case
- * for a camp of one (Baron, a buff, Gromp).
+ * for a camp of one (a jungle boss, a buff camp, a small camp).
  */
 export interface MonsterBody {
   name: string;
@@ -242,7 +253,7 @@ export interface MonsterBody {
  * local monster id exactly the way `spells` is keyed by local spell id — and
  * `preset.ts`'s `monsterBodyPreset` merges them back on by reading
  * `contentRegistry().abilitiesFor(monster.id)`, never by importing a
- * specific pack's file. Baron (`packs/riot/monsters/Baron.ts`) is the first
+ * specific pack's file. This pack's one boss monster is the first
  * and, as of this writing, only monster that supplies any.
  */
 export interface MonsterDef {

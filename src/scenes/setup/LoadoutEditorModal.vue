@@ -28,10 +28,11 @@
  *   - changing anything else — one ability, the basic attack, a summoner slot
  *     filled with something that is not a summoner spell — turns the loadout
  *     custom, with the champion's own kit copied into the seven slots first
- *     (`toCustom`), so "Ahri but with Flash on A" is one tap from Ahri rather
+ *     (`toCustom`), so "the current champion but with a different D" is one
+ *     tap from that champion rather
  *     than a fresh build.
  *
- * A champion whose shelf carries only part of a kit (Graves, Olaf — see
+ * A champion whose shelf carries only part of a kit (a single-ability stub — see
  * `KitShelf.championName`) has no name the config can store, so taking its
  * kit goes through the custom path and writes only the slots it covers.
  *
@@ -41,7 +42,7 @@
  * change. This one doesn't: `draft` is edited freely and only `emit('change')`
  * on "Xác nhận" reaches `usePregameConfig`. The X and the backdrop both
  * discard it. That is the in-game picker's contract, and it is what makes
- * "take Ahri's kit, then swap her R" a thing you can back out of.
+ * "take a champion's kit, then swap one ability" a thing you can back out of.
  *
  * There was a "Huỷ" button beside Xác nhận too, dropped when the slot bar ran
  * out of room — two adjacent buttons whose outcomes differ by the whole edit was
@@ -315,7 +316,7 @@ const activeSlotIsRandom = computed(() => draftSlots.value[activeSlot.value] ===
  *     library write is not worth an unhandled error in the console.
  *   - **Keystrokes belong to the game.** p5 listens for `keydown` on `window`
  *     and `GameScene.keyPressed` turns A/Q/W/E/R/D/F into casts and Escape
- *     into "leave the match". Typing "Ahri quái" into an unguarded input
+ *     into "leave the match". Typing a champion's name into an unguarded input
  *     mid-match would fire four abilities, and one Escape would drop the
  *     player to the menu. `@keydown.stop` (plus keyup/keypress, which p5 also
  *     listens for) keeps the letters in the field. The setup screen never
@@ -427,7 +428,7 @@ const removeSavedKit = (kit: SavedKit): void => {
  * both sides are meant to be the very same object. A plain `ref` deep-converts
  * whatever it holds, handing the roster a reactive *proxy* of the shelf to
  * compare against the raw one it is iterating — never equal, so the class never
- * lands. Nothing fails loudly: the hint line reads "Ahri — bấm Dùng cả bộ" while
+ * lands. Nothing fails loudly: the hint line reads "<champion> — bấm Dùng cả bộ" while
  * the roster stays a grid of closed tiles.
  *
  * The compact mode this replaced happened not to hit it, which is why it is
@@ -488,7 +489,7 @@ const clearSearch = () => {
  * The shelf that serves a slot no champion ability can fill — A, D and F.
  *
  * Those three are the slots a player most often wants to change *without*
- * rebuilding a kit ("Ahri, but Ghost instead of Flash"), and no champion tile
+ * rebuilding a kit (a champion's kit but with a different summoner spell), and no champion tile
  * can offer them, so selecting one of them opens the shelf that can. This is
  * the same rule the old compact mode implemented as a separate "revealed"
  * shelf; it is now just one more thing that can be the open shelf.

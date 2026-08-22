@@ -62,7 +62,7 @@ export interface KitShelf {
    * A valid `ChampionLoadout.championName` when this shelf is a full,
    * portrait-carrying champion — the same predicate `listSelectableChampions`
    * uses, so the two cannot disagree about what counts. `null` for a partial
-   * shelf (Graves, Olaf, ...), which no `championName` can name and which
+   * shelf (a single-ability stub, ...), which no `championName` can name and which
    * therefore has to land in the custom kit slot by slot.
    */
   championName: string | null;
@@ -138,7 +138,7 @@ export const getPregameCatalog = (): PregameCatalog => {
     const kitShelves: KitShelf[] = contentCatalog()
       .champions()
       .map(champion => {
-        // `champion.spells` are registry-qualified (`riot:Yasuo_Q`,
+        // `champion.spells` are registry-qualified (`riot:<Champion>_Q`,
         // `reference:Vera_Q`); `catalogById` keys by the *bundled* pack's own
         // bare id (`spellCatalogIds()`'s population). `bareCatalogId` is the
         // same crossing `spellCatalog.ts` uses internally, and for any other
@@ -180,8 +180,8 @@ export const getPregameCatalog = (): PregameCatalog => {
        * Champions by name, with the two shelves that are not a champion pinned
        * ahead of them in `CHAMPION_KITS` order.
        *
-       * A flat `localeCompare` put the basic attack between Cassiopeia and
-       * Fizz, which is where nobody looks for it — and both pinned shelves are
+       * A flat `localeCompare` put the basic attack between two champions
+       * alphabetically nowhere near either end, which is where nobody looks for it — and both pinned shelves are
        * things you reach for *while* building a kit rather than instead of one.
        *
        * `kit.length === 0` is the pin because it is already the predicate that

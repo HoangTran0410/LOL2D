@@ -297,9 +297,19 @@ export const CDR_PERCENT_MAX = 90;
  */
 export const DEFAULT_MAP_ID = 'riot:summoners-rift';
 
-/** The value every bot slot starts at, and what a freed slot is refilled with
- *  when a bot is removed from the middle of the list — see `removeBotAt` in
- *  usePregameConfig.ts. */
+/**
+ * The value every bot slot starts at, and what a freed slot is refilled with
+ * when a bot is removed from the middle of the list — see `removeBotAt` in
+ * usePregameConfig.ts.
+ *
+ * `summonerD`/`summonerF` are two more restated literals, for the same
+ * reason `DEFAULT_MAP_ID` above is one: this module cannot import the
+ * content system to ask the bundled pack's own summoner-spell shelf
+ * (`spellCatalog.ts`'s `summonerSpellIds`) which two ids to default to.
+ * `tests/game/config/PregameConfig.test.ts` cross-checks both against that
+ * shelf so this cannot drift from it silently the way `DEFAULT_MAP_ID`
+ * cannot from `PackRegistry`'s own id.
+ */
 export const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze({
   mode: 'champion',
   championName: 'random',

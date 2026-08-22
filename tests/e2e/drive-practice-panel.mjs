@@ -57,9 +57,11 @@
  *      of which `MATCH_CONFIG` describes. This check asserted the exact
  *      opposite until the panel started persisting ("chỉ sửa trận hiện tại",
  *      reversed by `2026-08-16-panel-persistence-design`), and the half that
- *      did not reverse is asserted beside it: none of check 9's cheats or
- *      debug layers reaches storage, and the blob has only the five
- *      match-configuration sections (player, playerTeam, ai, rules, world);
+ *      did not reverse is asserted beside it: check 9's cheats and debug
+ *      layers *do* reach storage now (see check 13's own doc comment for the
+ *      reversal), and the blob's sections are exactly the six
+ *      match-configuration ones plus the chosen map
+ *      (ai, cheats, mapId, player, playerTeam, rules, world);
  *  12. "Đặt lại mặc định" arms on the first press and, on the second, puts the
  *      running match *and* storage back to `DEFAULT_PREGAME_CONFIG` — the
  *      clean slate persistence took away;
@@ -1070,7 +1072,7 @@ try {
       report.savedKit.storedPregame?.cheats?.playerInvulnerable === false &&
       report.savedKit.storedPregame?.cheats?.debug?.terrain === false &&
       JSON.stringify(report.savedKit.storedPregame?.sections) ===
-        JSON.stringify(['ai', 'cheats', 'player', 'playerTeam', 'rules', 'world']),
+        JSON.stringify(['ai', 'cheats', 'mapId', 'player', 'playerTeam', 'rules', 'world']),
     JSON.stringify({
       words: report.savedKit.cheatWordsInBlob,
       cheats: report.savedKit.storedPregame?.cheats,

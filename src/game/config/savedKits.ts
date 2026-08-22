@@ -31,7 +31,7 @@ import type { ChampionLoadout } from './PregameConfig';
 
 export const SAVED_KITS_STORAGE_KEY = 'lol2d:savedKits:v1';
 
-/** Long enough for "Ahri nhưng có Flash trên A", short enough to fit a shelf heading. */
+/** Long enough for "<champion> nhưng có <summoner spell> trên A", short enough to fit a shelf heading. */
 export const SAVED_KIT_NAME_MAX = 40;
 
 export interface SavedKit {

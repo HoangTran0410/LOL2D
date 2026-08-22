@@ -89,7 +89,7 @@ export default class Turret extends AttackableUnit {
   _spin = 0;
   /**
    * Where the turret was built. Buffs that displace a unit (Dash — which is what
-   * Blitzcrank Q and Thresh Q construct) write straight to `position` and never
+   * a hook or a lantern-pull ability constructs) write straight to `position` and never
    * consult canMove, so a hook could otherwise drag a building across the map.
    */
   _anchor: p5.Vector;

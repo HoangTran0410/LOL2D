@@ -258,11 +258,11 @@ export const RETREAT_ROLES: SpellRoleMask = roles(
  * cast with a mana cost: about seventy files. While retreating that mask scores
  * Shield `SCORE_SUPPORT` (health is below `SUPPORT_HEALTH_PCT` by definition
  * there) + Buff + Ultimate, and it is the only candidate the role filter leaves,
- * so it always wins. `Zed_R` is exactly that shape — `SELF`, 50 mana, `range`
+ * so it always wins. One self-cast auto-lock ultimate is exactly that shape — `SELF`, 50 mana, `range`
  * 500 — and it auto-locks the nearest enemy inside 500px and dashes *behind*
  * them. So a bot below its retreat threshold ulted into the champion chasing it,
- * where before the last wave it pressed nothing at all. `Warwick_R`,
- * `Nocturne_R` and `Diana_R` are the same shape.
+ * where before the last wave it pressed nothing at all. Three more self-cast
+ * ultimates are the same shape.
  *
  * The `Shield` bit is therefore inference noise on every costed `SELF` cast, and
  * the retreat set cannot trust it alone. Two further axes separate a genuine
@@ -270,7 +270,8 @@ export const RETREAT_ROLES: SpellRoleMask = roles(
  *
  * - **Not the ultimate slot.** That catches those four by construction.
  * - **Declares no range.** A real shield or heal reaches nobody; a `SELF` spell
- *   carrying a `declaredRange` reaches *out* to something, and Zed R's 500 is
+ *   carrying a `declaredRange` reaches *out* to something, and a self-cast
+ *   auto-lock ultimate's 500 is
  *   precisely that reach.
  *
  * The consequence is accepted: with nothing hand-tagged this leaves the retreat
@@ -330,7 +331,8 @@ export type CastMode = 'FREE' | 'RETREAT' | 'WAVE';
  *   `SCORE_ULTIMATE` is a priority bump between candidates that already earned
  *   their place, never a reason to cast.
  * - **Declares no range.** A `SELF` spell carrying a `declaredRange` reaches
- *   *out* at something — Zed R's 500 auto-locks the nearest enemy inside it —
+ *   *out* at something — a self-cast auto-lock ultimate's 500 auto-locks the
+ *   nearest enemy inside it —
  *   and with no target there is nothing out there.
  *
  * A genuine self-buff or shield, which declares no range and is not the
@@ -377,11 +379,12 @@ export class BotBrain {
    *
    * `cast` used to arrange a follow-through for charge activations and nothing
    * else, so the seven `activation: 'RECAST'` spells got exactly one press each:
-   * Jhin R raised its curtain and fired none of its four rounds, Ziggs W never
-   * detonated, Riven R never slashed, Renekton E never dashed back.
+   * one four-round ultimate raised its curtain and fired none of its four rounds, a
+   * detonation spell never detonated, a slashing ultimate never slashed, a
+   * second-dash ability never dashed back.
    *
    * `choice` rather than a bare spell so each recast can be re-aimed through
-   * `aimFor` — Jhin's rounds should track a target that is still running.
+   * `aimFor` — the four-round ultimate's rounds should track a target that is still running.
    */
   private pendingRecast?: {
     choice: SpellChoice;
@@ -412,11 +415,11 @@ export class BotBrain {
    *   gets this free from `PredefinedFilters.canTakeDamageFromTeam`, but the
    *   blackboard path — `pickTarget` walking `view.enemies` — has no filter of
    *   its own, so this is the only place it can come from. Without it a bot
-   *   chased and cast at a champion holding `Untargetable` (Fizz E, a Zed
-   *   shadow): the `UNIT` resolve fizzles and the skillshot is spent mana.
+   *   chased and cast at a champion holding `Untargetable` (a brief leap
+   *   invulnerability, a shadow pet): the `UNIT` resolve fizzles and the skillshot is spent mana.
    * - **Range** is `profile.aggroRange`, at every tier. It is not vision's job:
    *   `canSee` applies no sight-radius cap on purpose (`Vision.ts:33`), because
-   *   `Reach.ts` owns range and a 500px cap here once trimmed Warwick R to 500
+   *   `Reach.ts` owns range and a 500px cap here once trimmed one leap ability to 500
    *   from its authored 550. And it is emphatically not
    *   `AttackableUnit.visionRadius`, which is a lerped animation value written
    *   every frame from 0 upward, not a constant.
@@ -631,7 +634,7 @@ export class BotBrain {
     // spell for nobody and empty the pool into a melee minion.
     // `killCredit === 'champion'` is the discriminator the codebase already
     // treats as authoritative (see CLAUDE.md); `instanceof` is not, because
-    // `Pet` and `Zed_W_Clone` both extend `Champion`.
+    // `Pet` and a shadow-clone spell's own clone class both extend `Champion`.
     //
     // Both gated on `guardedByTurret`, and that gate is the point: it is the
     // same test `findAttackTarget` has always applied to *acquisition*, and
@@ -1552,7 +1555,7 @@ export class BotBrain {
 
     if (castSpec.activation !== 'RECAST') return;
     // `recasts` defaults to 1 in the runtime, which is every recast spell here
-    // bar Jhin R: Ziggs W detonates, Riven R slashes, Renekton E dashes a second
+    // bar the four-round ultimate: a detonation spell detonates, a slash lands, a second dash goes a second
     // time and that is the end of it.
     const remaining = castSpec.active?.recasts ?? 1;
     if (remaining < 1) return;
@@ -1576,7 +1579,7 @@ export class BotBrain {
    *
    * `castIntervalMs` deliberately does not apply. That knob rate-limits a bot
    * *deciding* to cast; finishing an ability already on screen is not a second
-   * decision, and gating it would leave Jhin R's later rounds unfired at easy.
+   * decision, and gating it would leave the four-round ultimate's later rounds unfired at easy.
    */
   private advanceRecast(nowMs: number): void {
     const pending = this.pendingRecast;
@@ -1610,7 +1613,7 @@ export class BotBrain {
    * `movementRevision`, which `CancelPolicy` reads as `'MOVE'` — cancelled by the
    * default `SpellForm.HELD`. The think interval is 250ms, so every ability with
    * a cast time at or above it died mid-cast, ten of them on the shipped roster:
-   * Caitlyn R at 1000ms down to Darius E at 250. Following an existing route is
+   * one ultimate at 1000ms down to another ability at 250. Following an existing route is
    * fine and stays allowed — only a *new* order bumps the counter.
    *
    * The basic attack is exempt by `attackOrder: 'keep'`, the marker for the one

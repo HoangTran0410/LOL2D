@@ -23,9 +23,10 @@ const StatusFlags = {
   Ghosted: 1 << 11,
   /**
    * Passes through *bodies only* — terrain still stops it. The one a sustained
-   * effect wants: Garen spinning through a wave, Ghost shouldering past, a
-   * Powerball ploughing through. Split out of `Ghosted` because that flag also
-   * disables the wall push-out, and a three-second spin with it on lets Garen
+   * effect wants: a spin attack ploughing through a wave, a summoner spell's
+   * phasing shouldering past, a rolling ultimate ploughing through. Split out
+   * of `Ghosted` because that flag also disables the wall push-out, and a
+   * three-second spin with it on lets the spinning champion
    * walk out of the world.
    */
   PhasesUnits: 1 << 30,

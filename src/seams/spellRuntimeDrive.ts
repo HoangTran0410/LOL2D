@@ -13,7 +13,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * is a pack's own spell test suite.
  *
  * See `tests/game/spells/spell-runtime-drive-seam.test.ts` for the shipped
- * examples (Jhin R, Jhin Q).
+ * examples (a four-round recast ultimate and its own basic ability).
  */
 export interface SpellRuntimeDriveOptions extends SeamCheckOptions {
   /** Test files known to still reach past the runtime. Debt, not permission. */

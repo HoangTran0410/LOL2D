@@ -49,16 +49,17 @@ export interface RevealOptions {
  * A reveal applied by one particular spell.
  *
  * `stackId` is required, and that requirement is the whole reason this factory
- * exists. Four unrelated spells apply this class — Lux R, Ashe E, Morgana R,
- * Lee Sin Q — and `AttackableUnit.addBuff` groups by `stackId`. Left on the
+ * exists. Four unrelated spells apply this class — a global-vision ultimate, a
+ * roots-and-reveals arrow, a fear-and-reveal ultimate,
+ * a recast-and-reveal skillshot — and `AttackableUnit.addBuff` groups by `stackId`. Left on the
  * default (the class itself) all four contended for one slot under
- * `REPLACE_EXISTING`, so Lux R's 1.5s reveal cut Ashe E's 3s one short, and
+ * `REPLACE_EXISTING`, so the ultimate's 1.5s reveal cut the arrow's 3s one short, and
  * `hudState.buildBuffs`, which keys on the same id, folded them into a single
  * row wearing whichever icon happened to arrive first. Both were measured.
  *
  * Passing it as an argument rather than leaving each caller to remember an
  * assignment is what keeps a fifth spell from reopening this: the compiler
- * asks for the slot. `Veigar_Q`'s `createPowerStack` is the same shape for the
+ * asks for the slot. A stacking spell's own `createPowerStack` is the same shape for the
  * same reason.
  */
 export const createReveal = (options: RevealOptions): TrueSight => {

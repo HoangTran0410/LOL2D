@@ -535,7 +535,7 @@ export default class AttackableUnit extends GameObject {
     // tick — so the stat covers all of them without a single one of them
     // knowing it exists. Paid on the damage that actually landed, i.e. after
     // shields ate their share, and before the death check so the kill still
-    // heals. Self-damage (Olaf E) is excluded: a cost that refunds itself is
+    // heals. Self-damage (a self-inflicted cost spell) is excluded: a cost that refunds itself is
     // not a cost.
     if (attacker && attacker !== this && !attacker.isDead) {
       const vamp = attacker.stats?.omnivamp?.value ?? 0;
@@ -543,7 +543,7 @@ export default class AttackableUnit extends GameObject {
     }
 
     // Before the death check, for the same reason omnivamp is: a hit that kills
-    // still happened, and Rammus dying to the swing still returns it.
+    // still happened, and a reflect buff on the victim still returns it.
     this.reactToDamage(swung, damage, attacker);
 
     if (this.stats.health.baseValue <= 0) {
@@ -586,8 +586,8 @@ export default class AttackableUnit extends GameObject {
   /**
    * Drops every buff on death instead of letting them ride the corpse (and
    * then respawn): each one is deactivated so `onDeactivate` hooks unwind
-   * status flags and every spell-held reference (Twitch's stealth cloak,
-   * Thresh's shackle, Blitzcrank's airborne) sees `toRemove` flip. Iterate a
+   * status flags and every spell-held reference (a stealth cloak,
+   * a leashing shackle, a knock-up hold) sees `toRemove` flip. Iterate a
    * copy — `deactivateBuff()` calls out to listeners that must not mutate
    * `this.buffs` out from under this loop.
    */
@@ -789,7 +789,8 @@ export default class AttackableUnit extends GameObject {
   /**
    * Body radius for unit-on-unit separation. Deliberately `stats.size`, the same
    * circle TerrainMap pushes out of walls, rather than the lerped
-   * `animatedValues.size` — a body that grows and shrinks while Cho'Gath eats
+   * `animatedValues.size` — a body that grows and shrinks while a stacking
+   * self-buff feeds
    * would make the separation it causes wobble too.
    */
   get bodyRadius(): number {
