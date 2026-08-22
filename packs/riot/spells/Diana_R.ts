@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 import { MOON_CORE, MOON_NIGHT, MOON_PALE, drawCrescent } from './Diana_Q';
 
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

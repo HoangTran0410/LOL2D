@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { ExecuteFallback, ExecuteSpell } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { ExecuteFallback, ExecuteSpell } from '@moba2d/core/content/types';
 
 type AoePulse = InstanceType<ContentApi['AoePulse']>;
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

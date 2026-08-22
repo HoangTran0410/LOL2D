@@ -1,4 +1,4 @@
-import type { MapDefinition } from '@/content/ContentPack';
+import type { MapDefinition } from '@moba2d/core/content/ContentPack';
 
 /**
  * Summoner's Rift's cheap half — enough for a picker to list, name and

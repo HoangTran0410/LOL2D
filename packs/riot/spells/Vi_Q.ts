@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CastContext, CastSpec, Vec2 } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CastContext, CastSpec, Vec2 } from '@moba2d/core/content/types';
 
 type Airborne = InstanceType<ContentApi['buffs']['Airborne']>;
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

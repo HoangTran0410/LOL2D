@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { ContentPackCode, SpellSource } from '@/content/ContentPack';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { ContentPackCode, SpellSource } from '@moba2d/core/content/ContentPack';
 import { spellModules } from './generated/spellModules';
 import makeBaronAbilities from './monsters/Baron';
 
@@ -14,7 +14,7 @@ import makeBaronAbilities from './monsters/Baron';
  * spells on top of what this factory returns: a pack file may not import
  * `@/generated/spellModules` or `@/game/gameObject/coreSpells/Recall`
  * (`tests/content/packBoundary.test.ts` allows only
- * `@/content/ContentApi`/`ContentPack`/`types`, type-only), and "a bare
+ * `@moba2d/core/content/ContentApi`/`ContentPack`/`types`, type-only), and "a bare
  * spell id always resolves against this pack" is a promise `qualifySpellId`
  * makes about the *whole* installed `riot` entry, `BasicAttack` and `Recall`
  * included — not something this pack's own data is entitled to decide on

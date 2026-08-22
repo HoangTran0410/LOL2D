@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BasicAttackHit, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BasicAttackHit, CastSpec } from '@moba2d/core/content/types';
 import { makeVayne_R_Buff } from './Vayne_R';
 import { VAYNE_R_Q_CDR, VAYNE_R_STEALTH_MS } from './Vayne_R';
 

@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CastContext, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CastContext, CastSpec } from '@moba2d/core/content/types';
 import makeGhost from './Ghost';
 import makeHeal from './Heal';
 import makeIgnite from './Ignite';

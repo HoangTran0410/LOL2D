@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { MonsterAbility, Vec2 } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { MonsterAbility, Vec2 } from '@moba2d/core/content/types';
 
 /**
  * Baron's kit — the first monster behaviour to come from a pack rather than a

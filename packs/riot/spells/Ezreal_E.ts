@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 import { makeDetonateEssenceFlux, makeEssenceFluxSpell } from './Ezreal_W';
 
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

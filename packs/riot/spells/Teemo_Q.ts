@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 
 type MissileSpellObject = InstanceType<ContentApi['MissileSpellObject']>;
 type Nearsight = InstanceType<ContentApi['buffs']['Nearsight']>;

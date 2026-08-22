@@ -2,6 +2,10 @@
   "name": "@moba2d/core",
   "version": "1.0.0",
   "type": "module",
+  "workspaces": [
+    ".",
+    "packs/*"
+  ],
   "exports": {
     "./content/ContentApi": "./src/content/ContentApi.ts",
     "./content/ContentPack": "./src/content/ContentPack.ts",

@@ -1,4 +1,4 @@
-import type { Vec2 } from '@/content/types';
+import type { Vec2 } from '@moba2d/core/content/types';
 
 /**
  * Lux R's beam, moved out of `src/game/vfx/` (Task 2 of the content-pack
@@ -8,10 +8,10 @@ import type { Vec2 } from '@/content/types';
  *
  * - **`BeamGeometry` is redeclared here instead of imported from
  *   `@/game/gameObject/spellObjects/BeamSpellObject`.** `packBoundary.test.ts`
- *   only allows a pack file to reach core through `@/content/ContentApi`,
- *   `@/content/ContentPack` and `@/content/types`, type-only — `BeamSpellObject`
+ *   only allows a pack file to reach core through `@moba2d/core/content/ContentApi`,
+ *   `@moba2d/core/content/ContentPack` and `@moba2d/core/content/types`, type-only — `BeamSpellObject`
  *   is none of those. The shape is trivial (`{ start, end, width }` over the
- *   same `Vec2` this file already gets from `@/content/types`), so redeclaring
+ *   same `Vec2` this file already gets from `@moba2d/core/content/types`), so redeclaring
  *   it costs nothing: TypeScript's structural typing makes this interface and
  *   core's `BeamGeometry` freely assignable to each other, so `Lux_R.ts`
  *   (still core, still importing the original `BeamGeometry`) can keep

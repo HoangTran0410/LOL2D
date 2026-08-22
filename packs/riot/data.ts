@@ -4,7 +4,7 @@ import type {
   ContentPackData,
   MonsterDef,
   SpellDisplayData,
-} from '@/content/ContentPack';
+} from '@moba2d/core/content/ContentPack';
 import type { SpellCatalogId as PackSpellCatalogId } from './generated/spellCatalog';
 import { spellCatalog } from './generated/spellCatalog';
 import { summonersRift } from './maps/summonersRift';

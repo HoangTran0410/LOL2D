@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BasicAttackController } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BasicAttackController } from '@moba2d/core/content/types';
 
 type Spell = InstanceType<ContentApi['Spell']>;
 type SpellObject = InstanceType<ContentApi['SpellObject']>;

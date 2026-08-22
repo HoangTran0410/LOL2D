@@ -1,5 +1,11 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BeamGeometry, CancelReason, CastContext, CastSpec, Vec2 } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type {
+  BeamGeometry,
+  CancelReason,
+  CastContext,
+  CastSpec,
+  Vec2,
+} from '@moba2d/core/content/types';
 import { drawIreliaBlade, IRELIA_CREST, IRELIA_EDGE, IRELIA_RIM, IRELIA_STEEL } from './Irelia_Q';
 
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

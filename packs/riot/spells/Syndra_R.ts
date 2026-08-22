@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CastContext, CastSpec, TargetingRequest } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CastContext, CastSpec, TargetingRequest } from '@moba2d/core/content/types';
 import { makeGroundedSpheres, makeSyndra_Burst } from './Syndra_Q';
 import { SPHERE_CORE_RADIUS, SPHERE_DARK, SPHERE_EDGE, SPHERE_VIOLET } from './Syndra_Q';
 

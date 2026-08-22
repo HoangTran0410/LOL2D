@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CastContext, KillCredit } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CastContext, KillCredit } from '@moba2d/core/content/types';
 
 type Champion = InstanceType<ContentApi['units']['Champion']>;
 type Dash = InstanceType<ContentApi['buffs']['Dash']>;

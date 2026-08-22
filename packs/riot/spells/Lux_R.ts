@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BeamGeometry, CastContext, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BeamGeometry, CastContext, CastSpec } from '@moba2d/core/content/types';
 // Relative, not `@/`: `LuxBeamEffect` moved into `packs/riot/vfx/` (Task 2 of
 // the content-pack extraction) and this file has not moved yet, so this is a
 // core file reaching into the Riot pack rather than the reverse. Temporary —

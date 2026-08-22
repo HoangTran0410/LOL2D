@@ -1,0 +1,9 @@
+{
+  "name": "@moba2d/content-riot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@moba2d/core": "*"
+  }
+}

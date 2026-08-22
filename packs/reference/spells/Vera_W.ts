@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 
 /** Vera's W — a self shield. Exercises `api.buffs` and a SELF cast. */
 export const VERA_W_SHIELD = 30;

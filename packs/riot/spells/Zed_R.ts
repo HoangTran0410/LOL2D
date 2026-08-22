@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 import { makeZed_W_Clone } from './Zed_W';
 
 type Buff = InstanceType<ContentApi['buffs']['Buff']>;

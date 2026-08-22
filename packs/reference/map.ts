@@ -1,4 +1,4 @@
-import type { MapDefinition } from '@/content/ContentPack';
+import type { MapDefinition } from '@moba2d/core/content/ContentPack';
 
 /**
  * The reference pack's own map — Task 9 of the content-pack extraction.

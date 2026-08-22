@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BeamGeometry, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BeamGeometry, CastSpec } from '@moba2d/core/content/types';
 import { makeConsumeJhinMark } from './Jhin_Q';
 
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;

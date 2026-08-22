@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 import { makeApplyAblaze } from './Brand_Q';
 import { isAblaze } from './Brand_Q';
 

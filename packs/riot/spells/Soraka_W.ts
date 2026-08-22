@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CastContext, CastSpec, TargetingRequest } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CastContext, CastSpec, TargetingRequest } from '@moba2d/core/content/types';
 import { makeGrantRejuvenation } from './Soraka_Q';
 import { hasRejuvenation } from './Soraka_Q';
 

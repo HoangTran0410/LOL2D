@@ -30,7 +30,7 @@
  *   2. `preset.ts` SpellGroups      — add it to the champion's kit
  *   3. `AssetManager` AssetPaths    — add `spell_<name>` pointing at the icon
  */
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 
 function __buildSpellName(api: ContentApi) {
   return class SpellName extends api.Spell {

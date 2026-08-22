@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BasicAttackHit } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BasicAttackHit } from '@moba2d/core/content/types';
 // Relative, not `@/`: `DariusAxe` moved into `packs/riot/vfx/` (Task 2 of the
 // content-pack extraction) — see `Lux_R.ts`'s identical note on `LuxBeamEffect`.
 import { drawDariusAxe } from '../vfx/DariusAxe';

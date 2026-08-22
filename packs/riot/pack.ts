@@ -17,7 +17,7 @@ export { default } from './code';
  * folding the code half's real spell/monster classes into the same module
  * the menu's picker reads for a roster would risk exactly the regression
  * `packs/reference/`'s own carve-out exists to avoid. `./data.ts` has no
- * import that reaches `@/content/ContentApi` as a value, and `./code.ts` is
+ * import that reaches `@moba2d/core/content/ContentApi` as a value, and `./code.ts` is
  * the only file in this pack that does — a fact `vite.config.ts` now pins
  * both of them against by path, not merely by convention.
  *

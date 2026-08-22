@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CancelReason, CastContext, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CancelReason, CastContext, CastSpec } from '@moba2d/core/content/types';
 import { makeKatarina_Blade_Impact } from './Katarina_Q';
 import { KATARINA_BLOOD, KATARINA_DAGGER_LENGTH, KATARINA_STEEL, drawKatarinaDagger } from './Katarina_Q';
 

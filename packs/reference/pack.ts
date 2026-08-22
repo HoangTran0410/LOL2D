@@ -1,5 +1,9 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { ContentPackCode, ContentPackData, MonsterDef } from '@/content/ContentPack';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type {
+  ContentPackCode,
+  ContentPackData,
+  MonsterDef,
+} from '@moba2d/core/content/ContentPack';
 import { referenceMap } from './map';
 import makeVeraQ, { VERA_Q_COOLDOWN_MS, VERA_Q_DAMAGE, VERA_Q_MANA } from './spells/Vera_Q';
 import makeVeraW, {

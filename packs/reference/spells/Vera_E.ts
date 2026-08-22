@@ -1,4 +1,4 @@
-import type { ContentApi } from '@/content/ContentApi';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
 
 /**
  * Vera's E — a short dash. Exercises `api.buffs.Dash`.

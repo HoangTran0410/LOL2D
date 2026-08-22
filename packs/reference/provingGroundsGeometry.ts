@@ -1,4 +1,4 @@
-import type { MapGeometry } from '@/content/ContentPack';
+import type { MapGeometry } from '@moba2d/core/content/ContentPack';
 
 /**
  * Proving Grounds' heavy half — terrain, slots and its one lane. Lazy behind

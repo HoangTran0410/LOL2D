@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { BasicAttackHit } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { BasicAttackHit } from '@moba2d/core/content/types';
 
 type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;
 type Circle = InstanceType<ContentApi['utils']['Quadtree']['Circle']>;

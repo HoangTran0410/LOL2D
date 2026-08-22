@@ -1,5 +1,5 @@
-import type { ContentApi } from '@/content/ContentApi';
-import type { CancelReason, CastContext, CastSpec } from '@/content/types';
+import type { ContentApi } from '@moba2d/core/content/ContentApi';
+import type { CancelReason, CastContext, CastSpec } from '@moba2d/core/content/types';
 
 type CastBar = InstanceType<ContentApi['vfx']['CastBar']>;
 type ChargeRangeTelegraph = InstanceType<ContentApi['vfx']['ChargeRangeTelegraph']>;

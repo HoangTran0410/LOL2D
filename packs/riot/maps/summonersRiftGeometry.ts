@@ -15,7 +15,7 @@ import type {
   NeutralSlot,
   SpawnSlot,
   StructureSlot,
-} from '@/content/ContentPack';
+} from '@moba2d/core/content/ContentPack';
 
 /**
  * Summoner's Rift's heavy half — terrain and slots — assembled from data
