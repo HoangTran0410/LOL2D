@@ -52,7 +52,7 @@ What is in it:
 | Nav debug overlay | `N` |
 | Practice panel (pause + live settings) | `Esc` |
 
-Charged abilities (Varus Q, Pantheon Q) are held down and fire on release. `Esc` pauses and opens the practice panel rather than leaving the match — exit from the panel's *Trận đấu* tab.
+Charged abilities are held down and fire on release. `Esc` pauses and opens the practice panel rather than leaving the match — exit from the panel's *Trận đấu* tab.
 
 ## Getting started
 
@@ -113,7 +113,7 @@ src/
 │   ├── preset.ts              # champion kits, jungle camps, turret and fountain spots
 │   ├── gameObject/
 │   │   ├── attackableUnits/    # Champion, AIChampion, Minion, Monster, Turret
-│   │   ├── spells/             # one file per ability: Ahri_Q.ts, Yasuo_R.ts, ... (58 champions)
+│   │   ├── coreSpells/         # engine-owned spells only — champion abilities live in a content pack
 │   │   ├── spellObjects/       # base classes: Missile, Area, Beam, HomingMissile
 │   │   ├── buffs/              # Stun, Slow, Shield, Invisible, ...
 │   │   ├── structures/         # Turret, Fountain
@@ -157,7 +157,7 @@ Images and JSON live under `assets/`. `npm run assets:generate` walks that tree 
 Ability data (damage, cooldowns, ranges, icons) is imported from the [LoL Wiki](https://wiki.leagueoflegends.com/) by `scripts/wiki/import-abilities.mjs` into `docs/abilities/<champion>/<slot>.json`, with provenance recorded in `assets/source-manifest.json`.
 
 ```bash
-npm run ability:import -- --champions Ahri,Zed --slots Q,W,E,R
+npm run ability:import -- --champions <Champion>,<Champion> --slots Q,W,E,R
 npm run ability:check
 ```
 
@@ -169,7 +169,7 @@ npm run ability:check
 
 ```bash
 npm test
-npx vitest run tests/game/spells/Varus_Q.test.ts   # a single file
+npx vitest run tests/packs/riot/spells/<Champion>_Q.test.ts   # a single file
 ```
 
 House rule: **tuning values are exported as constants from the spell file and imported by its test.** Tests assert the wiring, not a copy of the numbers — retuning damage should never mean editing a test.

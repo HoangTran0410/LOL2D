@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { readSource, walkTsFiles } from './shared';
 
 /**
@@ -6,7 +6,7 @@ import { readSource, walkTsFiles } from './shared';
  * intended pace. Ten seconds is this game's own arcade boundary; a pack that
  * wants a different pace passes its own `maxMs`.
  *
- * See `tests/game/spells/cooldowns.test.ts`.
+ * See `tests/seams/exported-seams.test.ts`.
  */
 export interface CooldownsOptions extends SeamCheckOptions {
   maxMs?: number;
@@ -14,7 +14,7 @@ export interface CooldownsOptions extends SeamCheckOptions {
 
 const COOLDOWN_LITERAL = /coolDown\s*=\s*([\d_]+)/g;
 
-export const checkCooldowns: SeamCheck = (root, options?: CooldownsOptions) => {
+export const checkCooldowns: SeamCheckOf<CooldownsOptions> = (root, options) => {
   const maxMs = options?.maxMs ?? 10_000;
   const violations: SeamViolation[] = [];
 

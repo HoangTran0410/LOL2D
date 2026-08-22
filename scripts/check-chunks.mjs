@@ -23,7 +23,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { contentPackInstalled } from './installed-packs.mjs';
+import { contentPackInstalled, installedContentPackages } from './installed-packs.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = join(root, 'dist', 'assets');
@@ -232,20 +232,50 @@ const PREGAME_SIZE_CEILING_BYTES = 225_000;
 //
 // Gated on the pack that provides those champions actually being installed —
 // the same distinction `tests/support/installedPacks.ts` draws for the source
-// scans. Every `spell-<champion>-*.js` chunk comes from `packs/riot/spells/`
+// scans. Every `spell-<champion>-*.js` chunk comes from that pack's spells
 // (`vite.config.ts`'s rule matches that path and no other); the reference
 // pack's four spells ride in `pregame` by design. So in a checkout with no
-// riot pack the honest count is zero and a flat floor of 40 would fail a
-// perfectly good build — which is exactly what `npm run verify:without-packs`
-// measured the first time it got this far. A floor that cannot be met is not
-// a check, and neither is one that is quietly skipped: with the pack present
-// this is unchanged.
-const RIOT_SPELL_CHUNK_FLOOR = 40;
+// riot pack the honest count is zero and a floor would fail a perfectly good
+// build — which is exactly what `npm run verify:without-packs` measured the
+// first time it got this far.
+//
+// **Derived, not `RIOT_SPELL_CHUNK_FLOOR = 40`.** That literal sat against an
+// actual 59, under a comment reasoning carefully about *when* the floor may be
+// applied, in a repository whose whole programme is moving spell files — so it
+// would have stayed green through a rule that lost a third of the split. The
+// pack's own generated module map is exactly what Rollup splits, and
+// `vite.config.ts` names each chunk `spell-<champion>` for an id shaped
+// `<Champion>_<slot>` and `spell-common` for everything else, so the expected
+// set is computable rather than guessable. `installedContentPackages` gives
+// the pack's resolved directory, which is the workspace symlink today and a
+// real `node_modules` directory once the pack is a repository of its own.
 const spellChunks = readdirSync(assets).filter(name => /^spell-.+\.js$/.test(name));
-if (contentPackInstalled(root, 'riot') && spellChunks.length < RIOT_SPELL_CHUNK_FLOOR) {
-  failures.push(
-    `only ${spellChunks.length} spell-*.js chunks — the per-champion split is not applying`
+if (contentPackInstalled(root, 'riot')) {
+  const pack = installedContentPackages(root).find(entry => entry.name === 'riot');
+  const moduleMap = readFileSync(join(pack.dir, 'generated/spellModules.ts'), 'utf8');
+  const ids = [...moduleMap.matchAll(/^\s*"([^"]+)":\s*\(\)\s*=>\s*import\(/gm)].map(m => m[1]);
+  if (ids.length === 0) {
+    failures.push(`${pack.name}: no dynamic spell imports parsed out of generated/spellModules.ts`);
+  }
+  const expected = new Set(
+    ids.map(id => {
+      const champion = /^([A-Za-z0-9]+)_[QWER][0-9]*$/.exec(id);
+      return `spell-${champion ? champion[1].toLowerCase() : 'common'}`;
+    })
   );
+  // Matched by prefix, not by stripping the hash: Vite's hash is base64url
+  // and can itself contain `-`, so any "cut the last segment" rule turns
+  // `spell-ahri-V-Ag.js` into `spell-ahri-V` or `spell`.
+  const missing = [...expected].filter(
+    name => !spellChunks.some(chunk => chunk.startsWith(`${name}-`))
+  );
+  if (missing.length > 0) {
+    failures.push(
+      `${missing.length} of ${expected.size} per-champion spell chunks are missing ` +
+        `(${missing.slice(0, 5).join(', ')}${missing.length > 5 ? ', …' : ''}) — ` +
+        'the per-champion split is not applying'
+    );
+  }
 }
 
 if (failures.length) {

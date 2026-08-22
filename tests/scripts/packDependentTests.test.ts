@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { join } from 'node:path';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 // @ts-expect-error — a plain .mjs build helper, shared with `vitest.config.ts`,
 // with no types of its own and not part of any TypeScript program.
 import { packDependentTests, readSource } from '../../scripts/pack-dependent-tests.mjs';
 
 const ROOT = join(__dirname, '../..');
+
+function filesUnder(dir: string): string[] {
+  return readdirSync(dir).flatMap(name => {
+    const full = join(dir, name);
+    return statSync(full).isDirectory() ? filesUnder(full) : [full];
+  });
+}
 
 /**
  * `scripts/pack-dependent-tests.mjs` decides which test files Vitest skips
@@ -72,8 +80,20 @@ describe('which tests need a pack this checkout does not have', () => {
     const withoutRiot = packDependentTests(ROOT, ['reference']);
     expect(withoutRiot).not.toContain('tests/content/vocabularyBoundary.test.ts');
     expect(withoutRiot).not.toContain('tests/content/coreSpellsApiSurface.test.ts');
-    expect(withoutRiot).not.toContain('tests/content/packAssetKeyBoundary.test.ts');
     expect(withoutRiot).not.toContain('tests/game/spells/terrain-field-seam.test.ts');
+    // Each of the three above must actually exist, or `not.toContain` is
+    // vacuously true — which is what this assertion was for a fourth entry,
+    // `tests/content/packAssetKeyBoundary.test.ts`, from the moment the
+    // whole-branch review moved that scan into the `pack-asset-key` seam and
+    // deleted the file. A named file that is gone reads exactly like a named
+    // file that is correctly kept in the run.
+    for (const named of [
+      'tests/content/vocabularyBoundary.test.ts',
+      'tests/content/coreSpellsApiSurface.test.ts',
+      'tests/game/spells/terrain-field-seam.test.ts',
+    ]) {
+      expect(existsSync(join(ROOT, named)), `${named} no longer exists`).toBe(true);
+    }
   });
 
   it('leaves a file whose only pack reach is a gated dynamic import in the run', () => {
@@ -111,6 +131,23 @@ describe('which tests need a pack this checkout does not have', () => {
   it('is a real population, not an empty list that would pass either way', () => {
     // Guards the guard: every `not.toContain` above is vacuously true against
     // an empty result.
-    expect(packDependentTests(ROOT, ['reference']).length).toBeGreaterThan(100);
+    //
+    // Derived, not `> 100`. That literal was created by task 8 three tasks
+    // after task 7 spent a whole task deleting the class, against an actual
+    // 131 that the handover's own "131-file exclusion list" section says
+    // changes at the split — a floor guaranteed to stop describing anything.
+    // The pack's own test directory is the population that cannot be missing:
+    // every file in it names the pack by construction, so the list must
+    // contain all of them, and it must contain more than them, because the
+    // importers living outside that directory are the half the deriver exists
+    // for. Both halves are read off the tree.
+    const excluded = packDependentTests(ROOT, ['reference']);
+    const ownDirectory = filesUnder(join(ROOT, 'tests/packs/riot')).map(file =>
+      relative(ROOT, file).split(sep).join('/')
+    );
+
+    expect(ownDirectory.length, 'tests/packs/riot/ contributed nothing').toBeGreaterThan(0);
+    expect(ownDirectory.filter(file => !excluded.includes(file))).toEqual([]);
+    expect(excluded.length).toBeGreaterThan(ownDirectory.length);
   });
 });

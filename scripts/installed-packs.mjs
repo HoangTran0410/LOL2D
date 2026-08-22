@@ -21,16 +21,28 @@
  * let `packs/`-listing say "absent" while a bare-specifier import said
  * "present".
  *
- * ## Two readers, one answer
+ * ## Three readers, one answer
  *
  *   - `scripts/generate-installed-packs.mjs` materializes this into
  *     `src/generated/installedPacks.ts`, the barrel `src/content/install.ts`
  *     and `tests/setup.ts` read. TypeScript cannot call this module at
  *     compile time, so the answer has to become a file — the same idiom
  *     `src/generated/assetManifest.ts` and `spellCatalog.ts` already are.
- *   - `scripts/check-chunks.mjs` reads it directly, because a floor like
- *     "at least 40 per-champion `spell-*.js` chunks" is only true of a build
- *     that has the pack that provides those champions.
+ *   - `scripts/check-chunks.mjs` reads it directly, for the per-champion
+ *     spell-chunk check: that check is only meaningful in a build that has
+ *     the pack providing those champions, and since the whole-branch fix
+ *     pass it also takes the pack's *directory* from here
+ *     (`installedContentPackages(...).dir`) to derive the chunk names it
+ *     expects, rather than pinning a literal floor.
+ *   - `vitest.config.ts` reads it to know which packs are installed, then
+ *     hands that list to `scripts/pack-dependent-tests.mjs` — which takes
+ *     the answer as an argument rather than importing this module, so it is
+ *     a consumer and not a fourth reading.
+ *
+ * (`tests/support/installedPacks.ts` is a fifth *reader* but not a fifth
+ * answer: it reads the generated barrel this module produces, which is this
+ * answer materialized for a compiler that cannot call a script.
+ * `tests/content/installedPacksBarrel.test.ts` asserts the two agree.)
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';

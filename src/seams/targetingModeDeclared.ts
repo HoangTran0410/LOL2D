@@ -20,7 +20,7 @@ import { readSource, walkTsFiles } from './shared';
  * `provingGroundsGeometry.ts` — none of them spells — were three false
  * positives from exactly that root.
  *
- * See `tests/game/spells/TargetingModeDeclared.test.ts`.
+ * See `tests/seams/exported-seams.test.ts`.
  */
 const TARGETING_MODE_LITERAL = /targeting\s*:\s*'(?:SELF|DIRECTION|POINT|UNIT)'/;
 const TARGETING_MODE_FIELD = /\btargetingMode\s*[:=]/;

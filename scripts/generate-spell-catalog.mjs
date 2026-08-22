@@ -121,9 +121,9 @@ const coreRoot = resolve(dirname(scriptPath), '..');
  *
  * `importBase` is the module specifier prefix a spell in that barrel is
  * imported through in the generated `spellModules.ts` — `@/game/gameObject/
- * spells` for core's content barrel, so the emitted line reads
- * `import('@/game/gameObject/spells/Yasuo_Q')`, exactly as it did before
- * this generalisation existed. It is per-barrel, not per-tree, because
+ * coreSpells` for core's own barrel, so the emitted line reads
+ * `import('@/game/gameObject/coreSpells/BasicAttack')`, exactly as it did
+ * before this generalisation existed. It is per-barrel, not per-tree, because
  * that is what `coreIds` was really encoding: not "which barrel" but
  * "which directory does this id's file live in" — the barrel a spell
  * comes from already answers that, so carrying it on the merged entry
@@ -233,7 +233,39 @@ function describe(id, SpellClass) {
 export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE, treeRoot = coreRoot) {
   const server = await createServer({
     root: coreRoot,
-    configFile: resolve(coreRoot, 'vite.config.ts'),
+    // `configFile: false` plus the three settings below, not core's own
+    // `vite.config.ts` — the same fix `scripts/check-seams.mjs` took in
+    // batch 5 task 6 fix round 4, for the same reason and against the same
+    // measured failure. That config's first two lines import
+    // `@vitejs/plugin-vue` and `vite-plugin-pwa`, which are core
+    // *devDependencies*: they are not in `package.json`'s `files`, they are
+    // not installed when a pack depends on `@moba2d/core`, and a sibling
+    // checkout with core installed from an `npm pack` tarball dies with
+    // `Cannot find package '@vitejs/plugin-vue'` (then `vite-plugin-pwa`)
+    // before it reads a line of the pack's spells. `catalog:check` is one
+    // of the five gates a separated pack has to be able to run from its own
+    // repository, and it was the only one of the five that could not.
+    //
+    // The alternative — moving both plugins into `dependencies` — was
+    // rejected: it makes every consumer of the engine install a Vue plugin
+    // and a service-worker generator to regenerate a table of spell names,
+    // and it leaves the tarball claiming a build-time dependency on tools
+    // that only core's own app build uses.
+    //
+    // What this SSR graph genuinely needs from that config is small and is
+    // spelled out here rather than inherited:
+    //   - `resolve.alias['@']`, because `src/content/ContentApi.ts` (loaded
+    //     below for `isPackFactory` trees) imports core internals through
+    //     core's own internal alias, 68 times.
+    //   - `assetsInclude`, so a `.json` reached from a spell keeps being
+    //     treated as an asset rather than parsed as a module, matching what
+    //     the real build does.
+    // Nothing else in `vite.config.ts` applies: `plugins` are Vue/PWA,
+    // `define` feeds `MenuScene.vue` (not in this graph), and everything
+    // under `build` is for Rollup, which `ssrLoadModule` never reaches.
+    configFile: false,
+    resolve: { alias: { '@': resolve(coreRoot, 'src') } },
+    assetsInclude: ['**/*.json'],
     logLevel: 'error',
     // `/@fs/` reaches outside `root` (see this file's header) — `fs.allow`
     // is the boundary that would otherwise refuse it. `coreRoot` is always
@@ -350,14 +382,14 @@ function render(entries, tree = CORE_SPELL_TREE) {
 }
 
 /**
- * The other half: `id → () => import('./Yasuo_Q')`, so a match can fetch the
+ * The other half: `id → () => import('./<Spell>')`, so a match can fetch the
  * kits it is actually about to play instead of the whole barrel.
  *
  * Parsed out of each barrel in `tree.barrels` rather than guessed from the
  * id, because a barrel is the thing that decides which file and which
  * directory an id names — `BasicAttack` is `coreSpells/BasicAttack`,
- * `Yasuo_Q` is `spells/Yasuo_Q`, and nothing guarantees id and path always
- * agree in future. The barrels are independent `readFile`s (this function
+ * a pack's own id is `spells/<Spell>`, and nothing guarantees id and path
+ * always agree in future. The barrels are independent `readFile`s (this function
  * never touches `ssrLoadModule`), so a barrel's own `importBase` travels
  * with each of its entries directly — the old two-barrel-only version
  * built a separate `coreIds` set for the same purpose, which does not

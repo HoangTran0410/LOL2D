@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
@@ -32,7 +32,7 @@ export interface UnitTargetTeamOptions extends SeamCheckOptions {
   noPressOverride?: Set<string>;
 }
 
-export const checkUnitTargetTeam: SeamCheck = (root, options?: UnitTargetTeamOptions) => {
+export const checkUnitTargetTeam: SeamCheckOf<UnitTargetTeamOptions> = (root, options) => {
   const noPressOverride = options?.noPressOverride ?? new Set<string>();
   // Which declared `noPressOverride` entries actually suppressed a real
   // would-be violation this run — the rest are stale (fix round 3).

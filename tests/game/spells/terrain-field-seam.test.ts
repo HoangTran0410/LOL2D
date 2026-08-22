@@ -21,16 +21,36 @@
  * to half an answer, the way `mana-spend-seam` and `target-vision` do for
  * their own.
  *
- * `packs/riot/spells/` and `packs/riot/monsters/` left the BAN scan below in
- * content-pack-extraction batch 5 task 6 fix round 1: `src/seams/
- * terrainField.ts` is the same rule, exported, and `packs/riot`'s own
- * `check-seams` script now runs it against both — `./spells` (`check-seams`)
- * and `./monsters` (`check-seams:monsters`, added this round for exactly
- * this) — so a pack violation reddens the pack's build, not this one. The
- * "is reached by every spell that needs terrain" pin below stays: it names
- * five specific pack spells by path, the same way `cc-buff-icons.test.ts`
- * pins this pack's own champions — content-specific regression history, not
- * a population scan a generic exported function could replace.
+ * ## The BAN scan that used to live here is `check-seams` now, on both sides
+ *
+ * `src/seams/terrainField.ts` is that rule, exported. `packs/riot`'s own
+ * `check-seams` runs it over `./spells` and `./monsters`, and core's own
+ * `npm run check-seams` (in `verify`) runs it over `coreSpells/`,
+ * `spellObjects/`, `buffs/` and `attackableUnits/` — so a pack violation
+ * reddens the pack's build and a core violation reddens core's, and neither
+ * needs a hand-written copy of the rule here. Batch 5 task 6 fix round 1
+ * collapsed ten such duplicates into that CLI and the next commit gave core
+ * its own invocation, which re-created the duplication from the other side;
+ * the whole-branch review is what noticed. Proven before deleting: a planted
+ * `pointInWall(this.game, 1, 2)` in `buffs/` and in `spellObjects/` produces
+ * `terrain-field :: pointInWall` and exit 1 from each.
+ *
+ * Deleting it also retires two things the review flagged with it: a `> 20`
+ * absolute floor over a population that was `spellObjects` 4 + `buffs` 24 +
+ * `monsters` **0** (so `buffs/` alone cleared it and `spellObjects/`
+ * dropping out was invisible), and a `SCANNED` entry naming
+ * `src/game/gameObject/monsters`, a directory that has not existed since
+ * batch 5 task 2.
+ *
+ * ## What stays, and why the CLI cannot take it
+ *
+ * The "is reached by every spell that needs terrain" pin: it names five
+ * specific pack spells by path, the same way `cc-buff-icons.test.ts` pins
+ * this pack's own champions — content-specific regression history, and the
+ * *positive* direction, which a ban cannot express at all (a spell can
+ * satisfy a ban by asking nothing). It is a pin about riot's content living
+ * in core's suite, and it should travel with `tests/packs/riot/` when the
+ * pack becomes a repository of its own.
  *
  * Task 7 note: that pin still hardcoded `packs/riot/spells` directly and
  * threw `ENOENT` the moment that directory left the tree, which is exactly
@@ -40,100 +60,23 @@
  * loud if riot claims to be installed but one of the five files is gone.
  */
 import { describe, expect, it } from 'vitest';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { packIsInstalled, requireRoot } from '../../support/installedPacks';
 
 const REPO_ROOT = process.cwd();
-const GAME_OBJECT_ROOT = join(REPO_ROOT, 'src/game/gameObject');
 const PACKS_DIR = join(REPO_ROOT, 'packs');
 const RIOT_INSTALLED = packIsInstalled('riot');
 const SPELL_DIR = join(PACKS_DIR, 'riot/spells');
 
-/**
- * Everywhere in *core's own tree* an ability's code can live, for the BAN
- * scan below. `spellObjects/` is where a skillshot's flight actually
- * happens, `buffs/` is where a dash's per-frame movement happens, and
- * `monsters/` drove camps before Baron's kit moved into `packs/riot/
- * monsters/` (Task 2 of the content-pack extraction) — that directory no
- * longer holds any `.ts` file (see `sourceFiles`'s own guard for why that
- * must not crash the scan), kept here so the history stays legible rather
- * than silently vanishing from this list.
- */
-const SCANNED: { label: string; root: string }[] = [
-  { label: 'spellObjects', root: join(GAME_OBJECT_ROOT, 'spellObjects') },
-  { label: 'buffs', root: join(GAME_OBJECT_ROOT, 'buffs') },
-  { label: 'monsters', root: join(GAME_OBJECT_ROOT, 'monsters') },
-];
-
-/**
- * Every `.ts` file under `root`, recursive (`spellObjects/` has
- * subdirectories) — or `[]` for a root that does not exist. Git tracks no
- * empty directory, so a scanned directory whose last file just moved out (as
- * `src/game/gameObject/monsters/` did in Task 2) is not merely empty, it is
- * gone; that has to read as "nothing to scan here," not a crash.
- */
-const sourceFiles = (root: string): string[] => {
-  if (!existsSync(root)) return [];
-  return readdirSync(root, { recursive: true, encoding: 'utf8' }).filter(entry =>
-    entry.endsWith('.ts')
-  );
-};
-
-/**
- * The half-answers. `wallOutlinesInArea` returns raw polygon outlines, which is
- * every convex piece a wall was chopped into and no help with the seams between
- * them; `pointInWall` answers for a single point, which is what turns a moving
- * hook into a sampler that can overshoot or skip.
- *
- * `slabVertices`, `DynamicWall` and `isDynamicWall` are deliberately absent:
- * they are how a spell *declares itself* a wall, not how it reads one.
- */
-const BANNED = ['wallOutlinesInArea', 'pointInWall'];
-
-/** Comments stripped, or the scan flags the paragraph above. */
+/** Comments stripped, or the pin below reads its own prose as an answer. */
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-const offendersIn = (source: string): string[] =>
-  BANNED.filter(name => new RegExp(`\\b${name}\\b`).test(stripComments(source)));
-
 describe('the terrain seam', () => {
-  it('catches a spell that reaches past it', () => {
-    // The scan proving itself before it is trusted to report zero. This is the
-    // exact line Xin Zhao R carried until the migration, and a scan that cannot
-    // see it would pass the suite below by seeing nothing at all.
-    const asItWas = `
-      import { pointInWall } from '@/game/gameObject/map/DynamicTerrain';
-      if (pointInWall(this.game, x, y)) break;
-    `;
-
-    expect(offendersIn(asItWas)).toEqual(['pointInWall']);
-    expect(offendersIn('// pointInWall is what this used to call\nconst a = 1;')).toEqual([]);
-  });
-
-  it('is the only way a spell asks about walls', () => {
-    const offenders: string[] = [];
-    let scanned = 0;
-
-    for (const { label, root } of SCANNED) {
-      for (const entry of sourceFiles(root)) {
-        scanned++;
-        const found = offendersIn(readFileSync(join(root, entry), 'utf8'));
-        if (found.length > 0) offenders.push(`${label}/${entry}: ${found.join(', ')}`);
-      }
-    }
-
-    // The scan covering nothing would report nothing. `spellObjects/` (4) +
-    // `buffs/` (24) is ~28 files with headroom; the guard only has to be far
-    // enough under that to catch a directory list that stopped resolving.
-    expect(scanned).toBeGreaterThan(20);
-    expect(offenders).toEqual([]);
-  });
-
   it('is reached by every spell that needs terrain, when riot is installed', () => {
     // The other direction, and the one a ban alone cannot cover: a spell could
-    // satisfy the scan above by asking nothing at all. These five are the
+    // satisfy the ban by asking nothing at all. These five are the
     // abilities whose behaviour is defined by where a wall is, and each of them
     // has been wrong about it in a shipped build.
     //

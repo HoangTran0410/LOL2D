@@ -44,20 +44,28 @@
  * Exits 1 and prints one line per violation if any seam finds one; exits 0
  * and prints a summary otherwise.
  *
- * ## Thirteen rules over the named tree, and one over the package
+ * ## Thirteen rules over the named tree, and two over the package
  *
  * `checkSeams(root)` runs the thirteen rules that all mean the same thing
- * about the same directory. The fourteenth — `pack-core-boundary`, "a pack
- * reaches core only through its public content subpaths" — is scoped to a
- * *package* instead: a pack's `pack.ts`, its generated barrels, its maps and
- * vfx modules can reach into core exactly as a spell can, and none of them
- * sit under `./spells`. So this script resolves the `package.json` that owns
- * the scanned tree (`owningPackage`) and runs that rule over the whole
- * package — unless the owner is core itself, since `@/...` is how core's own
- * source refers to itself. Fix round 4 of content-pack-extraction batch 5
- * task 6; before it, that rule lived only in `tests/content/
- * packBoundary.test.ts`, which meant a pack breaking the rule the entire
- * extraction rests on reddened *core's* build and nothing of the pack's.
+ * about the same directory. Two more are scoped to a *package* instead,
+ * because a pack's `pack.ts`, its generated barrels, its maps, its monster
+ * factories and its vfx modules can break them exactly as a spell can and
+ * none of them sit under `./spells`:
+ *
+ *   - `pack-core-boundary` — "a pack reaches core only through its public
+ *     content subpaths" (fix round 4 of content-pack-extraction batch 5 task
+ *     6; before it, that rule lived only in `tests/content/
+ *     packBoundary.test.ts`, so a pack breaking the rule the entire
+ *     extraction rests on reddened *core's* build and nothing of the pack's).
+ *   - `pack-asset-key` — "a pack resolves art through its own manifest, never
+ *     a bare key from core's" (batch 5 whole-branch review; before it, that
+ *     rule was `tests/content/packAssetKeyBoundary.test.ts`, a core-side scan
+ *     of all of `packs/`, with the same inversion).
+ *
+ * So this script resolves the `package.json` that owns the scanned tree
+ * (`owningPackage`) and runs both over the whole package — unless the owner
+ * is core itself, since `@/...` is how core's own source refers to itself and
+ * core's own keys are core's to use.
  *
  * ## A pack's own debt is the pack's to state, not the engine's
  *
@@ -216,16 +224,20 @@ export async function runCheckSeams(targetRoot) {
     const owner = owningPackage(absoluteTarget);
     const boundary = owner.name === corePackageName() ? null : owner;
     if (boundary) {
-      const { packCoreBoundarySeam } = await server.ssrLoadModule('/src/seams/index.ts');
+      const { packCoreBoundarySeam, packAssetKeySeam } =
+        await server.ssrLoadModule('/src/seams/index.ts');
       const boundaryRoot = relative(process.cwd(), boundary.root) || '.';
-      for (const violation of packCoreBoundarySeam.check(boundary.root)) {
-        violations.push({ ...violation, seamId: packCoreBoundarySeam.id, root: boundaryRoot });
+      for (const seam of [packCoreBoundarySeam, packAssetKeySeam]) {
+        for (const violation of seam.check(boundary.root)) {
+          violations.push({ ...violation, seamId: seam.id, root: boundaryRoot });
+        }
       }
       return {
         violations,
         scannedCount,
         boundary: {
           package: boundary.name ?? boundaryRoot,
+          seamIds: [packCoreBoundarySeam.id, packAssetKeySeam.id],
           scannedCount: scannedSeamFiles(boundary.root).length,
         },
       };
@@ -264,7 +276,7 @@ if (invokedDirectly()) {
         console.log(`check-seams: scanned ${scannedCount} file(s), clean (${targetRoot})`);
         if (boundary) {
           console.log(
-            `check-seams: pack-core-boundary scanned ${boundary.scannedCount} file(s) of ${boundary.package}, clean`
+            `check-seams: ${boundary.seamIds.join(' + ')} scanned ${boundary.scannedCount} file(s) of ${boundary.package}, clean`
           );
         }
         return;

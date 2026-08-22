@@ -388,7 +388,7 @@ export default class Stats {
     // Current health and current mana are resources, not stats: they are moved
     // by `takeDamage`, `takeHeal`, `spendMana` and `restoreMana`, which all
     // write `baseValue` directly. Nothing should be modifying them through the
-    // stat pipeline at all, and `stat-resource-modifier.test.ts` enforces that
+    // stat pipeline at all, and the `stat-resource-modifier` seam enforces that
     // — but the write-back is what turned a merely meaningless modifier into a
     // game-breaking one, so it is fixed here as well.
     this.health.baseValue = constrain(

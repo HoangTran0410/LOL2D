@@ -72,7 +72,24 @@ describe('every seam names its own options fields', () => {
   it('finds the option interfaces to compare, or this proves nothing', () => {
     // Guards the guard: a rename of `SeamCheckOptions`, or these interfaces
     // moving, would otherwise leave the assertion below vacuously green.
-    expect(byInterface.size).toBeGreaterThanOrEqual(5);
+    //
+    // Derived, not `>= 5`. That literal was created inside batch 5 task 6
+    // fix round 4 — the same batch that spent task 7 deleting this class —
+    // over a population the batch itself was still adding to. The honest
+    // statement is that `optionInterfaces()`'s parse agrees with a plain
+    // substring count of the files that declare one: two different readings
+    // of the same text, so a regex that stops matching moves one and not the
+    // other.
+    const declaring = readdirSync(SEAMS_DIR).filter(
+      file =>
+        file.endsWith('.ts') &&
+        /\binterface\s+\w+\s+extends\s+SeamCheckOptions\b/.test(
+          stripComments(readFileSync(join(SEAMS_DIR, file), 'utf8'))
+        )
+    );
+
+    expect(declaring.length).toBeGreaterThan(0);
+    expect(new Set([...byInterface.values()].map(entry => entry.file)).size).toBe(declaring.length);
     for (const { fields } of byInterface.values()) expect(fields.length).toBeGreaterThan(0);
   });
 

@@ -20,9 +20,13 @@
     "moba2d-generate-spell-catalog": "./scripts/generate-spell-catalog.mjs"
   },
   "files": [
-    "assets",
+    "assets/cursors",
+    "assets/images",
+    "packs/reference",
     "public",
-    "scripts",
+    "scripts/check-seams.mjs",
+    "scripts/generate-spell-catalog.mjs",
+    "scripts/version.mjs",
     "src",
     "styles",
     "index.html",

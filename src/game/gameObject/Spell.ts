@@ -351,7 +351,7 @@ export default class Spell {
    * go — including placed effects like a ground-mark ability, which should have stopped
    * wherever it was aimed. `castSpec` now throws instead of guessing, so a
    * legacy spell subclass must set this explicitly to what it actually does.
-   * `tests/game/spells/TargetingModeDeclared.test.ts` fails the build for any
+   * The `targeting-mode-declared` seam (`npm run check-seams`) fails the build for any
    * spell file that doesn't (mirrors `tests/game/buffs/Ground.test.ts`, which
    * does the same for `owner.teleportTo`).
    */

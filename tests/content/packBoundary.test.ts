@@ -38,6 +38,35 @@ import { join } from 'node:path';
  * answered in one place. `tests/seams/exported-seams.test.ts` proves the rule
  * catches every shape it bans; `tests/scripts/checkSeams.bin.test.ts` proves
  * the CLI reaches the pack's tree and honours its debt.
+ *
+ * ## The one half of the contract that is *not* on the pack's side, and why
+ *
+ * The seam moved. The **compiler did not**, and cannot while both live here.
+ * Measured, whole-branch review of batch 5, re-measured when this paragraph
+ * was written: with `import type { Game } from '@moba2d/core/game/Game'`
+ * planted at the top of `packs/riot/spells/Ahri_Q.ts`, the pack's own
+ * `check-seams` reports `pack-core-boundary :: ./spells/Ahri_Q.ts` and exits
+ * 1 — and so do **core's** `npm run typecheck` and `npm run typecheck:core`,
+ * with
+ *
+ *     packs/riot/spells/Ahri_Q.ts(1,27): error TS2307: Cannot find module
+ *       '@moba2d/core/game/Game' or its corresponding type declarations.
+ *
+ * That is not a scan that was left behind; it is import-following.
+ * `tsconfig.json`'s `include: ["src/**\/*"]` reaches
+ * `src/generated/installedPacks.ts` -> `@moba2d/content-riot/pack`, and
+ * TypeScript type-checks every file it resolves. There is no per-file error
+ * suppression, no "treat this package as external" switch, and the two
+ * alternatives are both worse than the symptom: shimming the pack's
+ * specifier to a `.d.ts` would make core's own build blind to the contract it
+ * is checking, and dropping the static import would undo batch 5 task 8's
+ * generated barrel, which is what makes core build with no pack at all.
+ *
+ * So: **the scan half of "a pack's violation reddens the pack's build" holds
+ * today and the typecheck half does not.** It fails loudly, at a named pack
+ * file, in both builds rather than only core's — and it stops existing at the
+ * physical split, because core alone has no pack in its program to compile.
+ * Stated here rather than left for the next reader to rediscover.
  */
 const PACKS_DIR = join(__dirname, '../../packs');
 

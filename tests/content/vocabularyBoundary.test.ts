@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import { packIsInstalled, requireRoot } from '../support/installedPacks';
+import { join, relative, sep } from 'node:path';
+import { packIsInstalled } from '../support/installedPacks';
+import { srcSourceFilePaths } from '../support/srcTree';
+import {
+  describeOffence,
+  riotChampionNames,
+  riotMonsterNames,
+  riotVocabularyOffences,
+} from '../support/riotVocabulary';
 
 /**
  * Task 10 of the content-pack extraction: a scan over `src/` for Riot's
@@ -85,9 +92,8 @@ import { packIsInstalled, requireRoot } from '../support/installedPacks';
  * be there) is the real bug, and `requireRoot` is what turns that into a
  * loud, named failure instead of `readdirSync`'s bare `ENOENT`.
  */
-const SRC = join(__dirname, '../../src');
-const PACKS = join(__dirname, '../../packs');
-const RIOT_INSTALLED = packIsInstalled('riot');
+const REPO_ROOT = join(__dirname, '../..');
+const SRC = join(REPO_ROOT, 'src');
 
 function filesUnder(dir: string, extensions: string[]): string[] {
   const out: string[] = [];
@@ -101,60 +107,6 @@ function filesUnder(dir: string, extensions: string[]): string[] {
 
 const scannedFiles = (): string[] => filesUnder(SRC, ['.ts', '.vue']);
 
-/**
- * `Ahri_Q.ts` -> `Ahri`, `_EmptyExample.ts`/`index.ts` skipped (no `_[QWER]`
- * suffix). `[]` when the riot pack is not installed — there is no vocabulary
- * to certify core against, which is a legitimate "nothing to check", not a
- * crash. When it *is* installed, the directory it names must resolve.
- */
-function championNamesFromPack(): string[] {
-  if (!RIOT_INSTALLED) return [];
-  const dir = requireRoot(join(PACKS, 'riot/spells'), 'vocabularyBoundary: packs/riot/spells');
-  const names = new Set<string>();
-  for (const file of readdirSync(dir)) {
-    const match = file.match(/^([A-Za-z]+)_[QWERP][A-Za-z0-9]*\.ts$/);
-    if (match) names.add(match[1]);
-  }
-  return [...names];
-}
-
-/**
- * `Baron.ts` -> `Baron`. Every `.ts` file directly under
- * `packs/riot/monsters/` — `[]` when the riot pack is not installed, see
- * `championNamesFromPack`.
- */
-function monsterNamesFromPack(): string[] {
-  if (!RIOT_INSTALLED) return [];
-  const dir = requireRoot(join(PACKS, 'riot/monsters'), 'vocabularyBoundary: packs/riot/monsters');
-  return readdirSync(dir)
-    .filter(f => f.endsWith('.ts'))
-    .map(f => f.replace(/\.ts$/, ''));
-}
-
-/**
- * A handful of champions whose filename token (PascalCase, no spaces or
- * punctuation — a valid TS identifier) is not the display name a doc
- * comment actually writes in prose. Both forms are banned; this list only
- * adds the second.
- */
-const DISPLAY_VARIANTS: Record<string, string[]> = {
-  ChoGath: ["Cho'Gath"],
-  JarvanIV: ['Jarvan IV', 'Jarvan'],
-  LeeSin: ['Lee Sin'],
-  MasterYi: ['Master Yi'],
-  XinZhao: ['Xin Zhao'],
-};
-
-const bannedNames = (): string[] => {
-  const base = [...championNamesFromPack(), ...monsterNamesFromPack()];
-  const out = [...base];
-  for (const name of base) out.push(...(DISPLAY_VARIANTS[name] ?? []));
-  return out;
-};
-
-const stripComments = (source: string): string =>
-  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-
 describe("core carries none of Riot's vocabulary", () => {
   it('has real champion and monster names to check core against, when riot is installed', () => {
     // Not `names.length > 50` any more: that combined total survived riot's
@@ -163,100 +115,51 @@ describe("core carries none of Riot's vocabulary", () => {
     // anything real. Per-root instead: each source independently
     // contributed something, which is the actual failure worth naming if
     // one of them quietly stops.
-    if (!RIOT_INSTALLED) return; // nothing installed to certify core against
+    if (!packIsInstalled('riot')) return; // nothing installed to certify core against
     expect(
-      championNamesFromPack().length,
+      riotChampionNames().length,
       'packs/riot/spells contributed 0 champion names'
     ).toBeGreaterThan(0);
     expect(
-      monsterNamesFromPack().length,
+      riotMonsterNames().length,
       'packs/riot/monsters contributed 0 monster names'
     ).toBeGreaterThan(0);
   });
 
   it('finds source files under src/ to scan, or this scan proves nothing', () => {
-    expect(scannedFiles().length).toBeGreaterThan(20);
+    // Derived, not `> 20` — see `tests/support/srcTree.ts` for why a floor
+    // over `src/` is a number about last month's tree.
+    const viaVite = srcSourceFilePaths();
+
+    expect(viaVite.length).toBeGreaterThan(0);
+    expect(scannedFiles().length).toBe(viaVite.length);
   });
 
-  /**
-   * The one surviving hit, narrowed to its own line rather than its whole
-   * file — see this file's header. `key` is `${absolute path}: ${line}`,
-   * matching the convention `SUMMONER_LITERAL_GRANDFATHERED` below already
-   * uses.
-   */
-  const CHAMPION_NAME_GRANDFATHERED = new Set([
-    `${join(SRC, 'scenes/about/changelog.ts')}: 'Làm lại kỹ năng W của Shaco.',`,
-  ]);
+  /** Every offence in `src/`, grouped by which of the three rules caught it. */
+  function offendersByRule(): Record<string, string[]> {
+    const out: Record<string, string[]> = {
+      'champion-or-monster-name': [],
+      'spell-id': [],
+      'summoner-id': [],
+    };
+    for (const file of scannedFiles()) {
+      const rel = relative(REPO_ROOT, file).split(sep).join('/');
+      for (const offence of riotVocabularyOffences(rel, readFileSync(file, 'utf8'))) {
+        out[offence.rule].push(describeOffence(offence));
+      }
+    }
+    return out;
+  }
 
   it('names no champion or monster from the bundled pack, comments included', () => {
-    // Comments are NOT stripped here, unlike packBoundary.test.ts: most of
-    // this scan's real hits were doc comments illustrating a bug with the
-    // real spell that exposed it, and that is exactly the vocabulary this
-    // check exists to purge. Line-by-line (rather than one `.test()` over
-    // the whole file) so a single grandfathered line does not have to take
-    // its whole file off the scan with it.
-    const names = bannedNames();
-    const patterns = names.map(name => ({
-      name,
-      re: new RegExp(`\\b${name.replace(/'/g, "'?")}\\b`),
-    }));
-    const offenders: string[] = [];
-    for (const file of scannedFiles()) {
-      const source = readFileSync(file, 'utf8');
-      const rel = file.slice(SRC.length + 1);
-      for (const line of source.split('\n')) {
-        for (const { name, re } of patterns) {
-          if (!re.test(line)) continue;
-          const key = `${file}: ${line.trim()}`;
-          if (!CHAMPION_NAME_GRANDFATHERED.has(key))
-            offenders.push(`${rel}: ${name} (${line.trim()})`);
-        }
-      }
-    }
-    expect(offenders).toEqual([]);
+    expect(offendersByRule()['champion-or-monster-name']).toEqual([]);
   });
-
-  /** `Vera_Q` is `packs/reference/`'s fictional example id — see this file's own header. */
-  const SPELL_ID_GRANDFATHERED = new Set(['Vera_Q']);
 
   it('carries no spell-id-shaped identifier (ChampionName_Slot) anywhere', () => {
-    const pattern = /\b[A-Z][a-z]+(?:IV)?_[QWERP][A-Za-z0-9]*\b/g;
-    const offenders: string[] = [];
-    for (const file of scannedFiles()) {
-      const source = readFileSync(file, 'utf8');
-      const rel = file.slice(SRC.length + 1);
-      for (const match of source.matchAll(pattern)) {
-        if (!SPELL_ID_GRANDFATHERED.has(match[0])) offenders.push(`${rel}: ${match[0]}`);
-      }
-    }
-    expect(offenders).toEqual([]);
+    expect(offendersByRule()['spell-id']).toEqual([]);
   });
 
-  /**
-   * `DEFAULT_CHAMPION_LOADOUT.summonerD`/`summonerF` in `PregameConfig.ts` —
-   * see that field's own doc comment and this file's header.
-   */
-  const PREGAME_CONFIG = join(SRC, 'game/config/PregameConfig.ts');
-  const SUMMONER_LITERAL_GRANDFATHERED = new Set([
-    `${PREGAME_CONFIG}: summonerD: 'Flash',`,
-    `${PREGAME_CONFIG}: summonerF: 'Heal',`,
-  ]);
-
-  it('carries no summoner-spell id as a quoted string literal, outside the one documented default', () => {
-    const ids = ['Flash', 'Ghost', 'Heal', 'Ignite', 'StealthWard'];
-    const pattern = new RegExp(`['"](${ids.join('|')})['"]`, 'g');
-    const offenders: string[] = [];
-    for (const file of scannedFiles()) {
-      const source = stripComments(readFileSync(file, 'utf8'));
-      for (const line of source.split('\n')) {
-        for (const match of line.matchAll(pattern)) {
-          const key = `${file}: ${line.trim()}`;
-          if (!SUMMONER_LITERAL_GRANDFATHERED.has(key)) {
-            offenders.push(`${file.slice(SRC.length + 1)}: ${line.trim()} (${match[0]})`);
-          }
-        }
-      }
-    }
-    expect(offenders).toEqual([]);
+  it('carries no summoner-spell id as a quoted string literal, outside the documented defaults', () => {
+    expect(offendersByRule()['summoner-id']).toEqual([]);
   });
 });

@@ -70,8 +70,10 @@ jobs:
       # done: the riot pack is reached only through
       # `src/generated/installedPacks.ts`, a generated barrel that names it by
       # package name and is empty when it is not installed, so `verify` passes
-      # with the pack out of the tree — 156 files / 1531 tests, against 278 /
-      # 3802 with it. `install.ts` is still static and synchronous, which spec
+      # with the pack out of the tree — 154 files / 1579 tests + 9 skipped,
+      # against 272 / 3755 with it (measured at the whole-branch fix pass; the
+      # drill above prints both, which is the number to trust if these drift).
+      # `install.ts` is still static and synchronous, which spec
       # §9.1 requires of it; what became conditional is the generated list of
       # imports, not the imports themselves. The drill step above is what holds
       # that true rather than a comment claiming it.

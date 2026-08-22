@@ -34,7 +34,6 @@ import asset31Url from '../../assets/images/screenshots/Screenshot_1.jpg?url';
 import asset32Url from '../../assets/images/screenshots/Screenshot_3.jpg?url';
 import asset33Url from '../../assets/images/screenshots/Screenshot_4.jpg?url';
 import asset34Url from '../../assets/images/spells/basic_attack.png?url';
-import asset35Url from '../../assets/source-manifest.json?url';
 
 export type AssetKind = 'image' | 'json' | 'audio' | 'url';
 
@@ -74,7 +73,6 @@ export const assetManifest = {
   "screenshot_Screenshot_3": { kind: 'image', url: asset32Url, path: "assets/images/screenshots/Screenshot_3.jpg" },
   "screenshot_Screenshot_4": { kind: 'image', url: asset33Url, path: "assets/images/screenshots/Screenshot_4.jpg" },
   "spell_basic_attack": { kind: 'image', url: asset34Url, path: "assets/images/spells/basic_attack.png" },
-  "source_manifest": { kind: 'json', url: asset35Url, path: "assets/source-manifest.json" },
 } as const;
 
 export type AssetKey = keyof typeof assetManifest;

@@ -64,7 +64,7 @@ import { spellModules as coreSpellModules } from '@/generated/spellModules';
  * nothing below it changes, because a pack is a factory taking core's API in
  * both cases:
  *
- *     Stage 1  import code from '@lol2d/content-riot'      -> code(api)
+ *     Stage 1  import code from '@moba2d/content-riot'     -> code(api)
  *     Stage 2  const { default: code } = await import(url) -> code(api)
  *
  * Keeping that one seam is what makes Stage 2 a change to this file rather

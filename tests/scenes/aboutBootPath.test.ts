@@ -60,7 +60,16 @@ const reachesGame = (specifier: string): boolean =>
 describe('the About screen boots without the game', () => {
   it('finds the files it claims to check', () => {
     const files = aboutFiles();
-    expect(files.length).toBeGreaterThan(2);
+    // Per-root, not `> 2`. The list is two hard-coded entries plus whatever
+    // `scenes/about/` holds, so `> 2` is satisfied the moment that directory
+    // yields a single file and says nothing if it stops resolving entirely —
+    // and `existsSync` above makes a missing directory silent. The data
+    // directory answers for itself instead.
+    expect(files, 'scenes/AboutScene.ts left the list').toContain('scenes/AboutScene.ts');
+    expect(
+      files.filter(file => file.startsWith('scenes/about/')).length,
+      'scenes/about/ contributed 0 files'
+    ).toBeGreaterThan(0);
     for (const file of files) {
       expect(() => readFileSync(join(SRC, file), 'utf8'), `${file} is missing`).not.toThrow();
     }

@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { readSource, stripComments, walkTsFiles } from './shared';
 
 /**
@@ -11,7 +11,7 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * Two ways to satisfy it: declare `getDisplayBoundingBox()`, or set a
  * non-zero `visionRadius`.
  *
- * See `tests/game/spells/spell-object-display-box-seam.test.ts` (a beam
+ * See `tests/game/spells/aoe-display-bounds.test.ts` (a beam
  * ultimate's beam, and the behavioural half — `aoe-display-bounds.test.ts` — that
  * checks the box is actually big enough, which this scan cannot).
  */
@@ -39,9 +39,9 @@ const DIRECT_SPELL_OBJECT = /class\s+(\w+)\s+extends\s+SpellObject\b[^{]*\{/g;
 /** Either sanctioned way to state an extent. */
 const STATES_ITS_EXTENT = /getDisplayBoundingBox\s*\(|\bvisionRadius\b/;
 
-export const checkSpellObjectDisplayBox: SeamCheck = (
+export const checkSpellObjectDisplayBox: SeamCheckOf<SpellObjectDisplayBoxOptions> = (
   root,
-  options?: SpellObjectDisplayBoxOptions
+  options
 ) => {
   const grandfatheredClasses = options?.grandfatheredClasses ?? new Set<string>();
   // Which declared `grandfatheredClasses` entries actually suppressed a

@@ -60,7 +60,21 @@
     "tests/game/types/BaseObjectTypes.test.ts",
     "tests/game/types/BuffUnitTypes.test.ts",
     "tests/game/types/ChampionTypes.test.ts",
-    "tests/game/config/spellCatalogId.types.test.ts"
+    "tests/game/config/spellCatalogId.types.test.ts",
+    // `src/seams/` and the tests that certify it. The whole-branch review of
+    // batch 5 measured `tsc --listFiles` for all three programs and found
+    // **zero** files under `tests/seams/` in any of them — 900-odd lines,
+    // most of them written by that batch, that nothing typechecked. The
+    // consequence was already sitting in the tree: `exported-seams.test.ts`
+    // imported `checkSpellRuntimeDrive` twice in one clause, which Node's own
+    // ESM parser rejects outright (`SyntaxError`) and esbuild silently
+    // dedupes, so the suite was green over a latent syntax error in the file
+    // that certifies core's public seam exports. Here rather than in
+    // `tsconfig.json` because `src/seams/` is pure TypeScript over `node:fs`
+    // with no p5 global and no Vue in sight — the exact shape this strict
+    // program exists for.
+    "src/seams/**/*.ts",
+    "tests/seams/**/*.ts"
   ],
   // The six paths below match `tests/game/spell/**/*.ts` or
   // `tests/game/combat/**/*.ts` above but are carved back out: `registry.ts`

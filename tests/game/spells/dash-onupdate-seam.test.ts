@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
@@ -31,50 +31,25 @@ import {
  * invisible to `tsc` (assigning a method is perfectly legal), and it costs a
  * millisecond to rule out across every spell at once.
  */
-// `packs/riot/spells/` left this scan in content-pack-extraction batch 5
-// task 6 fix round 1: `src/seams/dashOnUpdate.ts` is the same rule, exported,
-// and `packs/riot`'s own `check-seams` script (`moba2d-check-seams
-// ./spells`, from the pack's own directory) now runs it against the pack's
-// own tree — a pack violation reddens the pack's build, not this one.
-// `coreSpells/` stays: it is core's own population, not the pack's.
-const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
+// ## The source scan that used to live here is core's own `check-seams` now
+//
+// `npm run check-seams` (in `verify`) runs `src/seams/dashOnUpdate.ts` — the
+// exported form of this exact rule — over `coreSpells/`, `spellObjects/`,
+// `buffs/` and `attackableUnits/`, wider than the one directory this file
+// walked by hand, and `packs/riot`'s own `check-seams` runs it over the
+// pack's tree. Batch 5 task 6 fix round 1 collapsed ten hand-written
+// duplicates into that CLI; the very next commit gave core its own
+// invocation of it, which re-created the duplication from the other side.
+// Proven before deleting: a planted `dash.onUpdate = () => {};` in `buffs/`
+// produces `dash-onupdate :: dash.onUpdate =` and exit 1.
+//
+// What is left below is what the CLI has no equivalent for: that `Dash`
+// still owns its movement, and that a hooked dash still moves and still
+// fires `onReachedDestination`.
 const BUFFS_DIR = join(__dirname, '../../../src/game/gameObject/buffs');
 
-/** Comments describe the rule; matching them would flag the documentation. */
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-}
-
-function tsFilesIn(dir: string): string[] {
-  return readdirSync(dir).filter(name => name.endsWith('.ts'));
-}
-
-/**
- * Core's own spell files. `index.ts` is a barrel, not a spell, so it is
- * excluded.
- */
-function allSpellFiles(): { dir: string; file: string }[] {
-  return tsFilesIn(CORE_SPELLS_DIR)
-    .filter(file => file !== 'index.ts')
-    .map(file => ({ dir: CORE_SPELLS_DIR, file }));
-}
-
-describe('a spell hooks a dash frame, it does not replace it', () => {
-  it('no spell assigns onUpdate onto a buff instance', () => {
-    const offenders: string[] = [];
-
-    for (const { dir, file } of allSpellFiles()) {
-      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
-      // `<identifier>.onUpdate =` — an assignment onto an existing object, as
-      // opposed to `onUpdate() {}` declared inside a class body.
-      const matches = source.match(/\b\w+\.onUpdate\s*=/g);
-      if (matches) offenders.push(`${file}: ${matches.join(', ')}`);
-    }
-
-    expect(offenders).toEqual([]);
-  });
-
-  it('Dash still owns its movement in onUpdate, so the ban keeps meaning something', () => {
+describe('Dash still owns its movement, so the ban keeps meaning something', () => {
+  it('keeps the frame in onUpdate and offers onDashUpdate as the seam', () => {
     const source = readFileSync(join(BUFFS_DIR, 'Dash.ts'), 'utf8');
     expect(source).toMatch(/onUpdate\(\)\s*:\s*void\s*\{/);
     expect(source).toMatch(/moveVectorToVector/);

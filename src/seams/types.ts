@@ -40,6 +40,26 @@ export interface SeamCheckOptions {
 
 export type SeamCheck = (root: string, options?: SeamCheckOptions) => SeamViolation[];
 
+/**
+ * A seam that reads a *narrower* options type than the shared one — the eight
+ * with a debt field of their own (`grandfathered`, `pinned`, `maxMs`, ...).
+ *
+ * They were all annotated `SeamCheck`, which erased that: `checkCooldowns(dir,
+ * { maxMs: 20_000 })` is the documented way to call one and it does not
+ * compile against the base type. Nothing noticed for a batch, because the
+ * only caller passing those fields is `tests/seams/`, and the whole-branch
+ * review of batch 5 measured that **no tsconfig included that directory** —
+ * 20 real `TS2353`s appeared the moment one did.
+ *
+ * Still assignable to `SeamCheck`, so `seams[]` and `checkSeams` are
+ * unchanged: every extra field is optional, so a caller holding only a
+ * `SeamCheckOptions` can still call it.
+ */
+export type SeamCheckOf<O extends SeamCheckOptions> = (
+  root: string,
+  options?: O
+) => SeamViolation[];
+
 /** One rule, named and described well enough to report on its own. */
 export interface Seam {
   id: string;

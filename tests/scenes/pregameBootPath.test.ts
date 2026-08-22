@@ -114,7 +114,21 @@ const reachesTheMatch = (specifier: string): boolean =>
 describe('the pregame screen boots without the match', () => {
   it('finds the files it claims to check', () => {
     const files = pregameFiles();
-    expect(files.length).toBeGreaterThan(10);
+    // Per-root, not `> 10`. A total floor over a list built from two
+    // directory reads plus one hard-coded entry is satisfiable by either
+    // directory alone, so the failure it exists to catch — one of the two
+    // stopping to resolve — is exactly the one it cannot see. Each source
+    // answers for itself instead, which is the shape this batch settled on
+    // for every population guard (`vocabularyBoundary`, `packAssetKey`).
+    expect(files, 'scenes/SetupScene.ts left the list').toContain('scenes/SetupScene.ts');
+    expect(
+      files.filter(file => file.startsWith('scenes/setup/')).length,
+      'scenes/setup/ contributed 0 files'
+    ).toBeGreaterThan(0);
+    expect(
+      files.filter(file => file.startsWith('game/hud/config/')).length,
+      'game/hud/config/ contributed 0 files'
+    ).toBeGreaterThan(0);
     for (const file of files) {
       expect(() => readFileSync(join(SRC, file), 'utf8'), `${file} is missing`).not.toThrow();
     }

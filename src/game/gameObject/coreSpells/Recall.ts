@@ -35,7 +35,7 @@ interface TeamPlatform {
  * The cast bar, built out here rather than inside the `castSpec` getter.
  *
  * The bar reads the channel clock at *draw* time — the spec only stores the
- * factory — so this is not the frozen-spec bug `castspec-frozen-seam.test.ts`
+ * factory — so this is not the frozen-spec bug the `castspec-frozen` seam
  * exists for. That scan cannot tell the two apart (it matches `this.<field>`
  * anywhere in the getter's body), and its debt list is both full and closed,
  * so the read lives one call away from the getter instead.

@@ -98,7 +98,7 @@
   height: 2em !important;
 }
 
-/* Stack counter for spells that accumulate, e.g. Nasus Q. Sits opposite the
+/* Stack counter for spells that accumulate. Sits opposite the
    hotkey so the two never collide, and shows at 0 so a stacking spell reads as
    one before it has any stacks. */
 .spell .stacks {

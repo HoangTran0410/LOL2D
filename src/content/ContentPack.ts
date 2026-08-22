@@ -27,7 +27,7 @@ export type { MonsterAbility };
  *
  * The same shape also loads at runtime, which is the whole point:
  *
- *     Stage 1  import code from '@lol2d/content-riot'          -> code(api)
+ *     Stage 1  import code from '@moba2d/content-riot'         -> code(api)
  *     Stage 2  const { default: code } = await import(url)     -> code(api)
  *
  * so batch 2 changes `install.ts` and nothing a pack author wrote.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { srcSourceFilePaths } from '../support/srcTree';
 
 const SRC = join(__dirname, '../../src');
 
@@ -50,15 +51,17 @@ describe("core's own generated spell barrel has exactly one legitimate reader", 
   );
 
   it('found sources to scan, or this proves nothing', () => {
-    // Not the current count: this whole programme keeps moving files out of
-    // `src/` (198 after batch 4 task 6, 199 after task 7 deleted
-    // `bundledPack.ts` but added nothing back), and pinning this near
-    // whatever the present size happens to be would make a later batch's
-    // honest shrinkage look like this scan's own failure. 150 is
-    // comfortably below any plausible "core accidentally emptied out"
-    // reading while still refusing to pass against a scan that silently
-    // matched nothing.
-    expect(files.length).toBeGreaterThan(150);
+    // Derived, not `> 150`. The walk below has to have seen every source
+    // file `src/` actually holds, and `srcSourceFilePaths()` answers that
+    // from Vite's own module graph rather than from another copy of this
+    // file's `readdirSync` recursion — see that helper for why a floor over
+    // a directory this programme keeps emptying is a number about last
+    // month's tree.
+    const viaVite = srcSourceFilePaths();
+
+    expect(viaVite.length).toBeGreaterThan(0);
+    expect(sourcesUnder(SRC).length).toBe(viaVite.length);
+    expect(files.length).toBeGreaterThan(0);
   });
 
   it.each(BANNED)('nothing outside install.ts reads %s', pattern => {

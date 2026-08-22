@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
@@ -50,7 +50,7 @@ const RUNTIME_HOOKS = [
 /** `.onSpellCast(` and friends. `super.onSpellCast(` is a legitimate delegation. */
 const CALL_PATTERN = new RegExp(`(?<!super)\\.\\s*(?:${RUNTIME_HOOKS.join('|')})\\s*\\(`, 'g');
 
-export const checkSpellRuntimeDrive: SeamCheck = (root, options?: SpellRuntimeDriveOptions) => {
+export const checkSpellRuntimeDrive: SeamCheckOf<SpellRuntimeDriveOptions> = (root, options) => {
   const grandfatheredTests = options?.grandfatheredTests ?? new Set<string>();
   // Which declared entries actually suppressed a real would-be violation
   // this run — the rest are stale. Fix round 4: this seam's own exemption

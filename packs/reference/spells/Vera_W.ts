@@ -28,7 +28,7 @@ function __buildVeraW(api: ContentApi) {
       shield.amount = VERA_W_SHIELD;
       shield.image = this.image;
       // Without its own id a bare Shield shares one stack pool with every
-      // other bare Shield applied in the match — see Malphite_W's own comment
+      // other bare Shield applied in the match — see the buff catalogue's own comment
       // on the same line.
       shield.stackId = 'reference_vera_w_shield';
       this.owner.addBuff(shield);

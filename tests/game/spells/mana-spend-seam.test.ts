@@ -36,9 +36,6 @@
  * copied" failure spec §8.1 exists to rule out. `coreSpells/`, `spellObjects/`
  * and `buffs/` stay — they are still core's own tree, not a pack's.
  */
-import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
@@ -48,54 +45,23 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Spell from '../../../src/game/gameObject/Spell';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
-const SCANNED_DIRECTORIES = ['coreSpells', 'spellObjects', 'buffs'];
-
-/** Any read or write of a caster's mana pool. */
-const TOUCHES_MANA = /\bstats\.mana\b|\bmana\.(?:baseValue|current)\b/;
-
 /**
- * The one form allowed to name a mana stat outside `Spell` itself: the base
- * class's own writer, handed an amount the caller already put through
- * `effectiveManaCost`. Pantheon Q, Malphite E and Varus Q each refund half
- * their cost on cancel this way. `spendMana()` (which applies the rule for
- * you) is preferred for new code; this form stays legal because it is still
- * reading the rule, just at the call site.
+ * ## The source scan that used to live here is core's own `check-seams` now
+ *
+ * `npm run check-seams` (in `verify`) runs `src/seams/manaSpend.ts` — the
+ * exported form of this exact rule — over `coreSpells/`, `spellObjects/`,
+ * `buffs/` **and** `attackableUnits/`, one tree wider than the three this
+ * file walked by hand. Batch 5 task 6 fix round 1 collapsed ten hand-written
+ * duplicates into that CLI and the very next commit gave core its own
+ * invocation of it, which re-created the duplication from the other side:
+ * two implementations of one rule over one population, which is how they
+ * drift. Proven before deleting, not assumed — a planted
+ * `this.owner.stats.mana.baseValue -= 5` in `buffs/` produces
+ * `mana-spend :: 4: this.owner.stats.mana.baseValue -= 5;` and exit 1.
+ *
+ * What is left below is the half the CLI has no equivalent for: what
+ * `effectiveMana` and `spendMana` actually *do* under each match rule.
  */
-const SANCTIONED = /this\.changeResource\(\s*this\.owner\.stats\.mana\s*,/;
-
-const gameObjectRoot = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
-
-const sourceFiles = (directory: string): string[] => {
-  const absolute = join(gameObjectRoot, directory);
-  return readdirSync(absolute, { recursive: true, encoding: 'utf8' })
-    .filter(entry => entry.endsWith('.ts'))
-    .map(entry => join(directory, entry));
-};
-
-/**
- * The scan reads code, not prose: a comment has to stay free to name the thing
- * it is explaining, the way `Anivia_R`'s upkeep comment now names `stats.mana`
- * to say precisely what it stopped doing.
- */
-const codeOnly = (line: string): string => {
-  const trimmed = line.trim();
-  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return '';
-  return line.split('//')[0];
-};
-
-const offendingLines = (relativePath: string): string[] =>
-  readFileSync(join(gameObjectRoot, relativePath), 'utf8')
-    .split('\n')
-    .map((line, index) => ({ code: codeOnly(line), line, number: index + 1 }))
-    .filter(({ code }) => TOUCHES_MANA.test(code) && !SANCTIONED.test(code))
-    .map(({ line, number }) => `${relativePath}:${number}: ${line.trim()}`);
-
-describe('spells bill mana only through the URF-aware seam on Spell', () => {
-  it.each(SCANNED_DIRECTORIES)('no file under %s/ touches a mana stat directly', directory => {
-    const offenders = sourceFiles(directory).flatMap(offendingLines);
-    expect(offenders).toEqual([]);
-  });
-});
 
 class ProbeSpell extends Spell {
   manaCost = 40;

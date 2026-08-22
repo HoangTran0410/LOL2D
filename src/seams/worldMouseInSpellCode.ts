@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { codeOnly, parsePinnedLine, pinnedLineFor, readSource, walkTsFiles } from './shared';
 
 /**
@@ -57,9 +57,9 @@ export interface WorldMouseInSpellCodeOptions extends SeamCheckOptions {
   pinned?: Set<string>;
 }
 
-export const checkWorldMouseInSpellCode: SeamCheck = (
+export const checkWorldMouseInSpellCode: SeamCheckOf<WorldMouseInSpellCodeOptions> = (
   root,
-  options?: WorldMouseInSpellCodeOptions
+  options
 ) => {
   const pinned = options?.pinned ?? new Set<string>();
   // Which declared `pinned` entries actually named a real `worldMouse`

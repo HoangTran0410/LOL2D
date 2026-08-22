@@ -20,8 +20,9 @@ import {
   checkSpellRuntimeDrive,
   checkWorldMouseInSpellCode,
   checkPackCoreBoundary,
-  checkSpellRuntimeDrive,
+  checkPackAssetKey,
   packCoreBoundarySeam,
+  packAssetKeySeam,
   staleSkipEntries,
 } from '@/seams';
 
@@ -653,5 +654,58 @@ describe('pack-core-boundary: a pack reaches core through its public subpaths an
     });
 
     expect(checkPackCoreBoundary(dir)).toEqual([]);
+  });
+});
+
+describe("pack-asset-key: a pack resolves art through its own manifest, never core's", () => {
+  // Moved here by the whole-branch review of batch 5: it used to be
+  // `tests/content/packAssetKeyBoundary.test.ts`, a scan of all of `packs/`
+  // living in core's own suite, so a violation planted in a pack spell
+  // reddened *core's* build — the inversion `pack-core-boundary` had already
+  // been created to fix a task earlier, and one with the same shelf life
+  // (once the pack is a sibling repository there is no `packs/` here to walk).
+
+  it('is exported as a seam, and deliberately not one of the thirteen', () => {
+    expect(packAssetKeySeam.id).toBe('pack-asset-key');
+    expect(seams.map(seam => seam.id)).not.toContain('pack-asset-key');
+  });
+
+  it("catches a bare key that resolves out of core's manifest", () => {
+    // `spell_basic_attack` is a real key in core's generated manifest —
+    // planting a made-up string proves nothing, which is exactly how the
+    // review's first two attempts at this plant passed.
+    const dir = tempTree({
+      'package.json': `{ "name": "@moba2d/content-example" }\n`,
+      'Bad.ts': `image = api.asset('spell_basic_attack');\n`,
+      'Good.ts': `image = api.asset('example_own_art');\n`,
+    });
+
+    expect(checkPackAssetKey(dir).map(v => v.file)).toEqual(['Bad.ts']);
+  });
+
+  it("leaves buff icons, qualified keys and the pack's own held-in-core art alone", () => {
+    const dir = tempTree({
+      // `@moba2d/content-reference` -> local id `reference`, so a
+      // `reference_*` key in core's manifest is core holding *this pack's*
+      // art — a debt legible in the key itself, not a boundary crossing.
+      'package.json': `{ "name": "@moba2d/content-reference" }\n`,
+      'Buff.ts': `icon = api.asset('buff_slow');\n`,
+      'Qualified.ts': `icon = api.asset('riot:spell_ahri_q');\n`,
+      'Own.ts': `icon = api.asset('reference_vera_q');\n`,
+      'Documented.ts': `// never write api.asset('spell_basic_attack')\nexport const fine = 1;\n`,
+    });
+
+    expect(checkPackAssetKey(dir)).toEqual([]);
+  });
+
+  it('applies the pack-id exemption to that pack only', () => {
+    // The exemption is "core is holding *your* art", not "reference_* is
+    // free for everyone".
+    const dir = tempTree({
+      'package.json': `{ "name": "@moba2d/content-other" }\n`,
+      'Bad.ts': `icon = api.asset('reference_vera_q');\n`,
+    });
+
+    expect(checkPackAssetKey(dir).map(v => v.file)).toEqual(['Bad.ts']);
   });
 });

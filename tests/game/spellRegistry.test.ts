@@ -400,7 +400,11 @@ describe('resolving through the pack registry', () => {
     expect(contentRegistry().hasSpell('riot:Recall')).toBe(true);
     expect(isSpellId('Recall')).toBe(false);
     expect(allSpellIds()).not.toContain('riot:Recall');
-    expect(allSpellIds().length).toBeGreaterThan(200);
+    // Derived, not `> 200`: the pool has to be at least as big as the
+    // bundled pack's own barrel, which is the population this programme
+    // keeps moving. Same oracle the "exposes the ids without loading
+    // anything" case above already uses.
+    expect(allSpellIds().length).toBeGreaterThanOrEqual(barrelKeys.length);
   });
 
   it('still fires onSettled once per id, including for an unknown one', async () => {

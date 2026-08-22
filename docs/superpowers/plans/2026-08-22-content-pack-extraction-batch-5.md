@@ -553,9 +553,12 @@ It answers one question: **what is left to do once the user authorises it?**
 ### Files that move, files that stay
 
 **Moves to the new repository, as a unit:**
-- `packs/riot/` (`@moba2d/content-riot`) — 239 spell `.ts` files, 373 image files, its own
-  `package.json`, `tsconfig.json` and generator scripts. Confirmed by the drill: this is the
-  only directory `scripts/verify-without-packs.mjs` ever relocates (`DEPARTING = ['riot']`).
+- `packs/riot/` (`@moba2d/content-riot`) — 239 spell `.ts` files, **378** image files (373
+  `.png` + 5 `.gif`, `packs/riot/assets/images/spells/thresh_e{,2..5}.gif`; the note used to
+  say 373, contradicting `scripts/verify-without-packs.mjs`'s own header, which says 378 three
+  times), its own `package.json`, `tsconfig.json` and generator scripts. Confirmed by the
+  drill: this is the only directory `scripts/verify-without-packs.mjs` ever relocates
+  (`DEPARTING = ['riot']`).
 - `tests/packs/riot/` — **69 test files today** (not 64; the number moved during this batch).
   They live in CORE's tree, not inside `packs/riot/`, because they're written against core's
   own `vitest.config.ts` / `tests/setup.ts`. Batch 5 deliberately left them here — task 9 is
@@ -566,18 +569,47 @@ It answers one question: **what is left to do once the user authorises it?**
   `packs/riot/`. Easy to miss with a plain `git mv packs/riot`.
 - `assets/source-manifest.json` — 296 provenance rows, every `localPath` pointing at
   `packs/riot/assets/...`. Also at core's root, also entirely about Riot content, also
-  outside `packs/riot/`.
+  outside `packs/riot/`. Since the whole-branch fix pass it is no longer an *asset*: it is
+  in `scripts/generate-assets.mjs`'s `MANIFEST_EXCLUDED_FILES`, so it has no key in
+  `src/generated/assetManifest.ts` and no longer travels in core's published tarball. It is
+  still on disk here, still Riot's, and still has to move.
 - `scripts/wiki/*.mjs` (`import-abilities.mjs`, `check-abilities.mjs`, `sync-spell-names.mjs`,
   `mediawiki.mjs`, `lua-data.mjs`, `normalize.mjs`) — the tooling that produces the two files
   above. Lives at core root; only meaningful with the riot pack present.
+
+**Also Riot's, also at core's root, and missing from the first version of this list:**
+- `docs/spell-names-vi.json` — the Data Dragon `vi_VN` cache `npm run names:sync` writes and
+  `tests/game/spells/vi-spell-names.test.ts` reads offline. 11 KB of Riot spell names.
+- `docs/all-champions.jpg` (149 KB) and `docs/Health_bar_guide.webp` — documentation art.
 
 **Stays in core:**
 - `packs/reference/` (`@moba2d/content-reference`) — never departs, not even in the drill.
   It is core's own content: `src/content/install.ts` imports it unconditionally, and it is
   what makes core "a complete game standing alone" rather than a menu (see the open question
-  below).
+  below). Since the whole-branch fix pass it is also **in `package.json`'s `files`**, so it
+  travels in the published tarball — `install.ts`'s `'../../packs/reference/pack'` was a
+  static import of a path the tarball did not contain. The asymmetry with riot (package name,
+  through the generated barrel) is deliberate and is argued in
+  `tests/content/corePackTarball.test.ts`.
 - Everything else: `src/`, the generated barrels, `scripts/*.mjs` other than `scripts/wiki/`,
   and `tests/` minus `tests/packs/riot/`.
+
+**But a third of the root scripts name the departing pack.** Nine `scripts/*.mjs` hard-code
+`packs/riot` or `@moba2d/content-riot`: `check-chunks.mjs`, `check-seams.mjs`,
+`installed-packs.mjs`, `generate-installed-packs.mjs`, `generate-spell-catalog.mjs`,
+`generate-assets.mjs`, `pack-dependent-tests.mjs`, `new-spell.mjs`, `verify-without-packs.mjs`.
+Most name it only as a *tree name* or in prose, and `installed-packs.mjs` is deliberately the
+one derivation — but `new-spell.mjs` (which writes into `packs/riot/spells` and edits
+`packs/riot/data.ts`) only functions with the pack present, and root `package.json` carries two
+riot-only scripts reachable from neither `verify` nor `verify:all`, `assets:generate:riot`
+(`node packs/riot/scripts/generate-assets.mjs`) and `catalog:generate:riot`, each duplicating
+the pack's own script with a *different* invocation. All four are decisions the split has to
+make.
+
+**`npm run verify` itself loses a step at departure, not just `verify:all`.** `ability:check`
+(`scripts/wiki/check-abilities.mjs`) runs over `docs/abilities/` and is the fourth entry in
+plain `verify`. The note flags the consequence of departure for `verify:all` and was silent
+about this one.
 
 ### `devDependencies`: `"*"` to a git dependency
 
@@ -594,21 +626,33 @@ need this change.
 Today, root `npm install` links both packs via the `packs/*` workspace glob. After the split,
 a bare clone of core has no `packs/` directory beyond `packs/reference/` (which travels with
 core) — `npm install` still succeeds, because core has no hard runtime dependency on the riot
-pack. What changes: `src/generated/installedPacks.ts` regenerates naming only `[reference]`,
-`verify` runs the pack-absent shape by default (161 files / 1632 tests + 9 skipped, this
-session's measurement), and `verify:all` — which reaches into `packs/riot/` explicitly for
+pack. What changes: `src/generated/installedPacks.ts` regenerates with `installedPackNames`
+naming only `[reference]` — and the `installedPacks` **array**, which is what `install.ts`
+reads, empty, since `CORE_OWN` deliberately filters the reference pack out of it;
+`verify` runs the pack-absent shape by default (154 files / 1579 tests + 9 skipped, measured
+at the whole-branch fix pass; it was 161 / 1632 before that pass removed seven test files that
+duplicated `check-seams`), and `verify:all` — which reaches into `packs/riot/` explicitly for
 its pack-specific checks — has nothing to run against and needs its own guard, or removal
 from a core-alone `package.json`.
 
 ### `@types/node`
 
-Only `tsconfig.json` (`npm run typecheck`, i.e. `vue-tsc --noEmit`) has `include: ["src/**/*"]`,
-which reaches `src/seams/` — `shared.ts` and `packCoreBoundary.ts` both import `node:fs` /
-`node:path`. `tsconfig.strict-core.json` (`npm run typecheck:core`) carries its own explicit
-`include` list and never names `src/seams/`. So `@types/node` (in root `devDependencies`
-today) is needed for `npm run typecheck` to succeed, but `typecheck:core` alone would work
-without it. Whether a split-off core repo keeps the broader `vue-tsc` check or narrows to
-`typecheck:core` is a scoping call, not a technical blocker either way.
+`@types/node` (root `devDependencies`) is needed by every program that reaches `src/seams/`,
+whose modules import `node:fs` / `node:path`. `tsconfig.json` (`npm run typecheck`, i.e.
+`vue-tsc --noEmit`) has always reached it through `include: ["src/**/*"]`. **The whole-branch
+fix pass added `src/seams/**/*.ts` and `tests/seams/**/*.ts` to `tsconfig.strict-core.json`
+as well** — the review measured `tsc --listFiles` for all three programs and found zero files
+under `tests/seams/`, i.e. 900 lines of this batch's own seam tests that nothing typechecked,
+with a duplicate import in one clause sitting there to prove it. So `typecheck:core` needs
+`@types/node` too now, and no core repo can drop it. Whether a split-off core keeps the
+broader `vue-tsc` check or narrows to `typecheck:core` is still a scoping call, not a
+technical blocker.
+
+**There is a third tsconfig, and it is `verify:all`-only:**
+`tsconfig.strict-core-boundary.json` (`npm run typecheck:pack-boundary`). Its six include
+roots are core's own test files that import pack spells by relative path, so it structurally
+cannot pass with the pack absent — which is why it is out of plain `verify`. A session reading
+"only `tsconfig.json` … `typecheck:core`" would not know it exists.
 
 ### Moving files does not clean git history
 
@@ -642,12 +686,18 @@ emptiness directly.
 
 This is the one place a human must keep a list in step by hand, and **the split is exactly
 when it stops being maintainable in this form**: once `packs/riot/` is a separate repository,
-the 69 files under `tests/packs/riot/` plus the ~62 files elsewhere (`tests/game/`,
-`tests/scenes/`, `tests/content/`) that reach the pack transitively either move with it
+the 69 files under `tests/packs/riot/` plus the 62 entries elsewhere either move with it
 (rewritten against its own test runner) or stay in core and require the nine-entry list to
 keep growing by hand indefinitely. Deciding which is part of executing the split, not a
 prerequisite to it — but whoever does it should budget time for exactly this decision, because
-it touches ~131 files, not a handful.
+it touches 131 files, not a handful.
+
+Those 62 are **not** all `.test.ts`, and the note used to say they were
+"(`tests/game/`, `tests/scenes/`, `tests/content/`)", which omitted the second-largest bucket.
+Measured: `tests/game` 47, **`tests/e2e` 10**, `tests/content` 2, `tests/scenes` 1,
+`tests/scripts` 1, `tests/wiki` 1. The ten under `tests/e2e/` are Playwright `.mjs` drivers,
+a different disposition problem from a Vitest file — only **118 of the 131** are `.test.ts`
+at all.
 
 ### The open product question spec §8.2 leans on
 
@@ -656,8 +706,10 @@ Core alone ships **no summoner spells** — `D` and `F` fall back to `BasicAttac
 `packs/riot/`). So "a complete game standing alone," the claim spec §8.2 uses to justify
 shipping the reference pack unconditionally, is today: one champion (Vera), four abilities,
 one map (Proving Grounds), zero summoner spells.
-`tests/e2e/verify-core-alone.mjs` proves that much boots and is genuinely playable — 12/12
-checks, confirmed both with riot present and with riot absent this session. Whether that is
+`tests/e2e/verify-core-alone.mjs` proves that much boots and is genuinely playable — **13/13**
+checks (the note said 12; the script has thirteen unconditional `check(` calls and has had one
+commit and none since, so it was never 12), confirmed both with riot present and with riot
+absent. Whether that is
 "complete enough" to ship core as a standalone product, or whether core needs its own
 summoner-spell pair before that claim holds, is a product decision for the user to make. It
 is not a defect this batch found and left unfixed.
@@ -711,4 +763,8 @@ the other. Proven both ways, both shapes:
 | pack-present | `467 of 467 declared entries cached` — PASS | deleted 12 → `455 of 467` — FAIL |
 | pack-free | `57 of 57 declared entries cached` — PASS | deleted 5 → `52 of 57` — FAIL |
 
-`npm run verify` stayed green at 279 files / 3807 tests after the change.
+`npm run verify` stayed green at 279 files / 3807 tests after the change. The whole-branch
+fix pass that followed moved that to **272 files / 3755 tests** (seven test files removed as
+duplicates of `check-seams`, four tests added by the new tarball and sibling-repo properties),
+and the pack-free shape to **154 / 1579 + 9 skipped**. `verify-pwa-offline.mjs`'s exact-match
+check is derived from each build's own manifest, so it needed no edit for that.

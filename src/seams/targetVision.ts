@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
@@ -41,7 +41,7 @@ export interface TargetVisionOptions extends SeamCheckOptions {
   grandfatheredFogReads?: Set<string>;
 }
 
-export const checkTargetVision: SeamCheck = (root, options?: TargetVisionOptions) => {
+export const checkTargetVision: SeamCheckOf<TargetVisionOptions> = (root, options) => {
   const grandfatheredFogReads = options?.grandfatheredFogReads ?? new Set<string>();
   const consumed = new Set<string>();
   const violations: SeamViolation[] = [];

@@ -163,6 +163,7 @@ import { checkSpellObjectDisplayBox } from './spellObjectDisplayBox';
 import { checkSpellRuntimeDrive } from './spellRuntimeDrive';
 import { checkWorldMouseInSpellCode } from './worldMouseInSpellCode';
 import { checkPackCoreBoundary } from './packCoreBoundary';
+import { checkPackAssetKey } from './packAssetKey';
 
 export type { Seam, SeamCheck, SeamCheckOptions, SeamViolation } from './types';
 export { staleSkipEntries } from './shared';
@@ -186,6 +187,7 @@ export {
   type WorldMouseInSpellCodeOptions,
 } from './worldMouseInSpellCode';
 export { checkPackCoreBoundary } from './packCoreBoundary';
+export { checkPackAssetKey } from './packAssetKey';
 export { scanImports, type ImportKind, type ImportReference } from './importScan';
 
 /** Every seam this module exports, named for reporting. */
@@ -271,6 +273,21 @@ export const packCoreBoundarySeam: Seam = {
   id: 'pack-core-boundary',
   summary: 'a pack reaches core through its public content subpaths and nowhere else',
   check: checkPackCoreBoundary,
+};
+
+/**
+ * The fifteenth rule, package-scoped for the same reason as the fourteenth:
+ * `api.asset()` is called from a pack's `pack.ts`, its maps and its monster
+ * factories as readily as from a spell, and none of those sit under the tree
+ * the CLI is pointed at. It used to be `tests/content/packAssetKeyBoundary.
+ * test.ts` — a scan of all of `packs/` living in **core's** suite, so a
+ * violation planted in a pack spell reddened core's build. See
+ * `packAssetKey.ts`'s own header.
+ */
+export const packAssetKeySeam: Seam = {
+  id: 'pack-asset-key',
+  summary: "a pack resolves art through its own manifest, never a bare key from core's",
+  check: checkPackAssetKey,
 };
 
 export interface TaggedSeamViolation extends SeamViolation {

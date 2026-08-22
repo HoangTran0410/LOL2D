@@ -5,7 +5,7 @@ import type { ContentApi } from '@moba2d/core/content/ContentApi';
  *
  * `AoePulse` is purely cosmetic — it carries no `damage` field and deals none
  * itself. The spell queries the ring and bills each enemy directly, then
- * spawns the pulse as the visual, the same split Amumu_R and Garen_R use.
+ * spawns the pulse as the visual, the same split every centred ultimate uses.
  *
  * 45 damage: ultimates are 40-60 against the ~100 health pool the whole game
  * is tuned to (`docs/VFX_STANDARD.md`). Each unit inside the ring is hit
@@ -35,7 +35,7 @@ function __buildVeraR(api: ContentApi) {
 
     onSpellCast(): void {
       // `getVectorWithMaxRange` clamps the landing point to the spell's own
-      // reach, the same idiom Lux_E uses for its POINT-targeted orb.
+      // reach, the same idiom every POINT-targeted orb uses.
       const point = api.utils.VectorUtils.getVectorWithMaxRange(
         this.owner.position,
         this.aimPoint,

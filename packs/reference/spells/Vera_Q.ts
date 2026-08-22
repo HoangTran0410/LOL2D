@@ -40,8 +40,8 @@ function __buildVeraQObject(api: ContentApi) {
     // A single straight bolt: the tooltip promises "the first enemy hit", not
     // a pierce. Without this it inherits MissileSpellObject's default of
     // Infinity and damages every distinct enemy it overlaps along its whole
-    // flight. Ashe_Q_Object.maxHitCount = 1 is the real model for a
-    // single-target missile; a piercing skillshot like Yasuo Q omits it on
+    // flight. `maxHitCount = 1` is the model for a single-target
+    // missile; a piercing skillshot omits it on
     // purpose, which this spell is not.
     maxHitCount = 1;
 
@@ -81,19 +81,20 @@ function __buildVeraQ(api: ContentApi) {
     image = api.asset('reference_vera_q');
     description =
       'Bắn một tia năng lượng thẳng, gây <span class="damage">22 sát thương</span> cho kẻ địch đầu tiên trúng.';
-    // Milliseconds. `Spell.coolDown` is ms throughout — Malphite_Q is 8_000.
+    // Milliseconds. `Spell.coolDown` is ms throughout — a long cooldown
+    // reads as 8_000, not 8.
     coolDown = VERA_Q_COOLDOWN_MS;
     manaCost = VERA_Q_MANA;
     targetingMode = 'DIRECTION' as const;
     // Read by the base class's `previewRadius`/`declaredRange`, so the HUD
-    // range ring has something to draw — the same field name Ashe_Q, Ekko_E
-    // and Malphite_Q all use for exactly this.
+    // range ring has something to draw — the field name every aimed spell
+    // in the bundled pack uses for exactly this.
     range = VERA_Q_RANGE;
 
     onSpellCast(): void {
       const shot = new VeraQObject(this.owner);
       // `aimPoint` + `VectorUtils.getVectorWithRange` is the established
-      // DIRECTION idiom in this codebase (Ashe_Q, Ekko_E): a cursor that
+      // DIRECTION idiom in this codebase: a cursor that
       // lands exactly on the caster degrades to a small random jitter
       // instead of a (0,0) direction, so the shot never destinations onto
       // its own origin. `aimPoint` reads the snapshotted cast context, so

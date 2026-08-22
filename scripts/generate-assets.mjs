@@ -12,6 +12,15 @@ const URL_EXTENSIONS = new Set(['.cur']);
  *  - `assets/sounds/index.js` is a legacy source file that happens to sit
  *    under `assets/`, not an asset — it was never meant to gain a `?url`
  *    import.
+ *  - `assets/source-manifest.json` is build *provenance* — where each
+ *    imported ability image came from on the wiki, and its content hash —
+ *    written and read only by `scripts/wiki/*`. Same class as the line
+ *    above: a file that happens to sit under `assets/`, not an asset. It
+ *    had a `source_manifest` key nothing ever called, and that key is what
+ *    put 113 KB of Riot image provenance into the *engine's* generated
+ *    manifest and therefore into `@moba2d/core`'s published tarball —
+ *    content-pack-extraction batch 5, whole-branch review, Q1.
+ *    `tests/content/corePackTarball.test.ts` is what keeps it out now.
  *
  * `assets/json/summoner_map.json` used to need an entry here for the same
  * reason: it is a real asset, but `summonersRiftGeometry.ts` has always read
@@ -26,6 +35,7 @@ const URL_EXTENSIONS = new Set(['.cur']);
  */
 const MANIFEST_EXCLUDED_FILES = new Set([
   'assets/sounds/index.js',
+  'assets/source-manifest.json',
 ]);
 
 function normalizePart(value) {

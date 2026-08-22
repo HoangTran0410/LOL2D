@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
 
 /**
@@ -7,7 +7,7 @@ import { exemptionFor, readSource, stripComments, walkTsFiles } from './shared';
  * press. A getter that computes any of it from live state therefore describes
  * the spell as it was on the opening press, for the rest of the match.
  *
- * See `tests/game/spells/castspec-frozen-seam.test.ts` for the worked example
+ * See `tests/seams/exported-seams.test.ts` for the worked example
  * (a four-round recast ultimate computing its recast cooldown from `shotsRemaining`).
  */
 export interface CastSpecFrozenOptions extends SeamCheckOptions {
@@ -62,7 +62,7 @@ function liveStateReads(body: string): string[] {
   return [...seen].sort();
 }
 
-export const checkCastSpecFrozen: SeamCheck = (root, options?: CastSpecFrozenOptions) => {
+export const checkCastSpecFrozen: SeamCheckOf<CastSpecFrozenOptions> = (root, options) => {
   const grandfathered = options?.grandfathered ?? new Set<string>();
   // Which declared `grandfathered` entries actually suppressed a real
   // would-be violation this run — the rest are stale (fix round 3).

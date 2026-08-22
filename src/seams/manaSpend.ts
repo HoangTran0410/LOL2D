@@ -1,4 +1,4 @@
-import type { SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+import type { SeamCheckOf, SeamCheckOptions, SeamViolation } from './types';
 import { codeOnly, parsePinnedLine, pinnedLineFor, readSource, walkTsFiles } from './shared';
 
 /**
@@ -50,7 +50,7 @@ export interface ManaSpendOptions extends SeamCheckOptions {
   pinnedManaLines?: Set<string>;
 }
 
-export const checkManaSpend: SeamCheck = (root, options?: ManaSpendOptions) => {
+export const checkManaSpend: SeamCheckOf<ManaSpendOptions> = (root, options) => {
   const pinnedManaLines = options?.pinnedManaLines ?? new Set<string>();
   const consumed = new Set<string>();
   const violations: SeamViolation[] = [];

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { srcSourceFilePaths } from '../support/srcTree';
 
 /**
  * Task 6 of the content-pack extraction: core must contain no Summoner's
@@ -111,7 +112,11 @@ describe("core contains no Summoner's Rift coordinate", () => {
   });
 
   it('finds source files under src/ to scan, or this scan proves nothing', () => {
-    expect(sourceFilesUnder(SRC).length).toBeGreaterThan(20);
+    // Derived, not `> 20` — see `tests/support/srcTree.ts`.
+    const viaVite = srcSourceFilePaths();
+
+    expect(viaVite.length).toBeGreaterThan(0);
+    expect(sourceFilesUnder(SRC).length).toBe(viaVite.length);
   });
 
   it('no file under src/ contains any of Summoner\u2019s Rift\u2019s fountain, lane or jungle coordinates', () => {

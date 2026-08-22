@@ -91,14 +91,14 @@ check the enforced list first, and treat the rest as things to verify by hand.
 | Rule | Enforced by |
 |---|---|
 | A spell test drives `press()`, never a lifecycle hook | `spell-runtime-drive-seam.test.ts` |
-| `castSpec` is built from constants, never live state | `castspec-frozen-seam.test.ts` |
+| `castSpec` is built from constants, never live state | `castspec-frozen` seam (`npm run check-seams`) |
 | A `UNIT` spell declares `targetTeam` + `targetingRequest` + `press()` | `unit-target-team-seam.test.ts` |
 | A spell that picks a unit filters on `visibleTo`, and never reads `visibleToPlayerTeam` | `target-vision-seam.test.ts` |
 | A dash hooks `onDashUpdate`, never `onUpdate` | `dash-onupdate-seam.test.ts` |
-| An effect painting past its centre has `getDisplayBoundingBox` | `aoe-display-bounds.test.ts`, `spell-object-display-box-seam.test.ts` |
+| An effect painting past its centre has `getDisplayBoundingBox` | `aoe-display-bounds.test.ts`, `spell-object-display-box` seam |
 | Ground art sets `zIndex = 2` | `ground-decal-zindex.test.ts` |
 | Mana moves only through `effectiveMana`/`spendMana` | `mana-spend-seam.test.ts` |
-| A legacy spell declares `targetingMode` | `TargetingModeDeclared.test.ts` |
+| A legacy spell declares `targetingMode` | `targeting-mode-declared` seam |
 | The display name is Riot's `vi_VN` string | `vi-spell-names.test.ts` |
 
 **Not enforced, and therefore your job**: that the ability matches the script you
@@ -207,7 +207,7 @@ above.)
 There used to be no such field, and the default was a silent `'DIRECTION'` for
 every legacy spell — the one mode that discards a drag's distance, so on touch
 every one of them flew to its absolute maximum range regardless of where the
-thumb let go. `tests/game/spells/TargetingModeDeclared.test.ts` fails the
+thumb let go. The `targeting-mode-declared` seam fails the
 build for a spell file that sets neither this nor its own `castSpec`.
 
 **Auto-locking spells.** Several legacy spells (Ignite, Nasus Q, Warwick Q,

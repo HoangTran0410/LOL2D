@@ -12,7 +12,7 @@
  * grant happens **once**, and the champion keeps taking damage normally for the
  * rest of the duration.
  *
- * `stat-resource-modifier.test.ts` bans the pattern statically; this checks the
+ * The `stat-resource-modifier` seam bans the pattern statically; this checks the
  * behaviour, because the static ban would still pass if a future edit swapped
  * the modifier for some other per-frame grant.
  */

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { scanImports, stripComments } from '@/seams/importScan';
+import { srcSourceFilePaths } from '../support/srcTree';
 
 /**
  * Core must not *value*-import out of `packs/` — anywhere, no exceptions.
@@ -147,13 +148,14 @@ describe('core does not import packs, outside the named exceptions', () => {
   const files = tsAndVueFilesUnder(SRC);
 
   it('finds core files to scan, or this proves nothing', () => {
-    // A floor, not the current count (203): this whole programme is moving
-    // files out of `src/`, and pinning this near the present size would make
-    // a later batch's honest shrinkage look like this scan's own failure.
-    // 20 is comfortably below any plausible "core accidentally emptied out"
-    // reading while still refusing to pass against a scan that silently
-    // matched nothing.
-    expect(files.length).toBeGreaterThan(20);
+    // Derived, not `> 20` — `srcSourceFilePaths()` is Vite's own walk of the
+    // same directory, so a recursion that stopped descending moves one side
+    // and not the other. See that helper for why a floor over `src/` is a
+    // number about last month's tree.
+    const viaVite = srcSourceFilePaths();
+
+    expect(viaVite.length).toBeGreaterThan(0);
+    expect(files.length).toBe(viaVite.length);
   });
 
   it('no core file reaches packs/ except the documented bridge', () => {
