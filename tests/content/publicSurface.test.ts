@@ -51,12 +51,17 @@ describe('package.json public surface', () => {
     expect(pkg.name).toBe('@moba2d/core');
   });
 
-  it('declares the moba2d-check-seams bin pointing at scripts/check-seams.mjs', () => {
+  it('declares exactly two bins: moba2d-check-seams and moba2d-generate-spell-catalog', () => {
     const pkg = readPackageJson();
     const bin = pkg.bin as Record<string, string> | undefined;
 
     expect(bin).toBeDefined();
-    expect(bin).toEqual({ 'moba2d-check-seams': './scripts/check-seams.mjs' });
-    expect(existsSync(join(repoRoot, bin!['moba2d-check-seams']))).toBe(true);
+    expect(bin).toEqual({
+      'moba2d-check-seams': './scripts/check-seams.mjs',
+      'moba2d-generate-spell-catalog': './scripts/generate-spell-catalog.mjs',
+    });
+    for (const target of Object.values(bin!)) {
+      expect(existsSync(join(repoRoot, target)), `${target} does not exist on disk`).toBe(true);
+    }
   });
 });

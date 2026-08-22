@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "assets:generate": "node scripts/generate-assets.mjs",
+    "assets:check": "node scripts/generate-assets.mjs --check",
+    "catalog:generate": "moba2d-generate-spell-catalog --tree=riot",
+    "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot"
+  },
   "devDependencies": {
     "@moba2d/core": "*"
   }

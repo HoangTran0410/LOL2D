@@ -1,7 +1,33 @@
+#!/usr/bin/env node
 /**
  * Generates `src/generated/spellCatalog.ts` — every spell's *display* data as
  * plain values, so the pregame screen can render the whole roster without
  * importing a single spell class.
+ *
+ * ## Invoked by a pack, not just core
+ *
+ * `package.json`'s `bin` also names this `moba2d-generate-spell-catalog` —
+ * content-pack-extraction batch 5 task 5's answer to "how does a pack ask
+ * core to build its catalogue?" Unlike `scripts/generate-assets.mjs --tree=
+ * riot` (moved into the pack outright, since that walk has zero core
+ * dependency), this generator constructs every spell and reads its fields,
+ * which needs a real `ContentApi` — core's runtime, at build time, even
+ * though a pack needs none of it at play time. So core keeps owning the
+ * mechanism and a pack invokes it by name: `packs/riot/package.json`'s
+ * `catalog:generate` runs `moba2d-generate-spell-catalog --tree=riot`, the
+ * same shape `check-seams.mjs` established for itself in task 3. npm's
+ * workspace bin symlink resolves that name today; a sibling repository with
+ * `@moba2d/core` installed as a devDependency resolves it the same way, from
+ * its own `node_modules/.bin/` — nothing about the specifier changes.
+ *
+ * That symlink is exactly why the self-invoke check below compares
+ * `realpathSync` output rather than the raw argv path: `import.meta.url`
+ * always names this file's real location, but `process.argv[1]` keeps
+ * whatever path was actually invoked — the bin symlink itself when run that
+ * way — and a bare `resolve()` never reconciles the two. Confirmed against
+ * `scripts/check-seams.mjs`, which still uses the raw comparison: invoking
+ * its bin (`node_modules/.bin/moba2d-check-seams ...`) loads the module but
+ * never enters its CLI block, exits 0, and prints nothing.
  *
  * ## Why this exists
  *
@@ -42,6 +68,7 @@
  * check is in `verify`: retuning a spell without regenerating would leave the
  * setup screen quoting numbers the engine no longer uses.
  */
+import { realpathSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -373,7 +400,23 @@ export async function generateSpellCatalog(check = false, tree = CORE_SPELL_TREE
   for (const { path, source } of outputs) await writeFile(path, source);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
+// `realpathSync`, not a bare `resolve()`: this file is also reachable as
+// `node_modules/.bin/moba2d-generate-spell-catalog`, an npm-managed symlink,
+// and Node resolves `import.meta.url` (hence `scriptPath`) to the real file
+// it points at while leaving `process.argv[1]` as the symlink path itself —
+// a plain string comparison never matches, and this block silently never
+// runs. See this file's own header for how that was found.
+function invokedDirectly() {
+  const invoked = process.argv[1];
+  if (!invoked) return false;
+  try {
+    return realpathSync(resolve(invoked)) === scriptPath;
+  } catch {
+    return resolve(invoked) === scriptPath;
+  }
+}
+
+if (invokedDirectly()) {
   const treeArg = process.argv.find(arg => arg.startsWith('--tree='));
   const treeName = treeArg?.slice('--tree='.length);
   const tree = treeName ? PACK_SPELL_TREES[treeName] : CORE_SPELL_TREE;

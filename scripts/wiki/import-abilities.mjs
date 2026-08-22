@@ -2,12 +2,15 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderAssetManifestSource, PACK_ASSET_TREES } from '../generate-assets.mjs';
+import { renderAssetManifestSource } from '../generate-assets.mjs';
+import { renderAssetManifestSource as renderPackAssetManifestSource } from '../../packs/riot/scripts/generate-assets.mjs';
 import { createMediaWikiClient } from './mediawiki.mjs';
 import { assertPcSource, championSkillForms, parseLuaData } from './lua-data.mjs';
 import { normalizeAbilityFields } from './normalize.mjs';
 
 const ALL_SLOTS = ['I', 'Q', 'W', 'E', 'R'];
+/** Every downloaded champion/spell asset lands under this prefix, root-relative. */
+const PACK_PATH_PREFIX = 'packs/riot/';
 
 function sorted(value) {
   if (Array.isArray(value)) return value.map(sorted);
@@ -329,12 +332,24 @@ export async function importAbilities({
   // this second call `packs/riot/generated/assetManifest.ts` would go stale
   // the moment a real import ran, and the next `assets:check:riot` would be
   // the first thing to notice.
+  //
+  // Batch 5 task 5 moved the pack's own tree out of this script (see
+  // `../generate-assets.mjs`'s own header) and into `packs/riot/scripts/
+  // generate-assets.mjs`, which is rooted at the pack's own directory, not
+  // at `root`. So the call below re-roots: `packRoot`, not `root`, and
+  // every `add`/`remove` path stripped of its `packs/riot/` prefix — the
+  // same files, just named the way that generator names them.
+  const packRoot = resolve(root, 'packs/riot');
+  const toPackRelative = path =>
+    path.startsWith(PACK_PATH_PREFIX) ? path.slice(PACK_PATH_PREFIX.length) : null;
   outputs.push([
     'packs/riot/generated/assetManifest.ts',
-    await renderAssetManifestSource(root, {
-      add: outputs.map(([path]) => path),
-      remove: [...removals],
-      tree: PACK_ASSET_TREES.riot,
+    await renderPackAssetManifestSource(packRoot, {
+      add: outputs
+        .map(([path]) => path)
+        .map(toPackRelative)
+        .filter(Boolean),
+      remove: [...removals].map(toPackRelative).filter(Boolean),
     }),
   ]);
   await commitFiles(resolve(root), outputs, [...removals]);

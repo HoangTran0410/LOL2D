@@ -8,7 +8,6 @@ import {
   buildManifestEntries,
   CORE_ASSET_TREE,
   generate,
-  PACK_ASSET_TREES,
   renderAssetManifestSource,
   renderManifest,
 } from '../../scripts/generate-assets.mjs';
@@ -57,12 +56,16 @@ describe('asset manifest generator', () => {
   });
 
   /**
-   * `buildManifestEntries`/`renderManifest` gained a second, tree-shaped
-   * caller (`packs/riot`, for now empty) beside core's. These two check the
-   * plumbing that makes a second tree's keys and imports distinguishable
-   * from core's without touching what core itself renders — the byte-
-   * identical proof for the default argument lives in the tests below,
-   * against the real checked-in files.
+   * `buildManifestEntries`/`renderManifest` still support a second, tree-
+   * shaped caller's key prefix and import depth — `packs/riot/scripts/
+   * generate-assets.mjs` is exactly that caller now, with its own copy of
+   * this same logic (content-pack-extraction batch 5 task 5; the survey
+   * behind it, `docs/superpowers/surveys/2026-08-22-pack-package-
+   * boundary.md` §4, measured this walk as having zero core dependency, so
+   * the pack duplicates it rather than importing it). What used to be
+   * `PACK_ASSET_TREES.riot`'s own byte-identical proof and stale-manifest
+   * test now live beside that copy, in `tests/packs/riot/generate-
+   * assets.test.ts` — these two just check the generic plumbing.
    */
   describe('a second tree', () => {
     it('prefixes generated keys so two trees cannot collide on the same relative path', () => {
@@ -84,26 +87,6 @@ describe('asset manifest generator', () => {
       expect(deeper).toContain("from '../../../assets/images/champions/janna.png?url'");
     });
 
-    /**
-     * `packs/riot/assets/` is real — batch 4 task 4 moved 377 champion
-     * portraits, spell icons and monster art files into it (378 minus
-     * `basic_attack.png`, which stays core's: `coreSpells/BasicAttack.ts`
-     * imports `AssetManager` directly and is typed against core's own
-     * `AssetKey` union, permanently — see `coreSpellsApiSurface.test.ts`).
-     * Generating against this tree now produces the real, populated
-     * manifest — still without ever reading core's own `assets/`.
-     */
-    it('generates the real manifest for packs/riot/assets, never reading core/assets', async () => {
-      const source = await renderAssetManifestSource(root, { tree: PACK_ASSET_TREES.riot });
-
-      expect(source).toContain('export const assetManifest = {');
-      expect(source).toContain('champ_janna');
-      expect(source).toContain('spell_janna_q');
-      // Core-only art (never moved) must not leak into the pack's own tree.
-      expect(source).not.toContain('buff_stun');
-      expect(source).not.toContain('spell_basic_attack');
-    });
-
     it("leaves core's own manifest byte-identical to what is already checked in", async () => {
       const generated = await renderAssetManifestSource(root);
       const committed = await readFile(resolve(root, CORE_ASSET_TREE.outputPath), 'utf8');
@@ -111,20 +94,9 @@ describe('asset manifest generator', () => {
       expect(generated).toBe(committed);
     });
 
-    /**
-     * `--check --tree=riot`'s stale message used to always say "npm run
-     * assets:generate" — the core command, regardless of which tree was
-     * actually stale. Under `--tree=riot` that regenerates the wrong
-     * manifest. Each tree now carries its own `regenerateCommand`.
-     */
-    it('names the tree-specific regenerate command in the stale-manifest message', async () => {
+    it('names the regenerate command in the stale-manifest message', async () => {
       const tmpRoot = await mkdtemp(join(tmpdir(), 'lol2d-assets-stale-'));
       try {
-        await mkdir(join(tmpRoot, 'packs/riot/assets'), { recursive: true });
-        await expect(generate(tmpRoot, true, PACK_ASSET_TREES.riot)).rejects.toThrow(
-          /Run npm run assets:generate:riot\./
-        );
-
         await mkdir(join(tmpRoot, 'assets'), { recursive: true });
         await expect(generate(tmpRoot, true, CORE_ASSET_TREE)).rejects.toThrow(
           /Run npm run assets:generate\./

@@ -13,13 +13,14 @@
     "./seams": "./src/seams/index.ts"
   },
   "bin": {
-    "moba2d-check-seams": "./scripts/check-seams.mjs"
+    "moba2d-check-seams": "./scripts/check-seams.mjs",
+    "moba2d-generate-spell-catalog": "./scripts/generate-spell-catalog.mjs"
   },
   "scripts": {
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
-    "assets:generate:riot": "node scripts/generate-assets.mjs --tree=riot",
-    "assets:check:riot": "node scripts/generate-assets.mjs --check --tree=riot",
+    "assets:generate:riot": "node packs/riot/scripts/generate-assets.mjs",
+    "assets:check:riot": "node packs/riot/scripts/generate-assets.mjs --check",
     "catalog:generate": "node scripts/generate-spell-catalog.mjs",
     "catalog:check": "node scripts/generate-spell-catalog.mjs --check",
     "catalog:generate:riot": "node scripts/generate-spell-catalog.mjs --tree=riot",

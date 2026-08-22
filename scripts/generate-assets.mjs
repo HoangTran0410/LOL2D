@@ -148,35 +148,25 @@ async function walk(directory, root) {
 
 /**
  * The tree this generator has always walked: `assets/` at the repository
- * root, written to `src/generated/assetManifest.ts`. Every existing caller
- * — `renderAssetManifestSource(root, { add, remove })`, `generate(root,
+ * root, written to `src/generated/assetManifest.ts`. Every caller —
+ * `renderAssetManifestSource(root, { add, remove })`, `generate(root,
  * check)`, `npm run assets:generate` — passes no tree at all and gets this
- * one, so generalising to a second tree could not change core's output.
+ * one.
+ *
+ * A second tree, `packs/riot/`'s own, used to live alongside this one as
+ * `PACK_ASSET_TREES.riot`, selected from the CLI with `--tree=riot`.
+ * Content-pack-extraction batch 5 task 5 moved it out: the asset walk has
+ * zero core dependency, so the pack now carries its own full copy —
+ * `packs/riot/scripts/generate-assets.mjs` — rather than reaching back into
+ * this file, which keeps working (and stays extractable on its own) even
+ * with no core checkout beside it. `--tree=` is gone from this CLI along
+ * with it — a flag nothing still passes is a trap for the next reader.
  */
 export const CORE_ASSET_TREE = {
   assetsDir: 'assets',
   outputPath: 'src/generated/assetManifest.ts',
   keyPrefix: '',
-  // No `--tree=` name: this is the default tree `npm run assets:generate`
-  // (no flag) produces. Carried alongside `PACK_ASSET_TREES`' own `name`
-  // so `generate()`'s stale-manifest message can name the right command for
-  // whichever tree actually went stale, instead of always naming this one.
   regenerateCommand: 'npm run assets:generate',
-};
-
-/**
- * Trees a pack can generate for, selected from the CLI with `--tree=<name>`.
- * Only `riot` exists so far, and it is a placeholder: `packs/riot/assets/`
- * is empty until batch 4 task 4 moves the art in, so today this produces an
- * empty manifest — a real, if trivial, answer, not an error.
- */
-export const PACK_ASSET_TREES = {
-  riot: {
-    assetsDir: 'packs/riot/assets',
-    outputPath: 'packs/riot/generated/assetManifest.ts',
-    keyPrefix: '',
-    regenerateCommand: 'npm run assets:generate:riot',
-  },
 };
 
 /**
@@ -227,19 +217,8 @@ export async function generate(root, check = false, tree = CORE_ASSET_TREE) {
 const scriptPath = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   const root = resolve(dirname(scriptPath), '..');
-  const treeArg = process.argv.find(arg => arg.startsWith('--tree='));
-  const treeName = treeArg?.slice('--tree='.length);
-  const tree = treeName ? PACK_ASSET_TREES[treeName] : CORE_ASSET_TREE;
-
-  if (treeName && !tree) {
-    console.error(
-      `Unknown asset tree "${treeName}". Known: ${Object.keys(PACK_ASSET_TREES).join(', ')}`
-    );
+  generate(root, process.argv.includes('--check')).catch(error => {
+    console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
-  } else {
-    generate(root, process.argv.includes('--check'), tree).catch(error => {
-      console.error(error instanceof Error ? error.message : error);
-      process.exitCode = 1;
-    });
-  }
+  });
 }
