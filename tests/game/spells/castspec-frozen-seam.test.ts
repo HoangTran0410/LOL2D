@@ -36,7 +36,12 @@ vi.mock('../../../src/managers/AssetManager', () => ({
  * A source scan, like the other seams here: the mistake is a shape, `tsc` is
  * happy with it, and one millisecond rules it out across every spell at once.
  */
-const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
+// `packs/riot/spells/` left this scan in content-pack-extraction batch 5
+// task 6 fix round 1: `src/seams/castSpecFrozen.ts` is the same rule,
+// exported, and `packs/riot`'s own `check-seams` script now runs it against
+// the pack's own tree (with the pack's own `GRANDFATHERED` set, moved to
+// `packs/riot/seam-debt.mjs`) — a pack violation reddens the pack's build,
+// not this one. `coreSpells/` stays: it is core's own population.
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 
 /**
@@ -57,28 +62,6 @@ const CONSTANT_FIELDS = new Set([
   'healthCost',
   'targetingMode',
   'name',
-]);
-
-/**
- * Spells reading live state in `castSpec` from before the rule existed.
- *
- * Debt, not permission — each one is a spell whose runtime is running a spec
- * from its first cast while its HUD reads a fresher one. Some may turn out to
- * be harmless (a field that is in practice set before the first press and never
- * again); each still has to be *checked* rather than assumed, and the list may
- * only shrink.
- */
-const GRANDFATHERED = new Set([
-  'Janna_Q.ts',
-  'Janna_R.ts',
-  'Lux_R.ts',
-  'Malzahar_R.ts',
-  'MasterYi_W.ts',
-  'Pantheon_Q.ts',
-  'Rammus_Q.ts',
-  'Riven_Q.ts',
-  'Varus_Q.ts',
-  'Vayne_Q.ts',
 ]);
 
 function stripComments(source: string): string {
@@ -111,22 +94,15 @@ function liveStateReads(body: string): string[] {
 }
 
 describe('castSpec is resolved once, so it may not depend on live state', () => {
-  // `coreSpells/` left the population `spells/` scans but did not stop being
-  // spells; `index.ts` there is a barrel, not a spell, so it is excluded.
-  const files = [
-    ...readdirSync(SPELLS_DIR)
-      .filter(name => name.endsWith('.ts'))
-      .map(file => ({ dir: SPELLS_DIR, file })),
-    ...readdirSync(CORE_SPELLS_DIR)
-      .filter(name => name.endsWith('.ts') && name !== 'index.ts')
-      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
-  ];
+  // `index.ts` is a barrel, not a spell, so it is excluded.
+  const files = readdirSync(CORE_SPELLS_DIR)
+    .filter(name => name.endsWith('.ts') && name !== 'index.ts')
+    .map(file => ({ dir: CORE_SPELLS_DIR, file }));
 
-  it('no new spell computes its cast spec from mutable state', () => {
+  it('no core spell computes its cast spec from mutable state', () => {
     const offenders: string[] = [];
 
     for (const { dir, file } of files) {
-      if (GRANDFATHERED.has(file)) continue;
       const body = castSpecBody(stripComments(readFileSync(join(dir, file), 'utf8')));
       if (body === null) continue;
       const reads = liveStateReads(body);
@@ -134,21 +110,6 @@ describe('castSpec is resolved once, so it may not depend on live state', () => 
     }
 
     expect(offenders).toEqual([]);
-  });
-
-  it('the debt list only names spells that still read live state', () => {
-    const stale: string[] = [];
-
-    for (const file of GRANDFATHERED) {
-      const body = castSpecBody(stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8')));
-      if (body === null || liveStateReads(body).length === 0) stale.push(file);
-    }
-
-    expect(stale).toEqual([]);
-  });
-
-  it('the debt only shrinks', () => {
-    expect(GRANDFATHERED.size).toBeLessThanOrEqual(10);
   });
 
   it('the scan can actually see a violation', () => {

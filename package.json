@@ -54,7 +54,7 @@
     "format": "prettier --write \"src/**/*.{ts,vue}\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.{ts,vue}\" \"tests/**/*.ts\"",
     "verify": "npm run assets:check && npm run catalog:check && npm run ability:check && npm run typecheck && npm run typecheck:core && npm run test:all && npm run build && npm run chunks:check",
-    "verify:all": "npm run verify && npm run assets:check --workspace=@moba2d/content-riot && npm run catalog:check --workspace=@moba2d/content-riot && npm run typecheck --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-reference",
+    "verify:all": "npm run verify && npm run assets:check --workspace=@moba2d/content-riot && npm run catalog:check --workspace=@moba2d/content-riot && npm run typecheck --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-riot && npm run check-seams:monsters --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-reference",
     "e2e": "node tests/e2e/drive-game.mjs",
     "e2e:hud": "node tests/e2e/hud-mana.mjs",
     "e2e:attacks": "node tests/e2e/drive-basic-attacks.mjs",

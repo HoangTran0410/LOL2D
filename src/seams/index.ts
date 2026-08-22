@@ -98,7 +98,10 @@ export {
   type SpellObjectDisplayBoxOptions,
 } from './spellObjectDisplayBox';
 export { checkSpellRuntimeDrive, type SpellRuntimeDriveOptions } from './spellRuntimeDrive';
-export { checkWorldMouseInSpellCode } from './worldMouseInSpellCode';
+export {
+  checkWorldMouseInSpellCode,
+  type WorldMouseInSpellCodeOptions,
+} from './worldMouseInSpellCode';
 
 /** Every seam this module exports, named for reporting. */
 export const seams: Seam[] = [

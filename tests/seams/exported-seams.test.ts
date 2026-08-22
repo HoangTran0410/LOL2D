@@ -225,6 +225,29 @@ describe('each exported check catches its violation on an arbitrary tree', () =>
     });
     expect(checkWorldMouseInSpellCode(dir).map(v => v.file)).toEqual(['Bad.ts']);
   });
+
+  it('world-mouse-in-spell-code: a pinned line is exempt, every other line on the same file is not', () => {
+    // Fix round 1, content-pack-extraction batch 5 task 6: before `pinned`
+    // existed, the only lever to exempt Blitzcrank_E.ts's one known
+    // `worldMouse` line was `skip`, which removes the *whole file* from
+    // *every* seam. This proves the finer-grained replacement: the pinned
+    // line is exempt, a second, unrelated `worldMouse` line in the same
+    // file is still caught.
+    const dir = tempTree({
+      'Bad.ts':
+        `const p = this.aimPoint;\n` +
+        `const angle = getAngle(this.owner.position, this.game.worldMouse);\n` +
+        `const other = this.game.worldMouse;\n`,
+    });
+
+    expect(checkWorldMouseInSpellCode(dir).map(v => v.message)).toEqual([
+      '2: const angle = getAngle(this.owner.position, this.game.worldMouse);',
+      '3: const other = this.game.worldMouse;',
+    ]);
+
+    const withPin = checkWorldMouseInSpellCode(dir, { pinned: new Set(['Bad.ts:2']) });
+    expect(withPin.map(v => v.message)).toEqual(['3: const other = this.game.worldMouse;']);
+  });
 });
 
 // A "checkSeams against this repo's own pack, with its known debt declared"

@@ -19,19 +19,15 @@ import { describe, expect, it } from 'vitest';
  * this closes it for the next spell someone writes.
  */
 const spellsRoot = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
-// Batch 4 task 3 moved `spells/` out from under `gameObject/` entirely, into
-// `packs/riot/spells/` — every other directory here stayed put.
-const packsRoot = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
-const rootFor = (directory: string): string => (directory === 'spells' ? packsRoot : spellsRoot);
 
 const sourceFiles = (directory: string): string[] =>
-  readdirSync(join(rootFor(directory), directory), { recursive: true, encoding: 'utf8' })
+  readdirSync(join(spellsRoot, directory), { recursive: true, encoding: 'utf8' })
     .filter(entry => entry.endsWith('.ts'))
     .map(entry => join(directory, entry));
 
 /** Comments describe the rule; only code may break it. */
 const codeOf = (relativePath: string): string =>
-  readFileSync(join(rootFor(relativePath.split('/')[0]), relativePath), 'utf8')
+  readFileSync(join(spellsRoot, relativePath), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '');
 
@@ -50,13 +46,16 @@ const DEACTIVATE_CALL = /([A-Za-z_$][\w$]*)\s*\??\.deactivate\(\)/g;
 const isSpellReceiver = (receiver: string): boolean =>
   receiver === 'super' || /spell/i.test(receiver);
 
+// `spells/` (`packs/riot/spells/`) left this scan in content-pack-extraction
+// batch 5 task 6 fix round 1: `src/seams/buffDeactivate.ts` is the same
+// rule, exported, and `packs/riot`'s own `check-seams` script now runs it
+// against the pack's own tree — a pack violation reddens the pack's build,
+// not this one. The other four directories stay core's own.
 describe('a buff is ended with deactivateBuff(), never deactivate()', () => {
-  const files = ['spells', 'coreSpells', 'spellObjects', 'buffs', 'attackableUnits'].flatMap(
-    sourceFiles
-  );
+  const files = ['coreSpells', 'spellObjects', 'buffs', 'attackableUnits'].flatMap(sourceFiles);
 
   it('scans a real set of files, so passing means something', () => {
-    expect(files.length).toBeGreaterThan(100);
+    expect(files.length).toBeGreaterThan(30);
   });
 
   it.each(files)('%s', file => {

@@ -14,10 +14,11 @@
  * into the pack's own build step.
  *
  * `checkSeams` hands this one object to every seam; a seam that does not
- * read a given field (`grandfathered`, `noPressOverride`) simply ignores
- * it, which is what lets `grandfathered` below carry two seams' worth of
- * names — `castspec-frozen` matches by file basename, `spell-object-
- * display-box` by class name, and neither domain collides with the other.
+ * read a given field (`grandfathered`, `noPressOverride`, `pinned`) simply
+ * ignores it, which is what lets `grandfathered` below carry two seams'
+ * worth of names — `castspec-frozen` matches by file basename,
+ * `spell-object-display-box` by class name, and neither domain collides
+ * with the other.
  */
 
 /** `castspec-frozen`: cast specs that still read live state on every cast
@@ -53,6 +54,20 @@ const GRANDFATHERED = new Set([
 const NO_PRESS_OVERRIDE = new Set(['Annie_Q.ts']);
 
 /**
+ * `world-mouse-in-spell-code`: known offending lines, one per entry
+ * (`"<file>:<1-indexed line number>"`). `Blitzcrank_E.ts:83` is
+ * `tests/game/integration/SpellAimIntegration.test.ts`'s own pinned example
+ * (`const angle = VectorUtils.getAngle(this.owner.position,
+ * this.game.worldMouse);`). Fix round 1 of content-pack-extraction batch 5
+ * task 6: this used to be folded into `skip` below, because the seam had no
+ * line-level exemption field — which exempted the *whole file* from *every*
+ * seam, not just this one line, a real loss of coverage on a file that has
+ * already needed pinning once. `WorldMouseInSpellCodeOptions.pinned` closes
+ * that gap; only this exact line is exempt now, from only this one rule.
+ */
+const PINNED = new Set(['Blitzcrank_E.ts:83']);
+
+/**
  * Basenames left out of the walk entirely, for every seam at once:
  *
  * - `index.ts` — the spell barrel. Not itself a spell.
@@ -62,19 +77,12 @@ const NO_PRESS_OVERRIDE = new Set(['Annie_Q.ts']);
  *   would not need stating — except this template *does* extend `Spell`
  *   without declaring how it aims, on purpose, since it is not meant to be
  *   cast.
- * - `Blitzcrank_E.ts` — `world-mouse-in-spell-code` has no `grandfathered`
- *   field (unlike the seams above), so `skip` is the only lever this rule
- *   honours. `tests/game/integration/SpellAimIntegration.test.ts` still
- *   pins the exact offending line in core's own suite; this is a broader
- *   exemption (the whole file, from every seam) than that one line, which
- *   is a real trade-off of using `skip` here rather than a purpose-built
- *   exemption — accepted because today Blitzcrank_E.ts carries no other
- *   violation.
  */
-const SKIP = new Set(['index.ts', '_EmptyExample.ts', 'Blitzcrank_E.ts']);
+const SKIP = new Set(['index.ts', '_EmptyExample.ts']);
 
 export const seamDebt = {
   skip: SKIP,
   grandfathered: GRANDFATHERED,
   noPressOverride: NO_PRESS_OVERRIDE,
+  pinned: PINNED,
 };

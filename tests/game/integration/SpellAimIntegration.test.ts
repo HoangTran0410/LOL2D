@@ -1,5 +1,3 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
@@ -607,31 +605,15 @@ describe('spell aim integration', () => {
     expect(coincidentReplay.usedContext?.direction).toEqual({ x: 0, y: 0 });
   });
 
-  it('keeps shared worldMouse out of spell activation code', () => {
-    const spellsDir = fileURLToPath(
-      new URL('../../../packs/riot/spells/', import.meta.url)
-    );
-    // Code, not prose — the same `codeOnly` split `mana-spend-seam` uses. A
-    // scan that matches its own documentation punishes the one thing that
-    // makes the rule survive: a comment saying why a file does not do this.
-    const codeOnly = (line: string): string => {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
-        return '';
-      }
-      return line.split('//')[0];
-    };
-    const reads = readdirSync(spellsDir)
-      .filter(file => file.endsWith('.ts'))
-      .flatMap(file =>
-        readFileSync(`${spellsDir}/${file}`, 'utf8')
-          .split('\n')
-          .filter(line => codeOnly(line).includes('this.game.worldMouse'))
-          .map(line => `${file}:${line.trim()}`)
-      );
-
-    expect(reads).toEqual([
-      'Blitzcrank_E.ts:const angle = VectorUtils.getAngle(this.owner.position, this.game.worldMouse);',
-    ]);
-  });
+  // "keeps shared worldMouse out of spell activation code" used to live
+  // here, hand-scanning `packs/riot/spells/` directly for
+  // `this.game.worldMouse`. Content-pack-extraction batch 5 task 6 fix
+  // round 1: that population is 100% pack content (core's own
+  // `coreSpells/`, `spellObjects/` and `buffs/` read `worldMouse` nowhere),
+  // so the check had nothing core-specific left to prove and was a straight
+  // duplicate of `src/seams/worldMouseInSpellCode.ts`, exercised for real by
+  // `packs/riot`'s own `check-seams` script (`packs/riot/seam-debt.mjs`'s
+  // `pinned: Set(['Blitzcrank_E.ts:83'])` is that same known offender,
+  // exempted per-line rather than per-file now). Removed rather than left to
+  // duplicate the pack's own gate.
 });

@@ -9,24 +9,21 @@ import { describe, expect, it } from 'vitest';
 // a spell nobody happened to press before a release. This test catches it at
 // build time instead, for every registered spell file, mirroring
 // `tests/game/buffs/Ground.test.ts`'s guard against `owner.teleportTo`.
+// `packs/riot/spells/` left this scan in content-pack-extraction batch 5
+// task 6 fix round 1: `src/seams/targetingModeDeclared.ts` is the same rule,
+// exported, and `packs/riot`'s own `check-seams` script now runs it against
+// the pack's own tree — a pack violation reddens the pack's build, not this
+// one. `coreSpells/` stays: it is core's own population.
 describe('every spell declares a targeting mode', () => {
-  const spellsDir = join(process.cwd(), 'packs/riot/spells');
-  // `coreSpells/` left `spells/` but did not stop being spells.
   const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
-  // `index.ts` only re-exports; `_EmptyExample.ts` is copy-paste scaffolding
-  // for a new spell, never registered anywhere, and deliberately incomplete.
-  const skip = new Set(['index.ts', '_EmptyExample.ts']);
+  // `index.ts` only re-exports.
+  const skip = new Set(['index.ts']);
   const targetingModePattern = /targeting\s*:\s*'(?:SELF|DIRECTION|POINT|UNIT)'/;
   const targetingModeFieldPattern = /\btargetingMode\s*[:=]/;
 
-  const files = [
-    ...readdirSync(spellsDir)
-      .filter(name => name.endsWith('.ts') && !skip.has(name))
-      .map(name => ({ dir: spellsDir, name })),
-    ...readdirSync(coreSpellsDir)
-      .filter(name => name.endsWith('.ts') && !skip.has(name))
-      .map(name => ({ dir: coreSpellsDir, name })),
-  ];
+  const files = readdirSync(coreSpellsDir)
+    .filter(name => name.endsWith('.ts') && !skip.has(name))
+    .map(name => ({ dir: coreSpellsDir, name }));
 
   it('has spell files to check', () => {
     expect(files.length).toBeGreaterThan(0);

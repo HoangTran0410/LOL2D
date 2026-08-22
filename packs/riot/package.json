@@ -9,7 +9,8 @@
     "catalog:generate": "moba2d-generate-spell-catalog --tree=riot --root=.",
     "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot --root=.",
     "typecheck": "tsc -p ../../tsconfig.pack-riot.json",
-    "check-seams": "moba2d-check-seams ./spells"
+    "check-seams": "moba2d-check-seams ./spells",
+    "check-seams:monsters": "moba2d-check-seams ./monsters"
   },
   "devDependencies": {
     "@moba2d/core": "*"

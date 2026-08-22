@@ -50,13 +50,18 @@ import { describe, expect, it } from 'vitest';
  * still has to override it, but that is a size question, not a missing-seam
  * one, and it belongs to the behavioural test.
  */
-const SPELL_DIRECTORIES = ['spells', 'spellObjects'];
+// `spells/` (`packs/riot/spells/`) left this scan in content-pack-extraction
+// batch 5 task 6 fix round 1: `src/seams/spellObjectDisplayBox.ts` is the
+// same rule, exported, and `packs/riot`'s own `check-seams` script now runs
+// it against the pack's own tree (with the pack's own `GRANDFATHERED` set,
+// moved to `packs/riot/seam-debt.mjs`) — a pack violation reddens the
+// pack's build, not this one.
+const SPELL_DIRECTORIES = ['spellObjects'];
 const GAME_OBJECT_DIR = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
-// `spells/` moved into `packs/riot/spells/` (batch 4 task 3); `spellObjects/`
-// stayed in core (`AreaSpellObject`/`BeamSpellObject`/`HomingMissileSpellObject`/
-// `AoePulse` are engine mechanism, not Riot content — see task-3-report.md).
-const PACKS_DIR = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
-const rootFor = (directory: string): string => (directory === 'spells' ? PACKS_DIR : GAME_OBJECT_DIR);
+// `spellObjects/` stayed in core (`AreaSpellObject`/`BeamSpellObject`/
+// `HomingMissileSpellObject`/`AoePulse` are engine mechanism, not Riot
+// content — see task-3-report.md).
+const rootFor = (_directory: string): string => GAME_OBJECT_DIR;
 
 /**
  * Only classes extending `SpellObject` *directly*. `[^{]*` absorbs an
@@ -69,16 +74,6 @@ const DIRECT_SPELL_OBJECT = /class\s+(\w+)\s+extends\s+SpellObject\b[^{]*\{/g;
 
 /** Either sanctioned way to state an extent. */
 const STATES_ITS_EXTENT = /getDisplayBoundingBox\s*\(|\bvisionRadius\b/;
-
-/**
- * Three effects that predate the rule and are caster-centred enough that the
- * zero-area box never showed: Flash's and Heal's flourishes land on the
- * champion's own body, and Lee Sin R's kick trail was drawn beside its victim.
- * Grandfathered so the scan can be introduced without a drive-by rewrite of
- * three unrelated spells — not an endorsement. Adding a name here is how the
- * rule gets lost, so a new entry needs a reason in this comment.
- */
-const GRANDFATHERED = new Set(['Flash_Object', 'Heal_Object', 'LeeSin_R_Object']);
 
 /** Comments describe the trap; a scan that reads them flags its own docs. */
 const stripComments = (source: string): string =>
@@ -115,7 +110,6 @@ const collectOffenders = (): Offender[] => {
         }
         const body = source.slice(DIRECT_SPELL_OBJECT.lastIndex, end);
         if (STATES_ITS_EXTENT.test(body)) continue;
-        if (GRANDFATHERED.has(className)) continue;
         offenders.push({ file: `${directory}/${file}`, className });
       }
     }
@@ -136,7 +130,7 @@ describe('every SpellObject states the extent it paints', () => {
         while (DIRECT_SPELL_OBJECT.exec(source) !== null) counted += 1;
       }
     }
-    expect(counted).toBeGreaterThan(200);
+    expect(counted).toBeGreaterThan(2);
   });
 
   it('declares getDisplayBoundingBox() or a non-zero visionRadius', () => {
@@ -146,9 +140,5 @@ describe('every SpellObject states the extent it paints', () => {
       'a plain SpellObject inherits a zero-area box, so it is culled the moment ' +
         'its centre leaves the camera while its damage still lands'
     ).toEqual([]);
-  });
-
-  it('keeps the grandfathered list from growing silently', () => {
-    expect([...GRANDFATHERED].sort()).toEqual(['Flash_Object', 'Heal_Object', 'LeeSin_R_Object']);
   });
 });

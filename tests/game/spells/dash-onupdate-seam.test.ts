@@ -31,7 +31,12 @@ import {
  * invisible to `tsc` (assigning a method is perfectly legal), and it costs a
  * millisecond to rule out across every spell at once.
  */
-const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
+// `packs/riot/spells/` left this scan in content-pack-extraction batch 5
+// task 6 fix round 1: `src/seams/dashOnUpdate.ts` is the same rule, exported,
+// and `packs/riot`'s own `check-seams` script (`moba2d-check-seams
+// ./spells`, from the pack's own directory) now runs it against the pack's
+// own tree — a pack violation reddens the pack's build, not this one.
+// `coreSpells/` stays: it is core's own population, not the pack's.
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 const BUFFS_DIR = join(__dirname, '../../../src/game/gameObject/buffs');
 
@@ -45,18 +50,13 @@ function tsFilesIn(dir: string): string[] {
 }
 
 /**
- * Every spell file, content and core alike — `coreSpells/` left the population
- * this scanned but did not stop being spells. `index.ts` is a barrel, not a
- * spell, so it is excluded the same way `tsFilesIn` never had to think about
- * it under `spells/` (that barrel is scanned too, but it never matched).
+ * Core's own spell files. `index.ts` is a barrel, not a spell, so it is
+ * excluded.
  */
 function allSpellFiles(): { dir: string; file: string }[] {
-  return [
-    ...tsFilesIn(SPELLS_DIR).map(file => ({ dir: SPELLS_DIR, file })),
-    ...tsFilesIn(CORE_SPELLS_DIR)
-      .filter(file => file !== 'index.ts')
-      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
-  ];
+  return tsFilesIn(CORE_SPELLS_DIR)
+    .filter(file => file !== 'index.ts')
+    .map(file => ({ dir: CORE_SPELLS_DIR, file }));
 }
 
 describe('a spell hooks a dash frame, it does not replace it', () => {

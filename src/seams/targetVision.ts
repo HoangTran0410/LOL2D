@@ -8,8 +8,14 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * through, and area effects are deliberately out of scope — vision gates
  * target *acquisition*, never damage application.
  *
- * See `tests/game/spells/target-vision-seam.test.ts` for the worked example
- * (a leap ability finding a camp through a wall).
+ * The worked example (a leap ability finding a camp through a wall) used to
+ * live as a hand-written scan of `packs/riot/spells/` in
+ * `tests/game/spells/target-vision-seam.test.ts`; content-pack-extraction
+ * batch 5 task 6 fix round 1 removed that file — its whole population was
+ * pack content (core's own `coreSpells/` neither auto-locks nor reads the
+ * fog flag) — in favour of `packs/riot`'s own `check-seams` script running
+ * this exported function directly. See `tests/seams/exported-seams.test.ts`
+ * for the synthetic proof.
  */
 const PICKS_ONE_UNIT = /nearestDistance|closestDistance|nearestDist\b|minD\b/;
 

@@ -10,8 +10,14 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * `targetingRequest`, and a `press()` override that runs `TargetResolver`
  * when the incoming context carries no target.
  *
- * See `tests/game/spells/unit-target-team-seam.test.ts` for the shipped
- * examples (four unit-targeted spells across four different champions).
+ * The shipped examples (four unit-targeted spells across four different
+ * champions) used to live as a hand-written scan of `packs/riot/spells/` in
+ * `tests/game/spells/unit-target-team-seam.test.ts`; content-pack-extraction
+ * batch 5 task 6 fix round 1 removed that file — its whole population was
+ * pack content (core's own `coreSpells/` has no `UNIT`-targeted spell at
+ * all) — in favour of `packs/riot`'s own `check-seams` script running this
+ * exported function directly. See `tests/seams/exported-seams.test.ts` for
+ * the synthetic proof.
  */
 export interface UnitTargetTeamOptions extends SeamCheckOptions {
   /**

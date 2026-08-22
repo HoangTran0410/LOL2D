@@ -18,8 +18,19 @@
  * The pieces underneath are still exported, because `TerrainField` is built out
  * of them and `Anivia_W`/`JarvanIV_R` implement `DynamicWall` themselves. This
  * scan is what stops the next terrain-reading spell from reaching past the seam
- * to half an answer, the way `mana-spend-seam` and `target-vision-seam` do for
+ * to half an answer, the way `mana-spend-seam` and `target-vision` do for
  * their own.
+ *
+ * `packs/riot/spells/` and `packs/riot/monsters/` left the BAN scan below in
+ * content-pack-extraction batch 5 task 6 fix round 1: `src/seams/
+ * terrainField.ts` is the same rule, exported, and `packs/riot`'s own
+ * `check-seams` script now runs it against both — `./spells` (`check-seams`)
+ * and `./monsters` (`check-seams:monsters`, added this round for exactly
+ * this) — so a pack violation reddens the pack's build, not this one. The
+ * "is reached by every spell that needs terrain" pin below stays: it names
+ * five specific pack spells by path, the same way `cc-buff-icons.test.ts`
+ * pins this pack's own champions — content-specific regression history, not
+ * a population scan a generic exported function could replace.
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -30,28 +41,19 @@ const GAME_OBJECT_ROOT = join(REPO_ROOT, 'src/game/gameObject');
 const SPELL_DIR = join(REPO_ROOT, 'packs/riot/spells');
 
 /**
- * Everywhere an ability's code can live. `spells/` alone is not enough and the
- * neighbouring seam scans know it: a `SpellObject` is where a skillshot's flight
- * actually happens, a `Buff` is where a dash's per-frame movement happens, and
- * `monsters/` drives camps. Each of those is somewhere a terrain question would
- * naturally be asked, and none of them was being read.
- *
- * `packs/riot/monsters` joined this list in Task 2 of the content-pack
- * extraction: Baron's kit moved out of `src/game/gameObject/monsters/` (now
- * empty of `.ts` files — see `sourceFiles`'s own guard for why that must not
- * crash the scan) into the pack, and its abilities are exactly the "monster
- * code [that] drives camps" line above already covers. `packs/riot/spells/`
- * is deliberately not here yet: that move has not happened. Whoever does it
- * should fold that directory in too, or this scan quietly stops covering most
- * of the tree it exists to watch.
+ * Everywhere in *core's own tree* an ability's code can live, for the BAN
+ * scan below. `spellObjects/` is where a skillshot's flight actually
+ * happens, `buffs/` is where a dash's per-frame movement happens, and
+ * `monsters/` drove camps before Baron's kit moved into `packs/riot/
+ * monsters/` (Task 2 of the content-pack extraction) — that directory no
+ * longer holds any `.ts` file (see `sourceFiles`'s own guard for why that
+ * must not crash the scan), kept here so the history stays legible rather
+ * than silently vanishing from this list.
  */
 const SCANNED: { label: string; root: string }[] = [
-  // Folded in, batch 4 task 3: `spells/` moved into `packs/riot/spells/`.
-  { label: 'spells', root: join(REPO_ROOT, 'packs/riot/spells') },
   { label: 'spellObjects', root: join(GAME_OBJECT_ROOT, 'spellObjects') },
   { label: 'buffs', root: join(GAME_OBJECT_ROOT, 'buffs') },
   { label: 'monsters', root: join(GAME_OBJECT_ROOT, 'monsters') },
-  { label: 'packs/riot/monsters', root: join(REPO_ROOT, 'packs/riot/monsters') },
 ];
 
 /**
@@ -112,10 +114,10 @@ describe('the terrain seam', () => {
       }
     }
 
-    // The scan covering nothing would report nothing. `spells/` alone is ~240
-    // files; the guard only has to be far enough under that to catch a directory
-    // list that stopped resolving.
-    expect(scanned).toBeGreaterThan(200);
+    // The scan covering nothing would report nothing. `spellObjects/` (4) +
+    // `buffs/` (24) is ~28 files with headroom; the guard only has to be far
+    // enough under that to catch a directory list that stopped resolving.
+    expect(scanned).toBeGreaterThan(20);
     expect(offenders).toEqual([]);
   });
 
