@@ -46,9 +46,9 @@ const BURST_MS = Number(process.env.LOL2D_BURST_MS ?? 5_000);
 /** Settle window before sampling starts, so the burst's own onset is excluded. */
 const WARMUP_MS = 300;
 
-const { url, page, report, check, finish } = await startHarness();
+const { url, page, report, check, guard } = await startHarness();
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
@@ -281,9 +281,4 @@ try {
     `live mean=${result.combatTextLiveMean}, max=${result.combatTextLiveMax}`
   );
   check('frames were actually rendered', result.fps > 0, `fps=${result.fps}`);
-} catch (error) {
-  console.error('SCRIPT ERROR:', error && error.stack ? error.stack : error);
-  throw error;
-} finally {
-  await finish();
-}
+});
