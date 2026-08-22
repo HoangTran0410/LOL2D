@@ -86,51 +86,85 @@ interface Reference {
 }
 
 /**
- * One whole `import ...;` / `export ... from ...;` statement, bounded by its
- * own terminating `;` — never spanning into the next one.
+ * A static `import ... from '...'` / `export ... from '...'` clause,
+ * wherever one starts — bounded only by the one delimiter JavaScript
+ * actually guarantees: the `import`/`export` keyword itself.
  *
- * The previous version matched `from` with a single, file-wide
- * `[\s\S]*?\bfrom` lazy wildcard, which happily walks straight through a
- * semicolon and a newline into a *different* statement whenever the one it
- * anchored on has no `from` clause of its own before the next real one — a
- * bare `export type { X };` local re-export, or a side-effect `import
- * './x';`. That let a `type` keyword captured off one statement attach to
- * an unrelated later statement's specifier (a genuine *value* import of the
- * one allow-listed pack specifier reads as type-only — a hole in exactly
- * the rule this file enforces) and the reverse (a real `import type` reads
- * as a value import — a false positive). Both reproduced in
- * `references()`'s own self-test below. Scoping every regex to one
- * statement's text at a time closes both: nothing after this statement's
- * `;` is visible to it.
+ * Fix round 1 bounded on the statement's own terminating `;` instead, and
+ * fix round 2 found that boundary was still wrong: JS does not require a
+ * semicolon (ASI), so a `from`-less or type-only statement with none —
+ * `import type { X } from './y'` on its own line, no `;` — let `[^;]*;`
+ * walk straight through the newline and swallow the *next* statement whole,
+ * and two statements sharing one line (`import type { A } from './a';
+ * import { B } from './b';`) meant the second one never started at a line
+ * boundary `^` could see at all. Both silently **dropped** the second
+ * statement's specifier — not misclassified, absent — which is the more
+ * dangerous shape of the same bug round 1 fixed: a hole in exactly the rule
+ * this file enforces, invisible because the scan reported nothing at all.
+ * Both reproduced in `references()`'s own self-test below, alongside round
+ * 1's original two.
+ *
+ * The fix: stop delimiting on `;` or a line start and use `\b(?:import|
+ * export)\b` as the only boundary a match may not cross, between the
+ * keyword and its own `from`. Critically, that restriction covers only the
+ * *clause* — `{ X }`, `type { X }`, `* as X` — and stops the instant `from
+ * '` is found; the specifier itself, captured by the plain `[^'"]+` after
+ * it, sits outside the restricted span on purpose. An earlier version of
+ * this fix restricted matching to whole pre-split "statements" first and
+ * extracted `from` from each one after — which reintroduced the identical
+ * bug one level down: an import whose own specifier happens to contain the
+ * word `import` (hyphen- or dot-bounded, e.g. a hypothetical
+ * `'my-import-lib'`) tripped the *same* keyword lookahead while still
+ * inside that specifier's own text and cut the statement short before its
+ * closing quote, dropping it. Verified this is not reachable in this
+ * repository's current `src/` today (grepped every `from '...'` specifier
+ * for the word `import`/`export`: zero hits) but the combined, single-pass
+ * regex below does not depend on that being true — the specifier is simply
+ * never inside the restricted span at all.
+ *
+ * **Stated limit, not fixed:** a `from '...'`-shaped string literal sitting
+ * between a keyword that does not itself take a `from` clause (`export
+ * default function foo() { ... }`) and the next real `import`/`export`
+ * keyword could produce a false match — the restricted span's job is only
+ * "do not cross a keyword", not "know what is inside a string". This is a
+ * false *positive* (an innocent file wrongly flagged), not the dangerous
+ * direction this scan exists to close — a real `/packs/` reach could never
+ * hide behind it, since the false match would still have to name a
+ * `/packs/`-containing specifier to ever surface as an offender. Checked
+ * for it directly rather than only reasoning about it: grepped `src/` for
+ * any quoted `from '...'`/`from "..."` text outside real import syntax —
+ * the only two hits are English prose inside doc comments ("tell 'it died'
+ * from 'it walked out of my sight'"), which `stripComments()` already
+ * removes before this function ever sees them. Not reachable in real
+ * (non-comment) source in this repository today; contrived only.
  */
-const STATEMENT_PATTERN = /^[ \t]*(?:import|export)\b[^;]*;/gm;
+const STATIC_PATTERN =
+  /\b(?:import|export)\b\s+(type\s+)?(?:(?!\b(?:import|export)\b)[\s\S])*?\bfrom\s+['"]([^'"]+)['"]/g;
+
+/**
+ * A bare side-effect import — `import '../../packs/riot/spells/Yasuo_Q';`
+ * — has no `from` clause and nothing between the keyword and its specifier,
+ * so unlike `STATIC_PATTERN` it needs no keyword-boundary restriction at
+ * all to stay inside one statement: `\s+['"]` immediately after `import`
+ * cannot match a named clause (`{ X }`), `type`, or a dynamic call's `(`,
+ * so it is unambiguous wherever it occurs — no `^`/line-start anchor
+ * needed either, which is what let round 2's "two imports on one line"
+ * case reach a side-effect import too.
+ */
+const SIDE_EFFECT_PATTERN = /\bimport\s+['"]([^'"]+)['"]/g;
 
 /** Every module specifier a file names in a way that resolves at bundle time. */
 function references(source: string): Reference[] {
   const out: Reference[] = [];
 
-  for (const [statement] of source.matchAll(STATEMENT_PATTERN)) {
-    const staticMatch = /^\s*(?:import|export)\s+(type\s+)?[\s\S]*?\bfrom\s+['"]([^'"]+)['"]/.exec(
-      statement
-    );
-    if (staticMatch) {
-      out.push({ specifier: staticMatch[2], typeOnly: Boolean(staticMatch[1]) });
-      continue;
-    }
-    // A side-effect import — `import '../../packs/riot/spells/Yasuo_Q';` — has
-    // no `from` clause, so the pattern above never sees it. It resolves at
-    // bundle time exactly like a named import; only the binding is missing,
-    // and it has no type-only form. (A from-less `export type { X };` also
-    // reaches here and matches neither pattern, which is correct: it names
-    // no module at all.)
-    const sideEffectMatch = /^\s*import\s+['"]([^'"]+)['"]/.exec(statement);
-    if (sideEffectMatch) out.push({ specifier: sideEffectMatch[1], typeOnly: false });
+  for (const match of source.matchAll(STATIC_PATTERN)) {
+    out.push({ specifier: match[2], typeOnly: Boolean(match[1]) });
   }
-
-  let match: RegExpExecArray | null;
+  for (const match of source.matchAll(SIDE_EFFECT_PATTERN)) {
+    out.push({ specifier: match[1], typeOnly: false });
+  }
   // Dynamic `import()` has no type-only form either — it is always a runtime load.
-  const dynamicPattern = /\bimport\(\s*['"]([^'"]+)['"]/g;
-  while ((match = dynamicPattern.exec(source)) !== null) {
+  for (const match of source.matchAll(/\bimport\(\s*['"]([^'"]+)['"]/g)) {
     out.push({ specifier: match[1], typeOnly: false });
   }
   // `import.meta.glob('/packs/...')` is the natural Vite idiom for
@@ -138,8 +172,7 @@ function references(source: string): Reference[] {
   // reach into packs/ as a single import() — a core file discovering it
   // could eagerly glob every spell in a pack was exactly the shape of
   // mistake this scan exists to catch.
-  const globPattern = /\bimport\.meta\.glob\(\s*['"]([^'"]+)['"]/g;
-  while ((match = globPattern.exec(source)) !== null) {
+  for (const match of source.matchAll(/\bimport\.meta\.glob\(\s*['"]([^'"]+)['"]/g)) {
     out.push({ specifier: match[1], typeOnly: false });
   }
   return out;
@@ -211,9 +244,45 @@ describe("references() cannot let one statement borrow another one's from clause
       "import type { SpellCatalogId } from '../../../packs/riot/generated/spellCatalog';",
     ].join('\n');
 
+    // `STATIC_PATTERN` runs its whole pass before `SIDE_EFFECT_PATTERN`
+    // starts its own, so the static (`from`-bearing) match lands first in
+    // the array regardless of which statement appears first in the source
+    // — order here reflects that, not source position.
     expect(references(sample)).toEqual([
-      { specifier: './side-effect', typeOnly: false },
       { specifier: '../../../packs/riot/generated/spellCatalog', typeOnly: true },
+      { specifier: './side-effect', typeOnly: false },
+    ]);
+  });
+
+  // Round 2, reproduction 1: the statement `references()` anchors on has no
+  // `from` of its own and, this time, no trailing `;` either — ASI makes
+  // the semicolon optional, so round 1's `[^;]*;` bound walked straight
+  // through the newline and swallowed the next statement whole, reporting
+  // only the first specifier and dropping the second (the allow-listed
+  // pack one) entirely — not misclassified, absent.
+  it('does not drop a value import that follows a semicolon-less statement', () => {
+    const sample = [
+      "import type { Something } from './types'",
+      "import { spellCatalog } from '../../../packs/riot/generated/spellCatalog';",
+    ].join('\n');
+
+    expect(references(sample)).toEqual([
+      { specifier: './types', typeOnly: true },
+      { specifier: '../../../packs/riot/generated/spellCatalog', typeOnly: false },
+    ]);
+  });
+
+  // Round 2, reproduction 2: two statements sharing one line. Round 1's
+  // `STATEMENT_PATTERN` anchored each statement to `^` (a line start), so
+  // the second import — mid-line, right after the first one's `;` — never
+  // started a match at all and its specifier was dropped outright.
+  it('does not drop the second of two import statements sharing one line', () => {
+    const sample =
+      "import type { A } from './a'; import { spellCatalog } from '../../../packs/riot/generated/spellCatalog';";
+
+    expect(references(sample)).toEqual([
+      { specifier: './a', typeOnly: true },
+      { specifier: '../../../packs/riot/generated/spellCatalog', typeOnly: false },
     ]);
   });
 });
