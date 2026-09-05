@@ -6,9 +6,6 @@
     <title>LOL2D đã chuyển nhà → moba2d</title>
     <meta name="robots" content="noindex" />
     <link rel="canonical" href="https://moba2d.pages.dev/" />
-    <!-- Fallback for no-JS: the script below redirects instantly after it has
-         cleaned up the old PWA's service worker and caches. -->
-    <meta http-equiv="refresh" content="3;url=https://moba2d.pages.dev/" />
     <style>
       body {
         margin: 0;
@@ -19,35 +16,66 @@
         background: #0a1428;
         color: #f0e6d2;
         font-family: system-ui, -apple-system, sans-serif;
-        text-align: center;
       }
-      main { padding: 24px; }
-      h1 { font-size: 1.6rem; margin: 0 0 12px; }
-      p { margin: 6px 0; color: #a09b8c; }
+      main { padding: 24px; max-width: 560px; }
+      h1 { font-size: 1.5rem; margin: 0 0 12px; }
+      p { margin: 8px 0; color: #a09b8c; line-height: 1.5; }
+      ol { margin: 12px 0; padding-left: 22px; color: #a09b8c; line-height: 1.6; }
+      ol strong { color: #f0e6d2; }
       a.go {
         display: inline-block;
-        margin-top: 18px;
-        padding: 10px 22px;
+        margin-top: 16px;
+        padding: 12px 24px;
         background: #c8aa6e;
         color: #0a1428;
         text-decoration: none;
         font-weight: 700;
         border: 1px solid #c8aa6e;
       }
+      [hidden] { display: none !important; }
     </style>
   </head>
   <body>
     <main>
-      <h1>LOL2D đã chuyển nhà 🚚</h1>
-      <p>Game giờ là <strong>moba2d</strong> — đang đưa bạn qua địa chỉ mới…</p>
-      <p>The game moved to <strong>moba2d</strong> — taking you there…</p>
-      <a class="go" href="https://moba2d.pages.dev/">▶ moba2d.pages.dev</a>
+      <!-- Shown in a normal browser tab: the script below redirects right
+           after it has cleaned up the old PWA's service worker and caches. -->
+      <section id="browser-flow">
+        <h1>LOL2D đã chuyển nhà 🚚</h1>
+        <p>Game giờ là <strong>moba2d</strong> — đang đưa bạn qua địa chỉ mới…</p>
+        <p>The game moved to <strong>moba2d</strong> — taking you there…</p>
+      </section>
+
+      <!-- Shown inside the INSTALLED old PWA. An installed app is pinned to
+           its origin: it cannot become the new app, and navigating out of
+           scope opens a browser-chrome view on purpose (anti-phishing). So
+           here we explain and hand over instead of silently bouncing. -->
+      <section id="app-flow" hidden>
+        <h1>App LOL2D này đã ngừng hoạt động 🚚</h1>
+        <p>
+          Game đã chuyển sang <strong>moba2d.pages.dev</strong>. App đã cài thì
+          gắn chặt với địa chỉ cũ nên không thể tự biến thành app mới — bạn cài
+          lại một lần là xong (1 phút):
+        </p>
+        <ol>
+          <li>
+            Bấm nút dưới. Nếu trang mở trong khung có thanh địa chỉ, chọn menu
+            <strong>⋮ → Mở trong Chrome</strong> (hoặc <strong>Mở trong Safari</strong>).
+          </li>
+          <li>
+            Trong trình duyệt, cài app mới:
+            <strong>Chrome: ⋮ → Thêm vào màn hình chính</strong> ·
+            <strong>iPhone: Chia sẻ → Thêm vào MH chính</strong>.
+          </li>
+          <li>Gỡ app LOL2D cũ này đi.</li>
+        </ol>
+      </section>
+
+      <a class="go" href="https://moba2d.pages.dev/">▶ Mở moba2d.pages.dev</a>
     </main>
     <script>
       (async () => {
         // The old site was an offline-first PWA: unhook its service worker and
-        // drop its caches so this browser stops resurrecting the old game,
-        // then hand the visitor to the new home.
+        // drop its caches so this browser stops resurrecting the old game.
         try {
           if ('serviceWorker' in navigator) {
             const regs = await navigator.serviceWorker.getRegistrations();
@@ -58,9 +86,20 @@
             await Promise.all(keys.map((key) => caches.delete(key)));
           }
         } catch (_) {
-          // Cleanup is best-effort; the redirect happens regardless.
+          // Cleanup is best-effort; what follows happens regardless.
         }
-        location.replace('https://moba2d.pages.dev/');
+
+        const standalone =
+          matchMedia('(display-mode: standalone)').matches ||
+          matchMedia('(display-mode: fullscreen)').matches ||
+          navigator.standalone === true;
+        if (standalone) {
+          // Opened from the installed old app: show the hand-over guide.
+          document.getElementById('browser-flow').hidden = true;
+          document.getElementById('app-flow').hidden = false;
+        } else {
+          location.replace('https://moba2d.pages.dev/');
+        }
       })();
     </script>
   </body>
