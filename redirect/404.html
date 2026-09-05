@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LOL2D đã chuyển nhà → moba2d</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://moba2d.pages.dev/" />
+    <!-- Fallback for no-JS: the script below redirects instantly after it has
+         cleaned up the old PWA's service worker and caches. -->
+    <meta http-equiv="refresh" content="3;url=https://moba2d.pages.dev/" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a1428;
+        color: #f0e6d2;
+        font-family: system-ui, -apple-system, sans-serif;
+        text-align: center;
+      }
+      main { padding: 24px; }
+      h1 { font-size: 1.6rem; margin: 0 0 12px; }
+      p { margin: 6px 0; color: #a09b8c; }
+      a.go {
+        display: inline-block;
+        margin-top: 18px;
+        padding: 10px 22px;
+        background: #c8aa6e;
+        color: #0a1428;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1px solid #c8aa6e;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>LOL2D đã chuyển nhà 🚚</h1>
+      <p>Game giờ là <strong>moba2d</strong> — đang đưa bạn qua địa chỉ mới…</p>
+      <p>The game moved to <strong>moba2d</strong> — taking you there…</p>
+      <a class="go" href="https://moba2d.pages.dev/">▶ moba2d.pages.dev</a>
+    </main>
+    <script>
+      (async () => {
+        // The old site was an offline-first PWA: unhook its service worker and
+        // drop its caches so this browser stops resurrecting the old game,
+        // then hand the visitor to the new home.
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((reg) => reg.unregister()));
+          }
+          if (window.caches) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => caches.delete(key)));
+          }
+        } catch (_) {
+          // Cleanup is best-effort; the redirect happens regardless.
+        }
+        location.replace('https://moba2d.pages.dev/');
+      })();
+    </script>
+  </body>
+</html>

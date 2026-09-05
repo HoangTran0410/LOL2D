@@ -2,9 +2,17 @@
 
 [![Build](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml/badge.svg)](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml)
 
+> [!IMPORTANT]
+> **🚚 Dự án đã chuyển nhà — this project has moved.**
+>
+> LOL2D đã tách thành engine **[moba2d](https://github.com/moba2d-game/core)** và content pack **[moba2d-packs/lol](https://github.com/moba2d-packs/lol)** — giờ có thêm cả pack [Dota](https://github.com/moba2d-packs/dota) và [Naruto](https://github.com/moba2d-packs/naruto) đánh chung một sân. Mọi phát triển mới diễn ra ở đó.
+>
+> **👉 Chơi bản mới tại [moba2d.pages.dev](https://moba2d.pages.dev)** — các link cũ của trang này tự chuyển hướng sang đó. Repo này được giữ lại làm lịch sử.
+
+
 Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 58 champions, bot fights, and an installable PWA you can play offline.
 
-**[▶ Play Now](https://hoangtran0410.github.io/LOL2D)**
+**[▶ Play Now](https://moba2d.pages.dev)**
 
 ![Screenshot](/assets/images/screenshots/Screenshot_1.jpg)
 
