@@ -1,6 +1,9 @@
 # League of Legends - 2D (Fan-made)
 
 [![Build](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml/badge.svg)](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml)
+<!-- aio-desktop-badge:start -->
+[![AIO Desktop](https://img.shields.io/badge/Try-AIO_Desktop-7c3aed?style=for-the-badge&logo=googlechrome&logoColor=white)](https://fbaio.org/#/desktop)
+<!-- aio-desktop-badge:end -->
 
 > [!IMPORTANT]
 > **🚚 Dự án đã chuyển nhà — this project has moved.**
@@ -208,3 +211,11 @@ Contributions are welcome. What you need to know:
 This is a non-commercial, fan-made project, **not affiliated with or endorsed by [Riot Games](https://www.riotgames.com/en)**. The game is free and generates no revenue; it exists for entertainment only.
 
 [League of Legends](https://www.leagueoflegends.com/) and all related trademarks, characters, artwork, and other assets are the property of [Riot Games](https://www.riotgames.com/en). This project claims no ownership over that intellectual property.
+
+<!-- aio-desktop:start -->
+### 🖥️ AIO Desktop
+
+**EN:** Find this game and many more free tools & games in **[AIO Desktop](https://fbaio.org/#/desktop)**, a Windows/macOS-style web desktop by Social AIO. [▶ Open AIO Desktop](https://fbaio.org/#/desktop)
+
+**VI:** Xem game này cùng nhiều công cụ, trò chơi miễn phí khác trong **[AIO Desktop](https://fbaio.org/#/desktop)**, màn kiểu Windows/macOS của Social AIO. [▶ Mở AIO Desktop](https://fbaio.org/#/desktop)
+<!-- aio-desktop:end -->
